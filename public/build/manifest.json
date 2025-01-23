@@ -1,0 +1,31 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-DoRLwlK2.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-8ZluCjnR.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/plugins/chartjs.min.js": {
+    "file": "assets/chartjs.min-Kcxfep8C.js",
+    "name": "chartjs.min",
+    "src": "resources/js/plugins/chartjs.min.js",
+    "isEntry": true
+  },
+  "resources/js/plugins/perfect-scrollbar.min.js": {
+    "file": "assets/perfect-scrollbar.min-OuGPMkV6.js",
+    "name": "perfect-scrollbar.min",
+    "src": "resources/js/plugins/perfect-scrollbar.min.js",
+    "isEntry": true
+  },
+  "resources/js/soft-ui-dashboard-tailwind.js": {
+    "file": "assets/soft-ui-dashboard-tailwind-D3acPGgT.js",
+    "name": "soft-ui-dashboard-tailwind",
+    "src": "resources/js/soft-ui-dashboard-tailwind.js",
+    "isEntry": true
+  }
+}
