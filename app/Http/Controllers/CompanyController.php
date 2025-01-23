@@ -1,0 +1,167 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\{Company, Branch, Warehouse};
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+
+class CompanyController extends Controller
+{
+    /**
+     * عرض قائمة الشركات.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        // التأكد من وجود مستخدم مسجل الدخول
+        if (!auth()->check()) {
+            return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
+        }
+    
+        $user = auth()->user();
+    
+        // التحقق إذا كان المستخدم لديه دور admin
+        $isAdmin = $user->roles->contains(function ($role) {
+            return $role->is_admin; // التحقق من إذا كان أي دور هو دور admin
+        });
+    
+        // إذا كان المستخدم admin، عرض جميع الشركات والمستودعات
+        if ($isAdmin) {
+            // استرجاع كل الشركات والمستودعات
+            $companies = Company::all();
+            $warehouses = Warehouse::all();
+            $branches = Branch::all();
+        } else {
+            // استرجاع الأدوار المرتبطة بالمستخدم مع الفروع والمستودعات
+            $roles = $user->roles()->with('branches.warehouses')->get();
+    
+            // جمع جميع الفروع المرتبطة بالأدوار
+            $branches = $roles->flatMap(function ($role) {
+                return $role->branches;
+            });
+    
+            // جمع جميع الشركات المرتبطة بالفروع باستخدام المعرفات (company_id)
+            $companyIds = $branches->pluck('company_id')->unique();
+    
+            // استرجاع الشركات المرتبطة بالفروع فقط
+            $companies = Company::whereIn('id', $companyIds)->get();
+    
+            // جمع جميع المستودعات المرتبطة بالفروع
+            $warehouses = $branches->flatMap(function ($branch) {
+                return $branch->warehouses;
+            });
+        }
+    
+        // إرجاع البيانات إلى الـ view
+        return view('companies.index', compact('companies', 'branches', 'warehouses'));
+    }
+    
+
+    /**
+     * عرض نموذج إضافة شركة جديدة.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        return view('companies.create');
+    }
+
+    /**
+     * تخزين شركة جديدة.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'logo' => 'nullable|image',
+            'contact_info' => 'nullable|string',
+            'settings' => 'nullable|json',
+        ]);
+
+        // Handle file upload if logo exists
+        if ($request->hasFile('logo')) {
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        Company::create($validated);
+        return redirect()->route('companies.index');
+    }
+
+    /**
+     * عرض تفاصيل الشركة.
+     *
+     * @param  \App\Models\Company  $company
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Company $company)
+    {
+        return view('companies.show', compact('company'));
+    }
+
+    /**
+     * عرض نموذج تعديل الشركة.
+     *
+     * @param  \App\Models\Company  $company
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Company $company)
+    {
+        return view('companies.edit', compact('company'));
+    }
+
+    /**
+     * تحديث بيانات الشركة.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Company  $company
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Company $company)
+{
+    try {
+        // Validation for the update
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'logo' => 'nullable|image',
+            'phone_number' => 'nullable|string',
+            'email' => 'sometimes|email',
+            'settings' => 'nullable|json',
+        ]);
+
+        // Handle logo upload and delete the old one
+        if ($request->hasFile('logo')) {
+            if ($company->logo) {
+                Storage::disk('public')->delete($company->logo);
+            }
+            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        }
+
+        // Update company data
+         $company->update($validated);
+        // $company->update($request->all());
+        // Redirect back with success message
+        return redirect()->route('companies.edit', $company->id)->with('success', 'تم تحديث بيانات الشركة بنجاح');
+    } catch (\Exception $e) {
+        // Handle exceptions
+        return redirect()->route('companies.edit', $company->id)->with('error', 'حدث خطأ أثناء تحديث بيانات الشركة');
+    }
+}
+
+    /**
+     * حذف الشركة.
+     *
+     * @param  \App\Models\Company  $company
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Company $company)
+    {
+        $company->delete();
+        return redirect()->route('companies.index');
+    }
+}
