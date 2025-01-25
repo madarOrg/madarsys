@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\
 {Warehouse,
+    Company,
     User
  } ; // تأكد من إضافة النموذج المناسب
 use Illuminate\Http\Request;
@@ -13,12 +14,26 @@ class WarehousesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        // استرجاع جميع المستودعات من قاعدة البيانات
-        $warehouses = Warehouse::all();
-        return view('warehouses.index', compact('warehouses')); // يمكن تعديل العرض بما يتناسب معك
+    public function index(Request $request)
+{
+    $query = Warehouse::query();
+
+    // تطبيق البحث
+    if ($request->filled('search')) {
+        $query->where('name', 'like', '%' . $request->search . '%')
+              ->orWhere('address', 'like', '%' . $request->search . '%')
+              ->orWhere('code', 'like', '%' . $request->search . '%')
+              ->orWhereHas('branch', function ($q) use ($request) {
+                  $q->where('name', 'like', '%' . $request->search . '%');
+              });
     }
+
+    // جلب المستودعات
+    $warehouses = $query->paginate(10);
+
+    return view('warehouses.index', compact('warehouses'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -93,8 +108,9 @@ class WarehousesController extends Controller
     {
         // استرجاع المستودع وتوجيهه إلى نموذج التعديل
         $warehouse = Warehouse::findOrFail($id);
+        $companies = Company::with('branches')->get(); // Assuming your Company model has a relation called 'branches'
 
-        return view('warehouses.edit', compact('warehouse')); // عرض نموذج التعديل
+        return view('warehouses.edit', compact('warehouse', 'companies'));
     }
 
     /**

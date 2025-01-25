@@ -1,10 +1,12 @@
 import './bootstrap';
-// dark mode
+
+
 const themeToggle = document.getElementById('theme-toggle');
 const icon = themeToggle.querySelector('i');
 
 function applyTheme(theme) {
     if (theme === 'dark') {
+      
         document.documentElement.classList.add('dark');
         localStorage.setItem('theme', 'dark');
         icon.classList.remove('fa-moon');

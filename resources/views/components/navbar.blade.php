@@ -5,6 +5,19 @@ $user = Auth::user();
 $role = $user ? $user->roles()->first() : null;
  
 $NavbarLinks = [
+  [
+    'text' => 'إدارة المستودعات',
+    'children' => [
+        ['href' => '/warehouses/create', 'icon' => 'plus', 'text' => 'إضافة مستودع جديد'],
+        ['href' => '/warehouses', 'icon' => 'list', 'text' => 'قائمة المستودعات'],
+        ['href' => '/warehouses/locations', 'icon' => 'map-marker', 'text' => 'إدارة مواقع المستودع'],
+        ['href' => '/warehouses/zone-management', 'icon' => 'square', 'text' => 'إدارة المناطق التخزينية'],
+        ['href' => '/warehouses/security', 'icon' => 'shield-alt', 'text' => 'إدارة الأمان والتصاريح'],
+        ['href' => '/warehouses/audit', 'icon' => 'check-circle', 'text' => 'التدقيق والمراجعة'],
+        ['href' => '/warehouses/reports', 'icon' => 'file-alt', 'text' => 'تقارير المستودع'],
+        ['href' => '/warehouses/settings', 'icon' => 'cogs', 'text' => 'إعدادات النظام'],
+    ],
+],
     [
         'text' => 'إدارة المخزون',
         'children' => [

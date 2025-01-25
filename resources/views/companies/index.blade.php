@@ -1,21 +1,18 @@
-<x-layout dir="rtl">
-    <x-title :title="'إدارة الشركات'"></x-title>
+<x-layout>
 
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <!-- حقل البحث وزر الإضافة -->
-        <div class="pb-4 bg-gray-50 dark:bg-gray-900">
-            <label for="table-search" class="sr-only">بحث</label>
-            <div class="relative mt-1 flex justify-start mb-4">
-                <!-- أيقونة البحث -->
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-auto">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                    </svg>
-                </div>
-                <!-- إدخال البحث -->
-                <input type="text" id="table-search" class="block pr-10 text-sm text-gray-900  dark:text-gray-400 border rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ابحث عن الشركات">
-                <!-- زر إضافة شركة جديدة -->
-                <div>
+    <div class="relative mt-1 flex items-center">
+
+        <x-title :title="'إدارة الشركات'"></x-title>
+    
+        <form method="GET" action="{{ route('companies.index') }}">
+        <x-search-input 
+        id="custom-id"
+        name="search"
+        placeholder="ابحث عن الشركات"
+        :value="request()->input('search')"
+    />
+    </form>
+    </div>
                     <x-button :href="route('companies.create')" type="button">
                         <i class="fas fa-plus mr-2"></i> إضافة شركة جديدة
                     </x-button>
@@ -27,9 +24,8 @@
                     <x-button :href="route('warehouses.create')" type="button">
                         <i class="fas fa-plus mr-2"></i> إضافة مستودع جديد
                     </x-button>
-                </div>
-            </div>
-        </div>
+                
+       
     
         <!-- جدول الشركات -->
         <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">

@@ -2,7 +2,8 @@
     <section class="bg-gray-50 dark:bg-gray-900">
     <form action="{{ route('warehouses.store') }}" method="POST">
         @csrf
-        @if ($errors->any())
+        {{-- error messages --}}
+        {{-- @if ($errors->any())
         <div style="color: red;">
             <ul>
                 @foreach ($errors->all() as $error)
@@ -10,14 +11,14 @@
                 @endforeach
             </ul>
         </div>
-    @endif
+    @endif --}}
     
         <div class="space-y-12  dark:bg-gray-900 mb-24">
             <d class="border-b border-gray-900/10 pb-12">
                 <x-title :title="' بيانات المستودع'"></x-title>
                 <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">يرجى إدخال تفاصيل المستودع بدقة لضمان تنظيم البيانات.</p>
-                <div class="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
-                    <div class="sm:col-span-4">
+                <div class="mt-0 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+                    <div class="sm:col-span-2">
                         <x-file-input
                             id="warehouse-name"
                             name="name"
@@ -31,7 +32,7 @@
                         @enderror
                     </div>
                 
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-2">
                         <x-file-input
                             id="warehouse-code"
                             name="code"
@@ -45,7 +46,7 @@
                         @enderror
                     </div>
                 
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-2">
                         <x-file-input
                             id="address"
                             name="address"
@@ -59,7 +60,7 @@
                         @enderror
                     </div>
                 
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-2">
                         <x-file-input
                             id="contact-info"
                             name="contact_info"
@@ -73,7 +74,7 @@
                         @enderror
                     </div>
                 
-                    <div class="sm:col-span-4">
+                    {{-- <div class="sm:col-span-2">
                         <x-select-dropdown
                             id="supervisor"
                             name="supervisor_id"
@@ -85,9 +86,9 @@
                         @error('supervisor_id')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
-                    </div>
-                    
-                    {{-- <div class="sm:col-span-4">
+                    </div> --}}
+{{--                     
+                    <div class="sm:col-span-4">
                         <x-select-dropdown
                             id="company"
                             name="company_id"
@@ -101,7 +102,7 @@
                         @enderror
                     </div>
                      --}}
-                    <div class="sm:col-span-4">
+                    <div class="sm:col-span-2">
                         <x-select-dropdown
                             id="branch"
                             name="branch_id"
@@ -224,36 +225,30 @@
                         />
                     </div>
 
-                    
-                </div>
-                <div class="sm:col-span-2 flex items-center space-x-2">  
+                    <div class="sm:col-span-4 flex items-center space-x-8">  
                  
-                    <input type="checkbox" id="is_smart" name="is_smart" value="1" {{ old('is_smart') ? 'checked' : '' }}>
-                    <label for="is-smart" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل هو مستودع ذكي؟</label>
+                        <input type="checkbox" id="is_smart" name="is_smart" value="1" {{ old('is_smart') ? 'checked' : '' }}>
+                        <label for="is-smart" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل هو مستودع ذكي؟</label>
+                
+                        <input type="checkbox" name="has_security_system" id="has-security-system" class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
+                        <label for="has-security-system" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد نظام أمني؟</label>
+                
+                        <input type="checkbox" id="has_cctv" name="has_cctv" value="1" {{ old('has_cctv') ? 'checked' : '' }}>
+                        <label for="has-cctv" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد CCTV؟</label>
+                
+                        <input type="checkbox" name="is_integrated_with_wms" id="is-integrated-with-wms" class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
+                        <label for="is-integrated-with-wms" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل هو مدمج مع نظام إدارة المستودعات؟</label>
+                
+                        <input type="checkbox" name="has_automated_systems" id="has-automated-systems" class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
+                        <label for="has-automated-systems" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد أنظمة آلية؟</label>
+                    </div>
+              
+                    <div class="sm:col-span-6 flex justify-end">
+                        <x-button type="submit" >حفظ </x-button>
+                    </div>
                 </div>
-            
-                <div class="sm:col-span-2 flex items-center space-x-2">
-                    <input type="checkbox" name="has_security_system" id="has-security-system" class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
-                    <label for="has-security-system" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد نظام أمني؟</label>
-                </div>
-            
-                <div class="sm:col-span-2 flex items-center space-x-2">
-<input type="checkbox" id="has_cctv" name="has_cctv" value="1" {{ old('has_cctv') ? 'checked' : '' }}>
-                    <label for="has-cctv" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد CCTV؟</label>
-                </div>
-            
-                <div class="sm:col-span-2 flex items-center space-x-2">
-                    <input type="checkbox" name="is_integrated_with_wms" id="is-integrated-with-wms" class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
-                    <label for="is-integrated-with-wms" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل هو مدمج مع نظام إدارة المستودعات؟</label>
-                </div>
-            
-                <div class="sm:col-span-2 flex items-center space-x-2">
-                    <input type="checkbox" name="has_automated_systems" id="has-automated-systems" class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
-                    <label for="has-automated-systems" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد أنظمة آلية؟</label>
-                </div>
-                <div class="flex justify-end px-6 ">
-                    <x-button type="submit" >حفظ </x-button>
-                </div>
+                
+              
     
         </div>
        
