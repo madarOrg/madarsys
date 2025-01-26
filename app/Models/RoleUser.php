@@ -28,4 +28,5 @@ class RoleUser extends Pivot
     {
         return $this->belongsTo(Role::class, 'role_id');
     }
+     
 }

@@ -11,12 +11,28 @@ class BranchesController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $branches = Branch::with('company')->get(); // جلب الفروع مع بيانات الشركات
-        return view('branches.index', compact('branches'));
+        // الحصول على كلمة البحث من الطلب
+        $search = $request->input('search');
+    
+        // جلب الفروع مع الشركات مع إمكانية البحث في جميع الحقول
+        $branches = Branch::with('company')
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'LIKE', "%{$search}%") // البحث في اسم الفرع
+                      ->orWhere('address', 'LIKE', "%{$search}%") // البحث في عنوان الفرع
+                      ->orWhere('contact_info', 'LIKE', "%{$search}%") // البحث في معلومات الاتصال
+                      ->orWhereHas('company', function ($q) use ($search) {
+                          $q->where('name', 'LIKE', "%{$search}%"); // البحث في اسم الشركة
+                      });
+            })
+            ->get();
+    
+        // إرجاع النتائج إلى الـ view
+        return view('branches.index', compact('branches', 'search'));
     }
     
+
 
     /**
      * Show the form for creating a new resource.

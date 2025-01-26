@@ -1,5 +1,5 @@
 
-<div class="mb-4">
+<div class="mb-2">
     <!-- التسمية -->
     <label for="{{ $id }}" class="block text-sm font-medium text-gray-600 dark:text-gray-400">{{ $label }}</label>
 

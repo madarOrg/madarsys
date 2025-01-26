@@ -13,51 +13,119 @@ class CompanyController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        // التأكد من وجود مستخدم مسجل الدخول
-        if (!auth()->check()) {
-            return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
-        }
+    // public function index()
+    // {
+    //     // التأكد من وجود مستخدم مسجل الدخول
+    //     if (!auth()->check()) {
+    //         return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
+    //     }
     
-        $user = auth()->user();
+    //     $user = auth()->user();
     
-        // التحقق إذا كان المستخدم لديه دور admin
-        $isAdmin = $user->roles->contains(function ($role) {
-            return $role->is_admin; // التحقق من إذا كان أي دور هو دور admin
-        });
+    //     // التحقق إذا كان المستخدم لديه دور admin
+    //     $isAdmin = $user->roles->contains(function ($role) {
+    //         return $role->is_admin; // التحقق من إذا كان أي دور هو دور admin
+    //     });
     
-        // إذا كان المستخدم admin، عرض جميع الشركات والمستودعات
-        if ($isAdmin) {
-            // استرجاع كل الشركات والمستودعات
-            $companies = Company::all();
-            $warehouses = Warehouse::all();
-            $branches = Branch::all();
-        } else {
-            // استرجاع الأدوار المرتبطة بالمستخدم مع الفروع والمستودعات
-            $roles = $user->roles()->with('branches.warehouses')->get();
+    //     // إذا كان المستخدم admin، عرض جميع الشركات والمستودعات
+    //     if ($isAdmin) {
+    //         // استرجاع كل الشركات والمستودعات
+    //         $companies = Company::all();
+    //         $warehouses = Warehouse::all();
+    //         $branches = Branch::all();
+    //     } else {
+    //         // استرجاع الأدوار المرتبطة بالمستخدم مع الفروع والمستودعات
+    //         $roles = $user->roles()->with('branches.warehouses')->get();
     
-            // جمع جميع الفروع المرتبطة بالأدوار
-            $branches = $roles->flatMap(function ($role) {
-                return $role->branches;
-            });
+    //         // جمع جميع الفروع المرتبطة بالأدوار
+    //         $branches = $roles->flatMap(function ($role) {
+    //             return $role->branches;
+    //         });
     
-            // جمع جميع الشركات المرتبطة بالفروع باستخدام المعرفات (company_id)
-            $companyIds = $branches->pluck('company_id')->unique();
+    //         // جمع جميع الشركات المرتبطة بالفروع باستخدام المعرفات (company_id)
+    //         $companyIds = $branches->pluck('company_id')->unique();
     
-            // استرجاع الشركات المرتبطة بالفروع فقط
-            $companies = Company::whereIn('id', $companyIds)->get();
+    //         // استرجاع الشركات المرتبطة بالفروع فقط
+    //         $companies = Company::whereIn('id', $companyIds)->get();
     
-            // جمع جميع المستودعات المرتبطة بالفروع
-            $warehouses = $branches->flatMap(function ($branch) {
-                return $branch->warehouses;
-            });
-        }
+    //         // جمع جميع المستودعات المرتبطة بالفروع
+    //         $warehouses = $branches->flatMap(function ($branch) {
+    //             return $branch->warehouses;
+    //         });
+    //     }
     
-        // إرجاع البيانات إلى الـ view
-        return view('companies.index', compact('companies', 'branches', 'warehouses'));
+    //     // إرجاع البيانات إلى الـ view
+    //     return view('companies.index', compact('companies', 'branches', 'warehouses'));
+    // }
+    public function index(Request $request)
+{
+    // التأكد من وجود مستخدم مسجل الدخول
+    if (!auth()->check()) {
+        return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
     }
-    
+
+    $user = auth()->user();
+
+    // التحقق إذا كان المستخدم لديه دور admin
+    $isAdmin = $user->roles->contains(function ($role) {
+        return $role->is_admin; // التحقق من إذا كان أي دور هو دور admin
+    });
+
+    // الحصول على كلمة البحث من الطلب
+    $search = $request->input('search'); // تأكد أن $request يتم تمريره للطريقة
+
+    if ($isAdmin) {
+        $companies = Company::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            })
+            ->get();
+
+        $branches = Branch::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('address', 'LIKE', "%{$search}%");
+            })
+            ->get();
+
+        $warehouses = Warehouse::query()
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('address', 'LIKE', "%{$search}%")
+                      ->orWhereHas('branch', function ($q) use ($search) {
+                          $q->where('name', 'like', "%{$search}%");
+                      });
+            })
+            ->get();
+    } else {
+        $roles = $user->roles()->with('branches.warehouses')->get();
+
+        $branches = $roles->flatMap(function ($role) {
+            return $role->branches;
+        });
+
+        $companyIds = $branches->pluck('company_id')->unique();
+
+        $companies = Company::whereIn('id', $companyIds)
+            ->when($search, function ($query, $search) {
+                $query->where('name', 'LIKE', "%{$search}%");
+            })
+            ->get();
+
+        $warehouses = $branches->flatMap(function ($branch) use ($search) {
+            return $branch->warehouses()->where(function ($query) use ($search) {
+                $query->where('name', 'LIKE', "%{$search}%")
+                      ->orWhere('address', 'LIKE', "%{$search}%")
+                      ->orWhere('supervisor_name', 'LIKE', "%{$search}%");
+            })->get();
+        });
+    }
+
+    // إرجاع البيانات إلى الـ view
+    return view('companies.index', compact('companies', 'branches', 'warehouses'));
+}
+
+
 
     /**
      * عرض نموذج إضافة شركة جديدة.
@@ -78,9 +146,10 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => 'sometimes|string|max:255',
             'logo' => 'nullable|image',
-            'contact_info' => 'nullable|string',
+            'phone_number' => 'nullable|string',
+            'email' => 'sometimes|email',
             'settings' => 'nullable|json',
         ]);
 

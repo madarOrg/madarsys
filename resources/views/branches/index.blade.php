@@ -1,6 +1,22 @@
-<x-layout dir="rtl">
-    <x-title :title="'إدارة جميع الفروع'" />
+<x-layout>
 
+    <div class="relative mt-1 flex items-center">
+
+        <x-title :title="'إدارة جميع الفروع'" />
+    
+        <form method="GET" action="{{ route('branches.index') }}">
+        <x-search-input 
+        id="custom-id"
+        name="search"
+        placeholder="ابحث عن الفروع"
+        :value="request()->input('search')"
+    />
+    </form>
+</div>
+ <!-- زر إضافة فرع جديد -->
+ <x-button :href="route('branches.create')" type="button">
+    <i class="fas fa-plus mr-2"></i> إضافة فرع جديد
+</x-button>
     <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
         <table class="w-full text-sm text-gray-500 dark:text-gray-400 mb-4">
             <thead class="text-xs text-gray-700 uppercase bg-gray-300 dark:bg-gray-600 dark:text-gray-400">

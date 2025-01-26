@@ -39,8 +39,10 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('users', UserController::class);
 
-Route::resource('users-roles', RoleUserController::class);
-
+    // تعريف المسارات اليدوية
+Route::get('/users-roles', [RoleUserController::class, 'index'])->name('users-roles.index'); // عرض القائمة
+Route::post('/users-roles', [RoleUserController::class, 'store'])->name('users-roles.store'); // إضافة دور
+Route::delete('/users-roles/{userId}/{roleId}', [RoleUserController::class, 'destroy'])->name('users-roles.destroy'); // حذف دور
 
     // عرض معلومات
     Route::get('/info', function () {

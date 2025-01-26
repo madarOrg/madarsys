@@ -1,4 +1,5 @@
 <x-layout>
+
     <x-title :title="'تعديل بيانات الشركة'"></x-title>
 
     <div class="container mx-auto flex px-5 pt-0 pb-28 md:flex-row flex-col-reverse items-center min-h-screen overflow-hidden">
@@ -37,7 +38,7 @@
                         <div class="lg:max-w-lg lg:w-9 md:w-8 w-30 mx-auto md:mx-0">
                             @if(isset($company->logo) && $company->logo !== null)
                                 <img class="object-cover object-center rounded w-full h-auto" alt="{{ $company->name }}"
-                                 src="{{ asset('storage/logos/' . $company->logo) }}">
+                                 src="{{ asset('storage/' . $company->logo) }}">
 
                             @else
                             

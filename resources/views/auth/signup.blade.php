@@ -1,4 +1,5 @@
 <x-base>
+
     <section class="bg-gray-50 dark:bg-gray-900">
         <div class="flex flex-col items-center justify-center px-4 py-6 mx-auto sm:px-2 md:h-screen lg:py-0">
             <a href="#" class="flex items-center mb-6 text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">

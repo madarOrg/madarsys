@@ -1,4 +1,6 @@
 <x-layout>
+    <x-alert />
+
     <x-title :title="'إضافة بيانات الشركة'"></x-title>
 
         <div class="container mx-auto flex px-5 pt-0 pb-28 md:flex-row flex-col-reverse items-center min-h-screen overflow-hidden">
@@ -6,15 +8,17 @@
             <!-- Right Side: Form -->
             <div class="lg:flex-grow md:w-2/3 lg:pl-16 md:pl-8 flex flex-col md:items-start md:text-left items-start text-start">
                     <!-- Left Side: Company Image -->
+                <form class="w-full" action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data">
+
                     <div class="lg:max-w-lg lg:w-9 md:w-8 w-30 mx-auto md:mx-0">
                         @if(isset($company->logo) && $company->logo !== null)
+
                             <img class="object-cover object-center rounded w-full h-auto" alt="{{ $company->name }}" src="{{ asset('storage/' . $company->logo) }}">
                         @else
                             <img class="object-cover object-center rounded w-full h-auto" alt="default image" src="https://dummyimage.com/720x600">
                         @endif
                     </div>
 
-                <form class="w-full" action="{{ route('companies.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf <!-- Laravel CSRF Protection -->
                     
                     <div class="flex flex-wrap gap-4 mb-4">
