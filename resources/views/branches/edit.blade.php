@@ -1,4 +1,5 @@
 <x-layout>
+
     <section class="bg-gray-50 dark:bg-gray-900">
         <form action="{{ route('branches.update', $branch->id) }}" method="POST">
             @csrf

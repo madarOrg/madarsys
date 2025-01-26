@@ -2,17 +2,7 @@
     <section class="bg-gray-50 dark:bg-gray-900">
     <form action="{{ route('warehouses.store') }}" method="POST">
         @csrf
-        {{-- error messages --}}
-        {{-- @if ($errors->any())
-        <div style="color: red;">
-            <ul>
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif --}}
-    
+
         <div class="space-y-12  dark:bg-gray-900 mb-24">
             <d class="border-b border-gray-900/10 pb-12">
                 <x-title :title="' بيانات المستودع'"></x-title>
@@ -102,7 +92,7 @@
                         @enderror
                     </div>
                      --}}
-                    <div class="sm:col-span-2">
+                    {{-- <div class="sm:col-span-2">
                         <x-select-dropdown
                             id="branch"
                             name="branch_id"
@@ -110,11 +100,10 @@
                             :options="$companies->flatMap(fn($company) => $company->branches->pluck('name', 'id'))"
                             selected="{{ old('branch_id') }}"
                             required
-                        />
-                        {{-- <div class="sm:col-span-4">
+                        /> --}}
+                        <div class="sm:col-span-2">
                             <!-- التسمية -->
                             <label for="branch_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">الفرع</label>
-                            <div class="mt-2">
                                 <select name="branch_id" id="branch_id" class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1" required>
                                     @foreach($companies as $company)
                                         @foreach($company->branches as $branch)
@@ -124,13 +113,11 @@
                                         @endforeach
                                     @endforeach
                                 </select>
-                            </div>
                         </div>
-                         --}}
+                        
                         @error('branch_id')
                             <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                         @enderror
-                    </div>
                     
                 
                     <div class="sm:col-span-2">

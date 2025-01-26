@@ -1,4 +1,5 @@
-<x-layout dir="rtl">
+<x-layout>
+
     <div class="relative mt-1 flex items-center">
 
         <x-title :title="'إدارة جميع الفروع'" />

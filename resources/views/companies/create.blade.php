@@ -1,4 +1,6 @@
 <x-layout>
+    <x-alert />
+
     <x-title :title="'إضافة بيانات الشركة'"></x-title>
 
         <div class="container mx-auto flex px-5 pt-0 pb-28 md:flex-row flex-col-reverse items-center min-h-screen overflow-hidden">

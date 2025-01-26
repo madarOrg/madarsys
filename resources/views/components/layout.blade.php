@@ -14,6 +14,8 @@
         {{-- lg:pr-[267px] lg:pt-[94px]  --}}
         mt-24 px-4 sm:px-6 md:px-8 lg:pl-2 dark:bg-gray-900 dark:text-white"
         >
+        <x-alert />
+
             {{ $slot }}
         </main>
 

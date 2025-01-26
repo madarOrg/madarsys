@@ -2,6 +2,7 @@
     <section class="bg-gray-50 dark:bg-gray-900">
         <form action="{{ route('warehouses.update', $warehouse->id) }}" method="POST">
             @csrf
+
             @method('PUT')
 
             <div class="space-y-12 dark:bg-gray-900 mb-24">

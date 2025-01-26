@@ -75,6 +75,7 @@ class WarehousesController extends Controller
             
             // تخزين البيانات في قاعدة البيانات
             Warehouse::create($validated);
+            // Warehouse::create($request->all());
 
             // إعادة التوجيه مع رسالة نجاح
             return redirect()->route('warehouses.create')->with('success', 'تم إضافة المستودع بنجاح');
