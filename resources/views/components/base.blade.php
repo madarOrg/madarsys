@@ -46,18 +46,21 @@
 
         ])    
 
+@livewireStyles
  
  <!-- GitHub Button -->
  <script async defer src="https://buttons.github.io/buttons.js"></script>
  
     </head>
-    <body class="font-sans antialiased leading-default bg-gray-50 dark:bg-gray-900 text-black dark:text-white" style="font-family: 'Tajawal', sans-serif;">
+    <body 
+    class="font-sans antialiased leading-default     bg-gray-50 dark:bg-gray-900 text-black dark:text-white" style="font-family: 'Tajawal', sans-serif;">
 
     {{-- <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50  dark:bg-gray-900 text-black dark:text-white"> --}}
         {{-- <body class="antialiased bg-white dark:bg-gray-900 text-black dark:text-white"> --}}
 
         {{ $slot }}
- 
+        @livewireScripts
+
     </body>
 
 </html>

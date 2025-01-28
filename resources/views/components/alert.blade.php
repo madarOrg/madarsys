@@ -1,33 +1,54 @@
-<div class="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-11/12 md:w-1/2">
+<div id="targetElement" class="fixed top-2 left-1/2 transform -translate-x-1/2 z-50 w-11/12 md:w-1/2">
     @if (session('success'))
-        <div class="relative bg-green-100 text-green-800 border border-green-400 p-6 rounded-lg shadow-xl mb-4 transform transition-all duration-500 ease-in-out opacity-100 scale-100">
-            <!-- زر الإغلاق -->
-            <button class="absolute top-2 left-2 text-green-600 hover:text-green-800 focus:outline-none transition duration-300" onclick="this.parentElement.style.display='none';">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        <div class="flex items-center justify-between p-4 mb-4 text-sm text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800" role="alert">
+            <div  class="flex items-center">
+                <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+               
                 </svg>
-            </button>
-            <!-- محتوى الرسالة -->
-            <div class="flex items-center space-x-4">
-                <img src="{{ asset('storage/icons/success.png') }}" alt="Success Icon" class="h-8 w-8">
+                <i class="fa-solid fa-circle-exclamation ml-4"></i>
                 <span class="text-lg font-medium">{{ session('success') }}</span>
             </div>
+            <button id="triggerElement" type="button" class="ms-auto -mx-1.5 -my-1.5 text-green-500 rounded-lg focus:ring-2 focus:ring-green-400 p-1.5 hover:bg-green-200 dark:text-green-400 dark:hover:bg-gray-700" role="alert">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
         </div>
     @endif
 
     @if (session('error'))
-        <div class="relative bg-red-100 text-red-800 border border-red-400 p-6 rounded-lg shadow-xl mb-4 transform transition-all duration-500 ease-in-out opacity-100 scale-100">
-            <!-- زر الإغلاق -->
-            <button class="absolute top-2 left-2 text-red-600 hover:text-red-800 focus:outline-none transition duration-300" onclick="this.parentElement.style.display='none';">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        <div class="flex items-center justify-between p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
+            <div class="flex items-center">
+                <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                 </svg>
-            </button>
-            <!-- محتوى الرسالة -->
-            <div class="flex items-center space-x-4">
-                <img src="{{ asset('storage/icons/error.png') }}" alt="Error Icon" class="h-8 w-8">
+                <i class="fa-solid fa-circle-exclamation ml-4"></i>
                 <span class="text-lg font-medium">{{ session('error') }}</span>
             </div>
+            <button id="triggerElement" type="button" class="ms-auto -mx-1.5 -my-1.5 text-red-500 rounded-lg focus:ring-2 focus:ring-red-400 p-1.5 hover:bg-red-200 dark:text-red-400 dark:hover:bg-gray-700">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
+        </div>
+    @endif
+
+    @if (session('warning'))
+        <div class="flex items-center justify-between p-4 mb-4 text-sm text-yellow-800 border border-yellow-300 rounded-lg bg-yellow-50 dark:bg-gray-800 dark:text-yellow-400 dark:border-yellow-800" role="alert">
+            <div class="flex items-center">
+                <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                </svg>
+                <i class="fa-solid fa-circle-exclamation ml-4"></i>
+                <span class="text-lg font-medium">{{ session('warning') }}</span>
+            </div>
+            <button id="triggerElement" type="button" class="ms-auto -mx-1.5 -my-1.5 text-yellow-500 rounded-lg focus:ring-2 focus:ring-yellow-400 p-1.5 hover:bg-yellow-200 dark:text-yellow-400 dark:hover:bg-gray-700" role="alert">
+                <span class="sr-only">Close</span>
+                <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"/>
+                </svg>
+            </button>
         </div>
     @endif
 </div>
+

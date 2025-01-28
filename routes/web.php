@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Livewire\UserSteps;
 
 use App\Http\Controllers\
 {AuthController,
@@ -36,14 +37,18 @@ Route::middleware('auth')->group(function () {
     });
 
   
-
-    Route::resource('users', UserController::class);
-
-    // تعريف المسارات اليدوية
+// users
+Route::resource('users', UserController::class);
+  
+// user roles
 Route::get('/users-roles', [RoleUserController::class, 'index'])->name('users-roles.index'); // عرض القائمة
 Route::post('/users-roles', [RoleUserController::class, 'store'])->name('users-roles.store'); // إضافة دور
-Route::delete('/users-roles/{userId}/{roleId}', [RoleUserController::class, 'destroy'])->name('users-roles.destroy'); // حذف دور
 
+//create user in steps
+// Route::get('/user/create', UserSteps::class)->name('user.create');
+Route::get('/user/create', function () {
+    return view('users.create');
+})->name('users.create');
     // عرض معلومات
     Route::get('/info', function () {
         return view('info');

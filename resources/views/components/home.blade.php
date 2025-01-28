@@ -5,11 +5,17 @@
         {{-- <x-navbar class="lg:row-span-3 lg:col-span-1 bg-gray-800 text-white  dark:bg-gray-900 dark:text-white" /> --}}
 
         <!-- المحتوى الرئيسي -->
-        <main class="lg:pl-[0px] pt-10 dark:bg-gray-900 dark:text-white overflow-y-auto">
+        <main 
+        class=" p-10 pt-10  dark:bg-gray-900 dark:text-white overflow-y-auto
+        bg-linear-to-r/srgb from-indigo-500 to-teal-400
+        "
+        >
             {{ $slot }}
         </main>
 
         <!-- الفوتر -->
-        <x-footer class=" row-span-full col-span-full bg-gray-800 text-white text-center dark:bg-gray-900 dark:text-white " />
+        <x-footer 
+        {{-- class=" row-span-full col-span-full bg-gray-800 text-white text-center dark:bg-gray-900 dark:text-white " --}}
+         />
     </div>
 </x-base>

@@ -55,17 +55,20 @@ class RoleUserController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($userId, $roleId)
-{        // البحث عن سجل الربط وحذفه
-        $roleUser = RoleUser::where('user_id', $userId)
-            ->where('role_id', $roleId)
-            ->first();
-
+    
+{    
+       // البحث عن سجل الربط وحذفه
+    //    \DB::enableQueryLog();
+       $roleUser = RoleUser::where('user_id', $userId)
+           ->where('role_id', $roleId)
+           ->delete();
+    //    dd(\DB::getQueryLog());
         if ($roleUser) {
-            $roleUser->delete();
             return redirect()->back()->with('success', 'تم حذف الدور بنجاح.');
         }
 
         return redirect()->back()->with('error', 'تعذر العثور على السجل.');
-    }    
+    }  
+
 }
 

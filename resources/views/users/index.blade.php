@@ -1,25 +1,26 @@
 <x-layout dir="rtl">
-    <x-title :title="'إدارة المستخدمين'"></x-title>
+ <div class="relative mt-1 flex items-center">
 
-    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
-        <!-- حقل البحث وزر الإضافة -->
-        <div class="pb-4 bg-gray-50 dark:bg-gray-900">
-            <label for="table-search" class="sr-only">بحث</label>
-            <div class="relative mt-1 flex justify-start mb-4">
-                <!-- أيقونة البحث -->
-                <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-auto">
-                    <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
-                    </svg>
-                </div>
-                <!-- إدخال البحث -->
-                <input type="text" id="table-search" class="block pr-10 text-sm text-gray-900 dark:text-gray-400 border rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="ابحث عن المستخدمين">
+    <x-title :title="'إدارة المستخدمين'"></x-title>
+    <!-- حقل البحث وزر الإضافة -->
+    <x-search-input 
+    id="users-id"
+    name="search"
+    placeholder="ابحث عن المستخدمين"
+    :value="request()->input('search')"
+/>
+</div>       
+                
                 <!-- زر إضافة مستخدم جديد -->
                 <x-button :href="route('users.create')" type="button">
                     <i class="fas fa-plus mr-2"></i> إضافة مستخدم جديد
                 </x-button>
-            </div>
-        </div>
+                <!-- زر إضافة دور جديد -->
+                <x-button :href="route('users-roles.index')" type="button">
+                    <i class="fas fa-plus mr-2"></i> إضافة أدوار جديدة
+                </x-button>
+            
+       
     
         <!-- جدول المستخدمين -->
         <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">

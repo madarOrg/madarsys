@@ -7,7 +7,7 @@
             <d class="border-b border-gray-900/10 pb-12">
                 <x-title :title="' بيانات المستودع'"></x-title>
                 <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">يرجى إدخال تفاصيل المستودع بدقة لضمان تنظيم البيانات.</p>
-                <div class="mt-0 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-6">
+                <div class="mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h-full">
                     <div class="sm:col-span-2">
                         <x-file-input
                             id="warehouse-name"
