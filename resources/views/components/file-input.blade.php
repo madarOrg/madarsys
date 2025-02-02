@@ -15,5 +15,6 @@
             تم اختيار الملف: {{ session('file_uploaded') }}
         </p>
     @endif
+    
 
 </div>

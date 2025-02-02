@@ -1,17 +1,19 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\UserSteps;
 
 use App\Http\Controllers\
 {AuthController,
-    SignupController,
+SignupController,
 PasswordController,
 CompanyController,
 BranchesController,
 WarehousesController,
 UserController,
-RoleUserController};
+RoleUserController,
+RoleController,
+RolePermissionController,
+NavbarController};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -32,15 +34,52 @@ Route::post('/reset-password', [PasswordController::class, 'store'])->name('pass
 Route::middleware('auth')->group(function () {
 
     // عرض لوحة التحكم (dashboard)
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    });
 
-  
+    Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
+    
+
+    // مجموعة مسارات لإدارة الأدوار
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index'); // عرض جميع الأدوار
+        Route::get('/create', [RoleController::class, 'create'])->name('create'); // نموذج إضافة دور جديد
+        Route::post('/', [RoleController::class, 'store'])->name('store'); // تخزين الدور الجديد
+        Route::get('/{role}', [RoleController::class, 'show'])->name('show'); // عرض تفاصيل الدور
+        Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit'); // نموذج تعديل الدور
+        Route::put('/{role}', [RoleController::class, 'update'])->name('update'); // تحديث بيانات الدور
+        Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy'); // حذف الدور
+    });
+    
+   
+   //role primissions 
+    Route::prefix('role-permissions')->name('role-permissions.')->group(function () {
+        // عرض قائمة الصلاحيات المرتبطة بالأدوار
+        Route::get('/', [RolePermissionController::class, 'index'])->name('index');
+    
+        // عرض نموذج إضافة صلاحيات لدور معين
+        Route::get('/create', [RolePermissionController::class, 'create'])->name('create');
+    
+        // حفظ الصلاحيات المحددة لدور معين
+        Route::post('/', [RolePermissionController::class, 'store'])->name('store');
+    
+        // عرض تفاصيل صلاحيات دور معين
+        Route::get('/{role}', [RolePermissionController::class, 'show'])->name('show');
+    
+        // عرض نموذج تعديل الصلاحيات الخاصة بدور معين
+        Route::get('/{role}/edit', [RolePermissionController::class, 'edit'])->name('edit');
+    
+        // تحديث الصلاحيات لدور معين
+        Route::put('/{role}', [RolePermissionController::class, 'update'])->name('update');
+    
+        // حذف صلاحيات دور معين
+        Route::delete('/{id}', [RolePermissionController::class, 'destroy'])->name('destroy');
+    });
+    
 // users
 Route::resource('users', UserController::class);
   
 // user roles
+Route::resource('users-roles', RoleUserController::class);
+
 Route::get('/users-roles', [RoleUserController::class, 'index'])->name('users-roles.index'); // عرض القائمة
 Route::post('/users-roles', [RoleUserController::class, 'store'])->name('users-roles.store'); // إضافة دور
 
@@ -48,11 +87,14 @@ Route::post('/users-roles', [RoleUserController::class, 'store'])->name('users-r
 // Route::get('/user/create', UserSteps::class)->name('user.create');
 Route::get('/user/create', function () {
     return view('users.create');
-})->name('users.create');
+})->name('users.index');
+
+
     // عرض معلومات
     Route::get('/info', function () {
         return view('info');
     });
+
 
 // Routes for Companies
 Route::get('companies', [CompanyController::class, 'index'])->name('companies.index');          // عرض جميع الشركات

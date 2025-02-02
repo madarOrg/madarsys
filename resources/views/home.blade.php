@@ -1,9 +1,9 @@
 <x-home class=" dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
   <div class="">
     <div class="p-20 pb-24 shadow-lg border-2 border-white font-[sans-serif] max-w-[95rem] max-md:max-w-md mx-auto pt-20 bg-gray-200/60 rounded-xl  backdrop-blur-lg"
-    {{-- style="mask-image: radial-gradient(circle, rgba(0, 0, 0, 0.9) 50%, rgba(0, 0, 0, 0.3) 80%, rgba(0, 0, 0, 0) 100%);
+    style="mask-image: radial-gradient(circle, rgba(0, 0, 0, 0.9) 50%, rgba(0, 0, 0, 0.3) 80%, rgba(0, 0, 0, 0) 100%);
            -webkit-mask-image: radial-gradient(circle, rgba(0, 0, 0, 0.9) 50%, rgba(0, 0, 0, 0.3) 80%, rgba(0, 0, 0, 0) 100%);"
-            --}}
+           
            >
 
 

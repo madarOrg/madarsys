@@ -14,20 +14,19 @@ return new class extends Migration
         Schema::create('role_permissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('role_id')->constrained()->onDelete('cascade');
-            $table->foreignId('company_id')->constrained()->onDelete('cascade');
-            $table->foreignId('branch_id')->nullable()->constrained()->onDelete('cascade');
-            $table->foreignId('warehouse_id')->nullable()->constrained()->onDelete('cascade');
             $table->foreignId('permission_id')->constrained()->onDelete('cascade');
+            $table->boolean('status')->default(1); // 1 = فعال، 0 = غير فعال
+            $table->timestamp('status_updated_at')->nullable(); // تاريخ آخر تغيير للحالة
             $table->timestamps();
         });
-        
     }
+    
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_warehouse');
+        Schema::dropIfExists('role_permissions');
     }
 };

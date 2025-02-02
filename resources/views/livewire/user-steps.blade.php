@@ -36,7 +36,7 @@
             <form wire:submit.prevent="createUser">
                 <div class="flex gap-x-6 mb-6">
                     <div class="w-full relative">
-                        <label class="flex items-center mb-2 text-gray-600 text-sm font-medium">First Name</label>
+                        <label class="flex items-center mb-2 text-gray-600 text-sm font-medium"> Name</label>
                         <input type="text" wire:model="name"
                             class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none"
                             required>
@@ -45,15 +45,7 @@
                         @enderror
                     </div>
 
-                    <div class="w-full relative">
-                        <label class="flex items-center mb-2 text-gray-600 text-sm font-medium">Last Name</label>
-                        <input type="text" wire:model="last_name"
-                            class="block w-full h-11 px-5 py-2.5 bg-white leading-7 text-base font-normal shadow-xs text-gray-900 bg-transparent border border-gray-300 rounded-full placeholder-gray-400 focus:outline-none"
-                            required>
-                        @error('last_name')
-                            <span class="text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
+                    
                 </div>
 
                 <div class="relative mb-6">

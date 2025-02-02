@@ -19,7 +19,7 @@ class CreateCompaniesTable extends Migration
             $table->string('logo')->nullable(); // Company logo
 
             // الحقول الجديدة
-            $table->string('phone_number')->nullable(); // رقم الهاتف
+            $table->string('phone_number', 20)->unique(); // رقم الهاتف
             $table->string('email')->nullable();       // البريد الإلكتروني
             $table->string('address')->nullable();     // العنوان
             $table->text('additional_info')->nullable(); // معلومات إضافية

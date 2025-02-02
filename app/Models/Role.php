@@ -10,7 +10,7 @@ class Role extends Model
 {
     use HasFactory;
 
-   
+    protected $fillable = ['name', 'description'];
      /**
      * العلاقة بين الأدوار والمستخدمين (Many-to-Many)
      */
@@ -21,7 +21,7 @@ class Role extends Model
             ->withTimestamps(); // إضافة الطوابع الزمنية
     }
 
-    public function rolecompanies()
+    public function companies()
     {
         return $this->belongsToMany(Company::class, 'role_company');
     }
@@ -36,8 +36,15 @@ class Role extends Model
     public function warehouses()
     {
         return $this->belongsToMany(Warehouse::class, 'role_warehouse')
-                    ->withPivot('branch_id', 'company_id') // إضافة الفرع والشركة
+                    ->withPivot('branch_id') 
+                    ->withTimestamps();
+    }
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'role_permissions')
+                    ->withPivot('id','status', 'status_updated_at') // إضافة الحقول الخاصة بالـ pivot
                     ->withTimestamps();
     }
     
+
 }

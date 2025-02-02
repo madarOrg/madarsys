@@ -13,7 +13,11 @@ return new class extends Migration
     {
         Schema::create('permissions', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // مثل "create", "read", "update", "delete"
+            $table->string('name')->unique(); 
+            $table->foreignId('module_id')->constrained();
+            $table->foreignId('module_action_id')->constrained();
+            $table->string('permission_key')->unique(); // مثال: "warehouses.create"
+            $table->enum('scope_level', ['company', 'branch', 'warehouse'])->default('company'); // نطاق الصلاحية
             $table->timestamps();
         });
         

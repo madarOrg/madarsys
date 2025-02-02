@@ -2,7 +2,7 @@
     <div class="grid grid-rows-[auto_1fr_auto] min-h-screen">
         <!-- Sidebar: شريط علوي وقائمة جانبية -->
         <x-navbar 
-            class="bg-gray-800 text-white dark:bg-gray-900 dark:text-white"
+        class="bg-gray-800 text-white dark:bg-gray-900 dark:text-white"
         />
 
         <!-- Main Content -->

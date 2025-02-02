@@ -31,7 +31,7 @@
                     </th> --}}
                     <th class="px-6 py-3">اسم المستخدم</th>
                     <th class="px-6 py-3">البريد الإلكتروني</th>
-                    <th class="px-6 py-3">رقم الهاتف</th>
+                  
                     <th class="px-6 py-3">الدور</th>
                     <th class="px-6 py-3">الحالة</th>
                     <th class="px-6 py-3">الإجراء</th>
@@ -45,7 +45,7 @@
                     </td> --}}
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-300">{{ $user->name }}</td>
                     <td class="px-6 py-4">{{ $user->email }}</td>
-                    <td class="px-6 py-4">{{ $user->phone_number }}</td>
+                   
                     <td class="px-6 py-4">{{ $user->role }}</td>
                     <td class="px-6 py-4">{{ $user->status }}</td>
                     <td class="px-6 py-4 flex space-x-2">

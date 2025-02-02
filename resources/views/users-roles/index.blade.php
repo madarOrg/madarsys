@@ -50,9 +50,10 @@
                                         <option value="{{ $role->id }}">{{ $role->name }}</option>
                                     @endforeach
                                 </select>
-                                <button type="submit" class="mt-2 sm:mt-0 text-gray-700 bg-green-600 hover:bg-green-700 px-4 py-1 rounded-lg">
-                                    <i class="fas fa-plus"></i> إضافة
-                                </button>
+                               
+                                <x-button-secondary :href="route('users-roles.index')" type="submit">
+                                    <i class="fas fa-plus mr-2"></i> إضافة أدوار جديدة
+                                </x-button-secondary>
                             </form>
                         </td>
 

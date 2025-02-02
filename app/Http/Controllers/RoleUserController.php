@@ -28,6 +28,7 @@ class RoleUserController extends Controller
 
     //     return redirect()->route('users-roles.index')->with('success', 'تمت إضافة الدور للمستخدم بنجاح.');
     // }
+
     public function store(Request $request)
     {
         $request->validate([
