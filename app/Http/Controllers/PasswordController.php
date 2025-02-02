@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use App\Models\User;
 
+use function Laravel\Prompts\password;
+
 class PasswordController extends Controller
 {
     // عرض صفحة تغيير كلمة المرور
@@ -21,21 +23,25 @@ class PasswordController extends Controller
        // التحقق من البيانات المدخلة
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
+           
             'password' => 'required|min:8|confirmed',
         ]);
-
+        
         if ($validator->fails()) {
             return back()->withErrors($validator)->withInput();
         }
+        
        // تحديث كلمة المرور
         $user = User::where('email', $request->email)->first();
+         
+
         if ($user) {
             $user->password = Hash::make($request->password);
             $user->save();
-            return redirect()->route('login')->with('success', 'تم تحديث كلمة المرور بنجاح. يرجى تسجيل الدخول.');
+            return redirect()->route(' auth.login')->with( 'تم تحديث كلمة المرور بنجاح. يرجى تسجيل الدخول.');
 
         }
-
-        return back()->with('error', 'User not found.');
+       
+        return back()->with("خطأ، لم يتم العثور على المستخدم");
     }
 }

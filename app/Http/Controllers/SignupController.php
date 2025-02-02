@@ -42,6 +42,6 @@ class SignupController extends Controller
         $role = \App\Models\Role::where('name', $request->role)->first(); // استرجاع الدور بناءً على الاسم
         $user->roles()->attach($role->id); // ربط المستخدم بالدور
 
-        return redirect()->route('login')->with('success', 'Account created successfully.');
+        return redirect()->route('login')->with("تم إنشاء الحساب بنجاح");
     }
 }

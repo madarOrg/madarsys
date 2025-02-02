@@ -116,7 +116,7 @@ class UserController extends Controller
             // تحقق إذا كان للمستخدم دور بالفعل
             if ($user->roles()->where('role_id', $role->id)->exists()) {
                 // إذا كان الدور موجودًا، لا حاجة لتحديثه
-                return redirect()->route('users.index')->with('success', 'تم تحديث المستخدم بنجاح.');
+                return redirect()->route('users.index')->with( 'تم تحديث المستخدم بنجاح');
             } else {
                 // إذا لم يكن الدور موجودًا، قم بتحديثه
                 $user->roles()->sync([$role->id]); // أو يمكنك استخدام attach في حالة عدم الرغبة في الحذف
@@ -124,7 +124,7 @@ class UserController extends Controller
         }
         
     
-        return redirect()->route('users.index')->with('success', 'تم تحديث المستخدم بنجاح.');
+        return redirect()->route('users.index')->with( 'تم تحديث المستخدم بنجاح');
     }
     
 
@@ -135,6 +135,6 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        return redirect()->route('users.index')->with('success', 'تم حذف المستخدم بنجاح.');
+        return redirect()->route('users.index')->with( 'تم حذف المستخدم بنجاح');
     }
 }
