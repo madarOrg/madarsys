@@ -2,26 +2,27 @@
 namespace App\Http\Controllers;
 
 use App\Services\NavbarService;
+use App\Services\UserPermissionService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 class NavbarController extends Controller
 {
     protected $navbarService;
+    protected $userPermissionService;
 
-    public function __construct(NavbarService $navbarService)
+    public function __construct(NavbarService $navbarService, UserPermissionService $userPermissionService)
     {
         $this->navbarService = $navbarService;
+        $this->userPermissionService = $userPermissionService;
     }
 
     public function showNavbar()
     {
-        // جلب المستخدم والصلاحيات
-        $user = Auth::user();
-        $role = $user ? $user->roles()->first() : null;
-        $permissions = $role ? $role->permissions->pluck('permission_key')->toArray() : [];
+        // جلب الصلاحيات من الكاش
+        $permissions = $this->userPermissionService->getUserPermissions();
 
-        // استدعاء الخدمة للحصول على روابط الـ Navbar باستخدام الصلاحيات
+        // جلب روابط القائمة من الكاش
         $NavbarLinks = $this->navbarService->getNavbarLinks($permissions);
 
         // تمرير روابط الـ Navbar والصلاحيات إلى الصفحة

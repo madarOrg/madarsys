@@ -3,11 +3,9 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Livewire\Livewire;
-use App\Services\NavbarService;
 use Illuminate\Support\Facades\View;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Blade;
+use App\Services\NavbarService;
+use App\Services\UserPermissionService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,33 +15,35 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         //
-        $this->app->singleton(NavbarService::class, function ($app) {
-            return new NavbarService();
-        });
     }
 
     /**
      * Bootstrap any application services.
      */
-    public function boot(NavbarService $navbarService)
+    public function boot(NavbarService $navbarService, UserPermissionService $userPermissionService): void
     {
-        //
-        // Livewire::component('user-steps', \App\Http\Livewire\UserSteps::class);
-        Blade::component('navbar.navbar', 'navbar');
+        // تحديد القوالب التي تحتاج إلى Navbar
+        $viewsNeedingNavbar = [
+            
+            'dashboard',
+            'navbar.*'
+        ];
 
-        View::composer('*', function ($view) use ($navbarService) {
-            $user = Auth::user();
-            $role = $user ? $user->roles()->first() : null;
-            $permissions = $role ? $role->permissions->pluck('permission_key')->toArray() : [];
-    
-            $NavbarLinks = $navbarService->getNavbarLinks($permissions);
-    
-            $view->with('NavbarLinks', $NavbarLinks);
+        View::composer($viewsNeedingNavbar, function ($view) use ($navbarService, $userPermissionService) {
+            if (!auth()->check()) {
+                $view->with('NavbarLinks', []);
+                return;
+            }
+
+            // تخزين النتيجة في الذاكرة المؤقتة للطلب الحالي
+            static $navbarLinks = null;
+            
+            if ($navbarLinks === null) {
+                $permissions = $userPermissionService->getUserPermissions(auth()->id());
+                $navbarLinks = $navbarService->getNavbarLinks($permissions);
+            }
+
+            $view->with('NavbarLinks', $navbarLinks);
         });
-
     }
-
-   
-
-
 }

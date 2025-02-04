@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Livewire\WarehouseReports;
 
 use App\Http\Controllers\
 {AuthController,
@@ -13,7 +14,8 @@ UserController,
 RoleUserController,
 RoleController,
 RolePermissionController,
-NavbarController};
+NavbarController,
+WarehouseStorageAreaController};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -37,7 +39,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
     
-
+    Route::get('/warehouse-reports', WarehouseReports::class)->name('warehouse.reports');
     // مجموعة مسارات لإدارة الأدوار
     Route::prefix('roles')->name('roles.')->group(function () {
         Route::get('/', [RoleController::class, 'index'])->name('index'); // عرض جميع الأدوار
@@ -124,4 +126,24 @@ Route::get('warehouses/{warehouse}/edit', [WarehousesController::class, 'edit'])
 Route::put('warehouses/{warehouse}', [WarehousesController::class, 'update'])->name('warehouses.update'); // تحديث بيانات المستودع
 Route::delete('warehouses/{warehouse}', [WarehousesController::class, 'destroy'])->name('warehouses.destroy'); // حذف مستودع
 
+// Routes for Warehouse Storage Areas
+Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-areas.')->group(function () {
+    Route::get('/', [WarehouseStorageAreaController::class, 'index'])->name('index');           // عرض مناطق التخزين
+    Route::get('/create', [WarehouseStorageAreaController::class, 'create'])->name('create');    // صفحة إضافة منطقة تخزين
+    Route::post('/', [WarehouseStorageAreaController::class, 'store'])->name('store');          // حفظ منطقة تخزين جديدة
+    Route::get('/{storage_area}', [WarehouseStorageAreaController::class, 'show'])->name('show'); // عرض منطقة تخزين محددة
+    Route::get('/{storage_area}/edit', [WarehouseStorageAreaController::class, 'edit'])->name('edit'); // تعديل منطقة تخزين
+    Route::put('/{storage_area}', [WarehouseStorageAreaController::class, 'update'])->name('update'); // تحديث منطقة تخزين
+    Route::delete('/{storage_area}', [WarehouseStorageAreaController::class, 'destroy'])->name('destroy'); // حذف منطقة تخزين
+});
+
+    // إدارة مناطق المستودع
+    Route::prefix('warehouses')->name('warehouses.')->group(function () {
+        Route::get('/storage-areas', [WarehouseStorageAreaController::class, 'index'])->name('storage-areas.index');
+        Route::get('/storage-areas/create', [WarehouseStorageAreaController::class, 'create'])->name('storage-areas.create');
+        Route::post('/storage-areas', [WarehouseStorageAreaController::class, 'store'])->name('storage-areas.store');
+        Route::get('/storage-areas/{zone}/edit', [WarehouseStorageAreaController::class, 'edit'])->name('storage-areas.edit');
+        Route::put('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'update'])->name('storage-areas.update');
+        Route::delete('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'destroy'])->name('storage-areas.destroy');
+    });
 });
