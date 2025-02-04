@@ -11,10 +11,25 @@ class Warehouse extends Model
 
     // الحقول القابلة للتعبئة
     protected $fillable = [
-        'name', 'address', 'contact_info', 'branch_id', 'supervisor_id', 'latitude', 
-        'longitude', 'area', 'shelves_count', 'capacity', 'is_smart', 'has_security_system', 
-        'has_cctv', 'is_integrated_with_wms', 'last_maintenance', 'has_automated_systems', 
-        'temperature', 'humidity', 'code'
+        'name',
+        'address',
+        'contact_info',
+        'branch_id',
+        'supervisor_id',
+        'latitude',
+        'longitude',
+        'area',
+        'shelves_count',
+        'capacity',
+        'is_smart',
+        'has_security_system',
+        'has_cctv',
+        'is_integrated_with_wms',
+        'last_maintenance',
+        'has_automated_systems',
+        'temperature',
+        'humidity',
+        'code'
     ];
 
     // علاقة المستودع مع الفرع
@@ -27,13 +42,23 @@ class Warehouse extends Model
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_warehouse')
-                    ->withPivot('branch_id', 'company_id')
-                    ->withTimestamps();
+            ->withPivot('branch_id', 'company_id')
+            ->withTimestamps();
     }
 
     // علاقة المستودع مع المشرف
     public function supervisor()
     {
         return $this->belongsTo(User::class, 'supervisor_id');
+    }
+    // تحديد العلاقة مع مناطق التخزين
+    public function storageAreas()
+    {
+        return $this->hasMany(WarehouseStorageArea::class);
+    }
+    // تحديد العلاقة مع المواقع التخزينية
+    public function warehouseLocations()
+    {
+        return $this->hasMany(WarehouseLocation::class);
     }
 }

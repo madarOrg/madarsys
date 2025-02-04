@@ -1,16 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Livewire\WarehouseReports;
 
 use App\Http\Controllers\
 {AuthController,
-    SignupController,
+SignupController,
 PasswordController,
 CompanyController,
 BranchesController,
 WarehousesController,
 UserController,
-RoleUserController};
+RoleUserController,
+RoleController,
+RolePermissionController,
+NavbarController,
+WarehouseStorageAreaController};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -31,23 +36,67 @@ Route::post('/reset-password', [PasswordController::class, 'store'])->name('pass
 Route::middleware('auth')->group(function () {
 
     // عرض لوحة التحكم (dashboard)
-    Route::get('/dashboard', function () {
-        return view('dashboard');
+
+    Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
+    
+    Route::get('/warehouse-reports', WarehouseReports::class)->name('warehouse.reports');
+    // مجموعة مسارات لإدارة الأدوار
+    Route::prefix('roles')->name('roles.')->group(function () {
+        Route::get('/', [RoleController::class, 'index'])->name('index'); // عرض جميع الأدوار
+        Route::get('/create', [RoleController::class, 'create'])->name('create'); // نموذج إضافة دور جديد
+        Route::post('/', [RoleController::class, 'store'])->name('store'); // تخزين الدور الجديد
+        Route::get('/{role}', [RoleController::class, 'show'])->name('show'); // عرض تفاصيل الدور
+        Route::get('/{role}/edit', [RoleController::class, 'edit'])->name('edit'); // نموذج تعديل الدور
+        Route::put('/{role}', [RoleController::class, 'update'])->name('update'); // تحديث بيانات الدور
+        Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy'); // حذف الدور
     });
-
+    
+   
+   //role primissions 
+    Route::prefix('role-permissions')->name('role-permissions.')->group(function () {
+        // عرض قائمة الصلاحيات المرتبطة بالأدوار
+        Route::get('/', [RolePermissionController::class, 'index'])->name('index');
+    
+        // عرض نموذج إضافة صلاحيات لدور معين
+        Route::get('/create', [RolePermissionController::class, 'create'])->name('create');
+    
+        // حفظ الصلاحيات المحددة لدور معين
+        Route::post('/', [RolePermissionController::class, 'store'])->name('store');
+    
+        // عرض تفاصيل صلاحيات دور معين
+        Route::get('/{role}', [RolePermissionController::class, 'show'])->name('show');
+    
+        // عرض نموذج تعديل الصلاحيات الخاصة بدور معين
+        Route::get('/{role}/edit', [RolePermissionController::class, 'edit'])->name('edit');
+    
+        // تحديث الصلاحيات لدور معين
+        Route::put('/{role}', [RolePermissionController::class, 'update'])->name('update');
+    
+        // حذف صلاحيات دور معين
+        Route::delete('/{id}', [RolePermissionController::class, 'destroy'])->name('destroy');
+    });
+    
+// users
+Route::resource('users', UserController::class);
   
+// user roles
+Route::resource('users-roles', RoleUserController::class);
 
-    Route::resource('users', UserController::class);
-
-    // تعريف المسارات اليدوية
 Route::get('/users-roles', [RoleUserController::class, 'index'])->name('users-roles.index'); // عرض القائمة
 Route::post('/users-roles', [RoleUserController::class, 'store'])->name('users-roles.store'); // إضافة دور
-Route::delete('/users-roles/{userId}/{roleId}', [RoleUserController::class, 'destroy'])->name('users-roles.destroy'); // حذف دور
+
+//create user in steps
+// Route::get('/user/create', UserSteps::class)->name('user.create');
+Route::get('/user/create', function () {
+    return view('users.create');
+})->name('users.index');
+
 
     // عرض معلومات
     Route::get('/info', function () {
         return view('info');
     });
+
 
 // Routes for Companies
 Route::get('companies', [CompanyController::class, 'index'])->name('companies.index');          // عرض جميع الشركات
@@ -77,4 +126,24 @@ Route::get('warehouses/{warehouse}/edit', [WarehousesController::class, 'edit'])
 Route::put('warehouses/{warehouse}', [WarehousesController::class, 'update'])->name('warehouses.update'); // تحديث بيانات المستودع
 Route::delete('warehouses/{warehouse}', [WarehousesController::class, 'destroy'])->name('warehouses.destroy'); // حذف مستودع
 
+// Routes for Warehouse Storage Areas
+Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-areas.')->group(function () {
+    Route::get('/', [WarehouseStorageAreaController::class, 'index'])->name('index');           // عرض مناطق التخزين
+    Route::get('/create', [WarehouseStorageAreaController::class, 'create'])->name('create');    // صفحة إضافة منطقة تخزين
+    Route::post('/', [WarehouseStorageAreaController::class, 'store'])->name('store');          // حفظ منطقة تخزين جديدة
+    Route::get('/{storage_area}', [WarehouseStorageAreaController::class, 'show'])->name('show'); // عرض منطقة تخزين محددة
+    Route::get('/{storage_area}/edit', [WarehouseStorageAreaController::class, 'edit'])->name('edit'); // تعديل منطقة تخزين
+    Route::put('/{storage_area}', [WarehouseStorageAreaController::class, 'update'])->name('update'); // تحديث منطقة تخزين
+    Route::delete('/{storage_area}', [WarehouseStorageAreaController::class, 'destroy'])->name('destroy'); // حذف منطقة تخزين
+});
+
+    // إدارة مناطق المستودع
+    Route::prefix('warehouses')->name('warehouses.')->group(function () {
+        Route::get('/storage-areas', [WarehouseStorageAreaController::class, 'index'])->name('storage-areas.index');
+        Route::get('/storage-areas/create', [WarehouseStorageAreaController::class, 'create'])->name('storage-areas.create');
+        Route::post('/storage-areas', [WarehouseStorageAreaController::class, 'store'])->name('storage-areas.store');
+        Route::get('/storage-areas/{zone}/edit', [WarehouseStorageAreaController::class, 'edit'])->name('storage-areas.edit');
+        Route::put('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'update'])->name('storage-areas.update');
+        Route::delete('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'destroy'])->name('storage-areas.destroy');
+    });
 });

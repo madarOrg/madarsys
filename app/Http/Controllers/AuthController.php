@@ -29,7 +29,7 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
-            return redirect()->intended('/dashboard')->with('success', 'Logged in successfully!');
+            return redirect()->intended('/dashboard')->with("تم تسجيل الدخول بنجاح");
         }
 
         return back()->withErrors([
@@ -46,6 +46,6 @@ class AuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        return redirect('/')->with('success', 'Logged out successfully!');
+        return redirect('/')->with("تم تسجيل الخروج بنجاح");
     }
 }

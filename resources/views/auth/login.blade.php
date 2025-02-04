@@ -1,9 +1,9 @@
 <x-base>
 
-    <section class="bg-gray-50 dark:bg-gray-900" dir="rtl">
+    <section class="bg-gray-50 dark:bg-gray-900">
         <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-            <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
-                <dev class="w-8 h-8 ml-2">
+            <a href="#" class="flex items-center p-4 mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+                <dev class="w-8 h-8 ml-2 ">
                     <x-logo href="/" showText="true" />
                 </dev>
             </a>
@@ -37,3 +37,26 @@
         </div>
     </section>
 </x-base>
+<script>
+    if (themeToggle) {
+    const icon = themeToggle.querySelector('i');
+    const savedTheme = localStorage.getItem('theme') || 'light';
+
+    function applyTheme(theme) {
+        const isDark = theme === 'dark';
+        document.documentElement.classList.toggle('dark', isDark);
+        localStorage.setItem('theme', theme);
+        icon.classList.toggle('fa-moon', !isDark);
+        icon.classList.toggle('fa-sun', isDark);
+    }
+
+    applyTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.classList.contains('dark') ? 'light' : 'dark';
+        applyTheme(currentTheme);
+    });
+}
+
+
+</script>

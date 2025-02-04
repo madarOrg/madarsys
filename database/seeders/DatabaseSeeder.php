@@ -13,7 +13,9 @@ class DatabaseSeeder extends Seeder
             UsersSeeder::class,
             RoleUserSeeder::class,
             CompaniesTableSeeder::class,
-
+            ModulesSeeder::class,
+            ModuleActionsSeeder::class,
+            PermissionsSeeder::class,
         ]);
     }
 }

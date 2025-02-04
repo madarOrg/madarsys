@@ -78,7 +78,7 @@ class CompanyController extends Controller
         $companies = Company::query()
             ->when($search, function ($query, $search) {
                 $query->where('name', 'LIKE', "%{$search}%");
-            })
+            }) 
             ->get();
 
         $branches = Branch::query()

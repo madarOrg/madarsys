@@ -12,6 +12,9 @@ export default defineConfig({
                 'resources/js/soft-ui-dashboard-tailwind.js',
             ],
             refresh: true,
+            
         }),
     ],
+
 });
+
