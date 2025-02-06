@@ -30,8 +30,17 @@ class WarehouseStorageArea extends Model
     }
 
     // // تحديد العلاقة مع المناطق الفرعية (اختياري)
-    // public function zone()
-    // {
-    //     return $this->belongsTo(Zone::class);
-    // }
+    public function zone()
+    {
+        return $this->belongsTo(Zone::class);
+    }
+    
+     /**
+     * العلاقة مع مواقع التخزين التابعة لهذه المنطقة.
+     */
+    public function locations()
+    {
+        return $this->hasMany(WarehouseLocation::class, 'storage_area_id');
+    }
+
 }

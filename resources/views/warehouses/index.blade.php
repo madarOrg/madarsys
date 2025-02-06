@@ -29,7 +29,6 @@
                     <th class="px-6 py-3">الشركة / الفرع</th>
                     <th class="px-6 py-3">العنوان</th>
                     <th class="px-6 py-3">القدرة</th>
-                    <th class="px-6 py-3">عدد الرفوف</th>
                     <th class="px-6 py-3"> مناطق تخزينية</th>
                     <th class="px-6 py-3"> المواقع التخزينية</th>
                     <th class="px-6 py-3">الإجراءات</th>
@@ -50,16 +49,16 @@
                     </td>
                     <td class="px-6 py-4">{{ $warehouse->address }}</td>
                     <td class="px-6 py-4">{{ $warehouse->capacity }} متر مربع</td>
-                    <td class="px-6 py-4">{{ $warehouse->shelves_count }}</td>
                  <!--  أيقونة الانتقال إلى المناطق التخزينية -->
                  <td class="px-6 py-4">
-                    <a href="{{ route('warehouses.storage-areas.create', $warehouse->id) }}" style="color: #FF8b00; hover:underline;">
+                    <a href="{{ route('warehouse.storage-areas.create', ['warehouse' => $warehouse->id]) }}" style="color: #FF8b00; hover:underline;">
                         <i class="fas fa-box"></i> <!-- أيقونة المناطق التخزينية -->
-                    </a>
+                   
                 </td>
                  <!--  أيقونة الانتقال إلى المواقع التخزينية -->
                  <td class="px-6 py-4">
-                    {{-- <a href="{{ route('warehouses.storage-locations.create', $warehouse->id) }}" style="color: #FF8b00; hover:underline;"> --}}
+                    <a href="{{ route('warehouse.locations.create', ['warehouse' => $warehouse->id]) }}" style="color: #FF8b00; hover:underline;">
+
                         <i class="fa fa-map-marker text-red-500"></i> <!-- أيقونة المناطق التخزينية -->
                     </a>
                 </td>

@@ -15,7 +15,10 @@ RoleUserController,
 RoleController,
 RolePermissionController,
 NavbarController,
-WarehouseStorageAreaController};
+WarehouseStorageAreaController,
+WarehouseLocationController,
+ZoneController,
+CategoryController};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -137,13 +140,39 @@ Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-a
     Route::delete('/{storage_area}', [WarehouseStorageAreaController::class, 'destroy'])->name('destroy'); // حذف منطقة تخزين
 });
 
-    // إدارة مناطق المستودع
-    Route::prefix('warehouses')->name('warehouses.')->group(function () {
-        Route::get('/storage-areas', [WarehouseStorageAreaController::class, 'index'])->name('storage-areas.index');
-        Route::get('/storage-areas/create', [WarehouseStorageAreaController::class, 'create'])->name('storage-areas.create');
-        Route::post('/storage-areas', [WarehouseStorageAreaController::class, 'store'])->name('storage-areas.store');
-        Route::get('/storage-areas/{zone}/edit', [WarehouseStorageAreaController::class, 'edit'])->name('storage-areas.edit');
-        Route::put('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'update'])->name('storage-areas.update');
-        Route::delete('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'destroy'])->name('storage-areas.destroy');
-    });
+    
+
+Route::prefix('warehouses/{warehouse}/locations')->group(function () {
+    Route::get('/', [WarehouseLocationController::class, 'index'])->name('warehouse.locations.index');
+    Route::get('/create', [WarehouseLocationController::class, 'create'])->name('warehouse.locations.create');
+    Route::post('/', [WarehouseLocationController::class, 'store'])->name('warehouse.locations.store');
+    Route::get('/{warehouse_location}/edit', [WarehouseLocationController::class, 'edit'])->name('warehouse.locations.edit');
+    Route::put('/{warehouse_location}', [WarehouseLocationController::class, 'update'])->name('warehouse.locations.update');
+    Route::delete('/{warehouse_location}', [WarehouseLocationController::class, 'destroy'])->name('warehouse.locations.destroy');
+});
+
+
+Route::resource('zones', ZoneController::class);
+
+//Categroy routers
+Route::prefix('inventory')->name('inventory.')->group(function () {
+    // عرض قائمة الفئات
+    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+
+    // عرض نموذج إضافة فئة جديدة
+    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+
+    // تخزين فئة جديدة
+    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+
+    // عرض نموذج تعديل فئة
+    Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+
+    // تحديث بيانات الفئة
+    Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+
+    // حذف الفئة
+    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+});
+ 
 });

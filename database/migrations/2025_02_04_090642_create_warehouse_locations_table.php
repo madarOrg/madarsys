@@ -10,16 +10,22 @@ return new class extends Migration
     {
         Schema::create('warehouse_locations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('warehouse_id')->constrained('warehouses')->onDelete('cascade');
-            $table->foreignId('storage_area_id')->constrained('warehouse_storage_areas')->onDelete('cascade');
+            // معرف المستودع (مفتاح أجنبي يشير إلى جدول warehouses)
+            $table->foreignId('warehouse_id')
+                  ->constrained('warehouses')
+                  ->onDelete('cascade');
+            // معرف منطقة التخزين (مفتاح أجنبي يشير إلى جدول warehouse_storage_areas)
+            $table->foreignId('storage_area_id')
+                  ->constrained('warehouse_storage_areas')
+                  ->onDelete('cascade');
             $table->string('aisle');           // رقم الممر
             $table->string('rack');            // رقم الرف
             $table->string('shelf');           // رقم الرف الفرعي
             $table->string('position');        // الموقع على الرف
-            $table->string('barcode')->unique(); // باركود الموقع
+            $table->string('barcode')->unique(); // باركود الموقع (فريد)
             $table->boolean('is_occupied')->default(false); // هل الموقع مشغول
-            $table->text('notes')->nullable(); // ملاحظات
-            $table->timestamps();
+            $table->text('notes')->nullable(); // ملاحظات (اختياري)
+            $table->timestamps();              // تواريخ الإنشاء والتحديث
         });
     }
 
