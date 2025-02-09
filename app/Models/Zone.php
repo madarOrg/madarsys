@@ -9,7 +9,7 @@ class Zone extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'code', 'description'];
+    protected $fillable = ['name', 'code', 'description','warehouse_id'];
 
     // علاقة مع المستودعات 
     public function warehouses()

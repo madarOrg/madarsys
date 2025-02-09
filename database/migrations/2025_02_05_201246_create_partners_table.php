@@ -1,15 +1,17 @@
 <?php
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     public function up(): void
     {
         Schema::create('partners', function (Blueprint $table) {
             $table->id(); // معرف الشريك
             $table->string('name'); // اسم الشريك
-            $table->enum('type', ['supplier', 'customer', 'representative']); // نوع الشريك (مورد - عميل - مندوب)
+            $table->foreignId('type')->constrained('partner_types')->onDelete('cascade'); // نوع الشريك (مرتبط بجدول partner_types)
             $table->string('contact_person')->nullable(); // اسم الشخص المسؤول
             $table->string('phone')->nullable(); // رقم الهاتف
             $table->string('email')->unique()->nullable(); // البريد الإلكتروني

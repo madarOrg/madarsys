@@ -18,7 +18,10 @@ NavbarController,
 WarehouseStorageAreaController,
 WarehouseLocationController,
 ZoneController,
-CategoryController};
+CategoryController,
+PartnerController,
+ProductController,
+InventoryTransactionController};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -155,24 +158,72 @@ Route::prefix('warehouses/{warehouse}/locations')->group(function () {
 Route::resource('zones', ZoneController::class);
 
 //Categroy routers
-Route::prefix('inventory')->name('inventory.')->group(function () {
+Route::prefix('categories')->name('categories.')->group(function () {
     // عرض قائمة الفئات
-    Route::get('categories', [CategoryController::class, 'index'])->name('categories.index');
+    Route::get('/', [CategoryController::class, 'index'])->name('index');
 
     // عرض نموذج إضافة فئة جديدة
-    Route::get('categories/create', [CategoryController::class, 'create'])->name('categories.create');
+    Route::get('/create', [CategoryController::class, 'create'])->name('create');
 
     // تخزين فئة جديدة
-    Route::post('categories', [CategoryController::class, 'store'])->name('categories.store');
+    Route::post('/', [CategoryController::class, 'store'])->name('store');
 
     // عرض نموذج تعديل فئة
-    Route::get('categories/{category}/edit', [CategoryController::class, 'edit'])->name('categories.edit');
+    Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
 
     // تحديث بيانات الفئة
-    Route::put('categories/{category}', [CategoryController::class, 'update'])->name('categories.update');
+    Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
 
     // حذف الفئة
-    Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('categories.destroy');
+    Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
 });
  
+
+// مجموعة مسارات إدارة الشركاء
+Route::prefix('partners')->name('partners.')->group(function () {
+    Route::get('/', [PartnerController::class, 'index'])->name('index'); // عرض قائمة الشركاء
+    Route::get('/create', [PartnerController::class, 'create'])->name('create'); // نموذج إنشاء شريك جديد
+    Route::post('/', [PartnerController::class, 'store'])->name('store'); // تخزين الشريك الجديد
+    Route::get('/{partner}/edit', [PartnerController::class, 'edit'])->name('edit'); // تعديل الشريك
+    Route::put('/{partner}', [PartnerController::class, 'update'])->name('update'); // تحديث بيانات الشريك
+    Route::delete('/{partner}', [PartnerController::class, 'destroy'])->name('destroy'); // حذف الشريك
+});
+Route::prefix('products')->name('products.')->group(function () {
+    Route::get('/', [ProductController::class, 'index'])->name('index'); // قائمة المنتجات
+    Route::get('/create', [ProductController::class, 'create'])->name('create'); // إنشاء منتج جديد
+    Route::post('/', [ProductController::class, 'store'])->name('store'); // تخزين المنتج الجديد
+    Route::get('/{product}', [ProductController::class, 'show'])->name('show'); // عرض المنتج
+    Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit'); // تعديل المنتج
+    Route::put('/{product}', [ProductController::class, 'update'])->name('update'); // تحديث المنتج
+    Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy'); // حذف المنتج
+});
+
+Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(function () {
+    // عرض صفحة إنشاء عملية مخزنية جديدة
+    Route::get('/create', [InventoryTransactionController::class, 'create'])
+        ->name('create');
+
+    // تخزين العملية المخزنية الجديدة
+    Route::post('/', [InventoryTransactionController::class, 'store'])
+        ->name('store');
+
+    // عرض تفاصيل عملية مخزنية معينة
+    Route::get('/{id}', [InventoryTransactionController::class, 'show'])
+        ->name('show');
+
+    // عرض صفحة تعديل عملية مخزنية
+    Route::get('/{id}/edit', [InventoryTransactionController::class, 'edit'])
+        ->name('edit');
+
+    // تحديث بيانات العملية المخزنية
+    Route::put('/{id}', [InventoryTransactionController::class, 'update'])
+        ->name('update');
+
+    // حذف العملية المخزنية
+    Route::delete('/{id}', [InventoryTransactionController::class, 'destroy'])
+        ->name('destroy');
+});
+
+
+
 });

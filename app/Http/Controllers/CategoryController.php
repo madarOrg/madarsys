@@ -12,13 +12,13 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        return view('inventory.categories.index', compact('categories'));
+        return view('categories.index', compact('categories'));
     }
 
     // عرض نموذج إضافة فئة جديدة
     public function create()
     {
-        return view('inventory.categories.create');
+        return view('categories.create');
     }
 
     // تخزين فئة جديدة
@@ -33,14 +33,14 @@ class CategoryController extends Controller
         // إنشاء الفئة الجديدة
         Category::create($request->all());
 
-        return redirect()->route('inventory.categories.index')->with('success', 'Category created successfully');
+        return redirect()->route('categories.index')->with('success', 'Category created successfully');
     }
 
     // عرض بيانات فئة للتعديل
     public function edit($id)
     {
         $category = Category::findOrFail($id);
-        return view('inventory.categories.edit', compact('category'));
+        return view('categories.edit', compact('category'));
     }
 
     // تحديث بيانات الفئة
@@ -57,7 +57,7 @@ class CategoryController extends Controller
         // تحديث الفئة
         $category->update($request->all());
 
-        return redirect()->route('inventory.categories.index')->with('success', 'Category updated successfully');
+        return redirect()->route('categories.index')->with('success', 'Category updated successfully');
     }
 
     // حذف الفئة
@@ -66,6 +66,6 @@ class CategoryController extends Controller
         $category = Category::findOrFail($id);
         $category->delete();
 
-        return redirect()->route('inventory.categories.index')->with('success', 'Category deleted successfully');
+        return redirect()->route('categories.index')->with('success', 'Category deleted successfully');
     }
 }

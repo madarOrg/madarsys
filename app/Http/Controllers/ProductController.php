@@ -12,7 +12,7 @@ class ProductController extends Controller
     // عرض جميع المنتجات
     public function index()
     {
-        $products = Product::with('category', 'supplier')->get();
+        $products = Product::with('category', 'supplier')->paginate(7);
         return view('products.index', compact('products'));
     }
 
@@ -47,11 +47,7 @@ class ProductController extends Controller
         return redirect()->route('products.index')->with('success', 'تم إضافة المنتج بنجاح');
     }
 
-    // عرض تفاصيل المنتج
-    public function show(Product $product)
-    {
-        return view('products.show', compact('product'));
-    }
+   
 
     // عرض نموذج تعديل المنتج
     public function edit(Product $product)
@@ -83,10 +79,20 @@ class ProductController extends Controller
         // إعادة التوجيه مع رسالة نجاح
         return redirect()->route('products.index')->with('success', 'تم تحديث المنتج بنجاح');
     }
-
+    public function show($id)
+    {
+        $product = Product::with('category', 'supplier')->findOrFail($id);
+        return view('products.show', compact('product'));
+    }
+    
     // حذف المنتج من قاعدة البيانات
     public function destroy(Product $product)
     {
+         // التحقق مما إذا كان المنتج مرتبطًا بسجلات أخرى
+        //  if ($product->orders()->exists()) {
+        //     return redirect()->route('products.index')->with('error', 'لا يمكن حذف المنتج لأنه مرتبط بطلبات.');
+        // }
+        
         $product->delete();
 
         // إعادة التوجيه مع رسالة نجاح

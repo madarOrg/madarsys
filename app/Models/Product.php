@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasBranch;
 
 class Product extends Model
 {
-    use HasFactory;
+    use HasBranch,HasFactory;
 
     // الحقول القابلة للتعيين
     protected $fillable = [
@@ -23,9 +24,13 @@ class Product extends Model
         'min_stock_level',
         'max_stock_level',
         'unit',
-        'is_active'
+        'is_active',
+        'branch_id'
     ];
-
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
     // العلاقة مع التصنيف
     public function category()
     {

@@ -9,6 +9,7 @@ return new class extends Migration {
         Schema::create('products', function (Blueprint $table) {
             $table->id(); // معرف المنتج الفريد
             $table->string('name'); // اسم المنتج
+            $table->string('image')->nullable(); // إضافة عمود الصورة
             $table->text('description')->nullable(); // وصف المنتج
             $table->foreignId('category_id')->constrained('categories')->onDelete('cascade'); // التصنيف
             $table->foreignId('supplier_id')->nullable()->constrained('partners')->onDelete('set null'); // المورد (اختياري)

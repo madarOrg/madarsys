@@ -4,10 +4,11 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasBranch;
 
 class Partner extends Model
 {
-    use HasFactory;
+    use HasBranch,HasFactory;
 
     // الحقول القابلة للتعيين
     protected $fillable = [
@@ -18,33 +19,42 @@ class Partner extends Model
         'email', 
         'address',
         'tax_number',
-        'is_active'
+        'is_active',
+        'branch_id'
     ];
-
-    // الأنواع المختلفة للشركاء
-    const TYPE_SUPPLIER = 'supplier';
-    const TYPE_CUSTOMER = 'customer';
-    const TYPE_REPRESENTATIVE = 'representative';
-
-    // تحديد نوع الشريك
-    public function isSupplier()
+    public function branch()
     {
-        return $this->type === self::TYPE_SUPPLIER;
+        return $this->belongsTo(Branch::class);
     }
+    // // الأنواع المختلفة للشركاء
+    // const TYPE_SUPPLIER = 'supplier';
+    // const TYPE_CUSTOMER = 'customer';
+    // const TYPE_REPRESENTATIVE = 'representative';
 
-    public function isCustomer()
-    {
-        return $this->type === self::TYPE_CUSTOMER;
-    }
+    // // تحديد نوع الشريك
+    // public function isSupplier()
+    // {
+    //     return $this->type === self::TYPE_SUPPLIER;
+    // }
 
-    public function isRepresentative()
-    {
-        return $this->type === self::TYPE_REPRESENTATIVE;
-    }
+    // public function isCustomer()
+    // {
+    //     return $this->type === self::TYPE_CUSTOMER;
+    // }
+
+    // public function isRepresentative()
+    // {
+    //     return $this->type === self::TYPE_REPRESENTATIVE;
+    // }
 
     // العلاقات مع المنتجات (إذا كان المورد)
     public function products()
     {
         return $this->hasMany(Product::class);
     }
+    public function partnerType()
+{
+    return $this->belongsTo(PartnerType::class, 'type', 'name');
+}
+
 }

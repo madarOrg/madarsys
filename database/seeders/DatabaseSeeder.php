@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
             ModulesSeeder::class,
             ModuleActionsSeeder::class,
             PermissionsSeeder::class,
+            PartnerTypeSeeder::class,
+            CategorySeeder::class,
+            PartnersTableSeeder::class,
+            ProductSeeder::class,
+
         ]);
     }
 }

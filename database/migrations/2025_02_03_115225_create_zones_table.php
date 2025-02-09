@@ -13,6 +13,8 @@ return new class extends Migration {
             $table->string('code')->unique(); // رمز المنطقة
             $table->text('description')->nullable(); // وصف المنطقة
             $table->timestamps();
+            $table->foreignId('warehouse_id')->constrained('warehouses')->onDelete('cascade');
+
         });
     }
 

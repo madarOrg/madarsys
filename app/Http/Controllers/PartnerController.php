@@ -1,99 +1,88 @@
 <?php
 
-namespace App\Http\Controllers\Inventory;
+namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Category;
 use App\Models\Partner;
+use App\Models\PartnerType;
 use Illuminate\Http\Request;
 
-class ProductController extends Controller
+class PartnerController extends Controller
 {
-    // عرض قائمة المنتجات
+    // عرض قائمة الشركاء
     public function index()
     {
-        $products = Product::with(['category', 'supplier'])->get();
-        return view('inventory.products.index', compact('products'));
+        // استرجاع 7 سجلات في كل صفحة
+        $partners = Partner::paginate(7);
+    
+        // تمرير البيانات إلى العرض
+        return view('partners.index', compact('partners'));
     }
-
-    // عرض نموذج إضافة منتج جديد
+    
+    // عرض نموذج إضافة شريك جديد
     public function create()
     {
-        $categories = Category::all();
-        $suppliers = Partner::where('type', 'supplier')->get();
-        return view('inventory.products.create', compact('categories', 'suppliers'));
+        $partnerTypes = PartnerType::all(); // جلب جميع أنواع الشركاء
+        return view('partners.create', compact('partnerTypes'));
     }
 
-    // تخزين منتج جديد
+    // تخزين شريك جديد في قاعدة البيانات
     public function store(Request $request)
     {
         // التحقق من صحة المدخلات
         $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
-            'supplier_id' => 'nullable|exists:partners,id',
-            'barcode' => 'nullable|string|unique:products,barcode',
-            'sku' => 'required|string|unique:products,sku',
-            'purchase_price' => 'required|numeric',
-            'selling_price' => 'required|numeric',
-            'stock_quantity' => 'required|integer',
-            'min_stock_level' => 'required|integer',
-            'max_stock_level' => 'nullable|integer',
-            'unit' => 'required|string|max:50',
-            'is_active' => 'required|boolean'
+            'name'           => 'required|string|max:255',
+            'type'           => 'required|integer|exists:partner_types,id',
+            'contact_person' => 'nullable|string|max:255',
+            'phone'          => 'nullable|string|max:15',
+            'email'          => 'nullable|email|max:255|unique:partners',
+            'address'        => 'nullable|string|max:255',
+            'tax_number'     => 'nullable|string|max:50|unique:partners',
+            'is_active'      => 'required|boolean',
         ]);
 
-        // إنشاء منتج جديد
-        Product::create($request->all());
+        // إنشاء شريك جديد
+        $partner = Partner::create($request->all());
 
-        return redirect()->route('inventory.products.index')->with('success', 'Product created successfully');
+        return redirect()->route('partners.index')->with('success', 'Partner created successfully');
     }
 
-    // عرض بيانات منتج للتعديل
+    // عرض بيانات الشريك للتعديل
     public function edit($id)
     {
-        $product = Product::findOrFail($id);
-        $categories = Category::all();
-        $suppliers = Partner::where('type', 'supplier')->get();
-        return view('inventory.products.edit', compact('product', 'categories', 'suppliers'));
+        $partner = Partner::findOrFail($id);
+        $partnerTypes = PartnerType::all(); // جلب جميع الأنواع لعرضها في القائمة المنسدلة
+        return view('partners.edit', compact('partner', 'partnerTypes'));
     }
-
-    // تحديث بيانات المنتج
+    
+    // تحديث الشريك في قاعدة البيانات
     public function update(Request $request, $id)
     {
-        $product = Product::findOrFail($id);
+        $partner = Partner::findOrFail($id);
 
         // التحقق من صحة المدخلات
         $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'category_id' => 'required|exists:categories,id',
-            'supplier_id' => 'nullable|exists:partners,id',
-            'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
-            'sku' => 'required|string|unique:products,sku,' . $product->id,
-            'purchase_price' => 'required|numeric',
-            'selling_price' => 'required|numeric',
-            'stock_quantity' => 'required|integer',
-            'min_stock_level' => 'required|integer',
-            'max_stock_level' => 'nullable|integer',
-            'unit' => 'required|string|max:50',
-            'is_active' => 'required|boolean'
+            'name'           => 'required|string|max:255',
+            'type'           => 'required|integer|exists:partner_types,id',
+            'contact_person' => 'nullable|string|max:255',
+            'phone'          => 'nullable|string|max:15',
+            'email'          => 'nullable|email|max:255|unique:partners,email,' . $partner->id,
+            'address'        => 'nullable|string|max:255',
+            'tax_number'     => 'nullable|string|max:50|unique:partners,tax_number,' . $partner->id,
+            'is_active'      => 'required|boolean',
         ]);
 
-        // تحديث المنتج
-        $product->update($request->all());
+        // تحديث بيانات الشريك
+        $partner->update($request->all());
 
-        return redirect()->route('inventory.products.index')->with('success', 'Product updated successfully');
+        return redirect()->route('partners.index')->with('success', 'Partner updated successfully');
     }
 
-    // حذف المنتج
+    // حذف الشريك
     public function destroy($id)
     {
-        $product = Product::findOrFail($id);
-        $product->delete();
+        $partner = Partner::findOrFail($id);
+        $partner->delete();
 
-        return redirect()->route('inventory.products.index')->with('success', 'Product deleted successfully');
+        return redirect()->route('partners.index')->with('success', 'Partner deleted successfully');
     }
 }

@@ -9,6 +9,7 @@ return new class extends Migration {
         Schema::create('categories', function (Blueprint $table) {
             $table->id(); // مفتاح رئيسي Auto Increment
             $table->string('name')->unique(); // اسم التصنيف ويكون فريدًا
+            $table->string('code')->unique(); // كود التصنيف ويكون فريدًا
             $table->text('description')->nullable(); // وصف التصنيف (اختياري)
             $table->timestamps(); // created_at & updated_at
         });
