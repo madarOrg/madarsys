@@ -15,7 +15,13 @@ RoleUserController,
 RoleController,
 RolePermissionController,
 NavbarController,
-WarehouseStorageAreaController};
+WarehouseStorageAreaController,
+WarehouseLocationController,
+ZoneController,
+CategoryController,
+PartnerController,
+ProductController,
+InventoryTransactionController};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -137,13 +143,87 @@ Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-a
     Route::delete('/{storage_area}', [WarehouseStorageAreaController::class, 'destroy'])->name('destroy'); // حذف منطقة تخزين
 });
 
-    // إدارة مناطق المستودع
-    Route::prefix('warehouses')->name('warehouses.')->group(function () {
-        Route::get('/storage-areas', [WarehouseStorageAreaController::class, 'index'])->name('storage-areas.index');
-        Route::get('/storage-areas/create', [WarehouseStorageAreaController::class, 'create'])->name('storage-areas.create');
-        Route::post('/storage-areas', [WarehouseStorageAreaController::class, 'store'])->name('storage-areas.store');
-        Route::get('/storage-areas/{zone}/edit', [WarehouseStorageAreaController::class, 'edit'])->name('storage-areas.edit');
-        Route::put('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'update'])->name('storage-areas.update');
-        Route::delete('/storage-areas/{zone}', [WarehouseStorageAreaController::class, 'destroy'])->name('storage-areas.destroy');
-    });
+    
+
+Route::prefix('warehouses/{warehouse}/locations')->group(function () {
+    Route::get('/', [WarehouseLocationController::class, 'index'])->name('warehouse.locations.index');
+    Route::get('/create', [WarehouseLocationController::class, 'create'])->name('warehouse.locations.create');
+    Route::post('/', [WarehouseLocationController::class, 'store'])->name('warehouse.locations.store');
+    Route::get('/{warehouse_location}/edit', [WarehouseLocationController::class, 'edit'])->name('warehouse.locations.edit');
+    Route::put('/{warehouse_location}', [WarehouseLocationController::class, 'update'])->name('warehouse.locations.update');
+    Route::delete('/{warehouse_location}', [WarehouseLocationController::class, 'destroy'])->name('warehouse.locations.destroy');
+});
+
+
+Route::resource('zones', ZoneController::class);
+
+//Categroy routers
+Route::prefix('categories')->name('categories.')->group(function () {
+    // عرض قائمة الفئات
+    Route::get('/', [CategoryController::class, 'index'])->name('index');
+
+    // عرض نموذج إضافة فئة جديدة
+    Route::get('/create', [CategoryController::class, 'create'])->name('create');
+
+    // تخزين فئة جديدة
+    Route::post('/', [CategoryController::class, 'store'])->name('store');
+
+    // عرض نموذج تعديل فئة
+    Route::get('/{category}/edit', [CategoryController::class, 'edit'])->name('edit');
+
+    // تحديث بيانات الفئة
+    Route::put('/{category}', [CategoryController::class, 'update'])->name('update');
+
+    // حذف الفئة
+    Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
+});
+ 
+
+// مجموعة مسارات إدارة الشركاء
+Route::prefix('partners')->name('partners.')->group(function () {
+    Route::get('/', [PartnerController::class, 'index'])->name('index'); // عرض قائمة الشركاء
+    Route::get('/create', [PartnerController::class, 'create'])->name('create'); // نموذج إنشاء شريك جديد
+    Route::post('/', [PartnerController::class, 'store'])->name('store'); // تخزين الشريك الجديد
+    Route::get('/{partner}/edit', [PartnerController::class, 'edit'])->name('edit'); // تعديل الشريك
+    Route::put('/{partner}', [PartnerController::class, 'update'])->name('update'); // تحديث بيانات الشريك
+    Route::delete('/{partner}', [PartnerController::class, 'destroy'])->name('destroy'); // حذف الشريك
+});
+Route::prefix('products')->name('products.')->group(function () {
+    Route::get('/', [ProductController::class, 'index'])->name('index'); // قائمة المنتجات
+    Route::get('/create', [ProductController::class, 'create'])->name('create'); // إنشاء منتج جديد
+    Route::post('/', [ProductController::class, 'store'])->name('store'); // تخزين المنتج الجديد
+    Route::get('/{product}', [ProductController::class, 'show'])->name('show'); // عرض المنتج
+    Route::get('/{product}/edit', [ProductController::class, 'edit'])->name('edit'); // تعديل المنتج
+    Route::put('/{product}', [ProductController::class, 'update'])->name('update'); // تحديث المنتج
+    Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy'); // حذف المنتج
+});
+
+Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(function () {
+    // عرض صفحة إنشاء عملية مخزنية جديدة
+    Route::get('/create', [InventoryTransactionController::class, 'create'])
+        ->name('create');
+
+    // تخزين العملية المخزنية الجديدة
+    Route::post('/', [InventoryTransactionController::class, 'store'])
+        ->name('store');
+
+    // عرض تفاصيل عملية مخزنية معينة
+    Route::get('/{id}', [InventoryTransactionController::class, 'show'])
+        ->name('show');
+
+    // عرض صفحة تعديل عملية مخزنية
+    Route::get('/{id}/edit', [InventoryTransactionController::class, 'edit'])
+        ->name('edit');
+
+    // تحديث بيانات العملية المخزنية
+    Route::put('/{id}', [InventoryTransactionController::class, 'update'])
+        ->name('update');
+
+    // حذف العملية المخزنية
+    Route::delete('/{id}', [InventoryTransactionController::class, 'destroy'])
+        ->name('destroy');
+});
+
+
+
 });

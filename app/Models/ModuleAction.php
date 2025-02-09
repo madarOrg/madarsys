@@ -3,12 +3,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasBranch;
 
 class ModuleAction extends Model {
-    use HasFactory;
+    use HasBranch,HasFactory;
     
-    protected $fillable = ['module_id', 'name', 'action_key','icon', 'route'];
-
+    protected $fillable = ['module_id', 'name', 'action_key','icon', 'route','branch_id'];
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
 
     public function module() {
         return $this->belongsTo(Module::class, 'module_id');

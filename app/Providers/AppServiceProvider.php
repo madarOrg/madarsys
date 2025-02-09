@@ -4,8 +4,10 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Blade;
 use App\Services\NavbarService;
 use App\Services\UserPermissionService;
+use App\View\Components\Navbar; 
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,7 +23,8 @@ class AppServiceProvider extends ServiceProvider
      * Bootstrap any application services.
      */
     public function boot(NavbarService $navbarService, UserPermissionService $userPermissionService): void
-    {
+    {    Blade::component('navbar', Navbar::class);
+
         // تحديد القوالب التي تحتاج إلى Navbar
         $viewsNeedingNavbar = [
             

@@ -17,6 +17,8 @@ class UsersSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
+                'branch_id'      => 2,
+
             ],
             [
                 'name' => 'Representative User',
@@ -24,6 +26,8 @@ class UsersSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
+                'branch_id'      => 2,
+
             ],
             [
                 'name' => 'Storekeeper User',
@@ -31,6 +35,8 @@ class UsersSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
+                'branch_id'      => 2,
+
             ],
             [
                 'name' => 'Accountant User',
@@ -38,6 +44,8 @@ class UsersSeeder extends Seeder
                 'password' => Hash::make('password'),
                 'created_at' => now(),
                 'updated_at' => now(),
+                'branch_id'      => 2,
+
             ],
         ];
 

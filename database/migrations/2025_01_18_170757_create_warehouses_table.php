@@ -29,7 +29,6 @@ class CreateWarehousesTable extends Migration
         $table->decimal('latitude', 10, 7)->nullable(); // Latitude
         $table->decimal('longitude', 10, 7)->nullable(); // Longitude
         $table->float('area', 8, 2)->nullable(); // Warehouse area in square meters
-        $table->integer('shelves_count')->nullable(); // Number of shelves
         $table->float('capacity')->nullable(); // Warehouse capacity
         $table->boolean('is_smart')->default(false); // Is the warehouse smart?
         $table->boolean('has_security_system')->default(false); // Has security system

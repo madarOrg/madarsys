@@ -43,14 +43,16 @@ class UserController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withErrors($validator)->withInput();
         }
+        $branchId = $request->branch_id ?? auth()->user()->branch_id ?? null;
 
-        // إنشاء المستخدم
+        // إنشاء المستخدم مع branch_id
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'branch_id' => $branchId, // يتم تعيين البرانش إذا كان متاحًا
         ]);
-
+        
         // تعيين الدور للمستخدم
         $role = \App\Models\Role::where('name', $request->role)->first(); // استرجاع الدور بناءً على الاسم
         $user->roles()->attach($role->id); // ربط المستخدم بالدور

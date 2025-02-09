@@ -12,20 +12,20 @@ class WarehouseLocation extends Model
     // تعريف الجدول إذا كان مختلف عن الاسم الافتراضي
     protected $table = 'warehouse_locations';
 
-    // تحديد الأعمدة القابلة للتحديث
     protected $fillable = [
-        'warehouse_id',
-        'location_name',
-        'aisle',
-        'shelf_number',
-        'product_type',
-        'capacity',
-        'current_occupancy',
-        'zone_id',
+        'warehouse_id',      // معرف المستودع
+        'storage_area_id',   // معرف منطقة التخزين
+        'aisle',             // رقم الممر
+        'rack',              // رقم الرف
+        'shelf',             // رقم الرف الفرعي
+        'position',          // الموقع على الرف
+        'barcode',           // باركود الموقع (يجب أن يكون فريدًا)
+        'is_occupied',       // حالة الموقع (مشغول أو فارغ)
+        'notes',             // ملاحظات إضافية
     ];
 
     /**
-     * العلاقة مع موديل Warehouse.
+     * العلاقة مع موديل Warehouse
      */
     public function warehouse()
     {
@@ -33,12 +33,20 @@ class WarehouseLocation extends Model
     }
 
     /**
-     * العلاقة مع موديل Zone.
+     * العلاقة مع موديل Zone
      */
-    // public function zone()
-    // {
-    //     return $this->belongsTo(Zone::class);
-    // }
+    public function zone()
+    {
+        return $this->belongsTo(Zone::class);
+    }
+
+     /**
+     * العلاقة مع منطقة التخزين
+     */
+    public function storageArea()
+    {
+        return $this->belongsTo(WarehouseStorageArea::class, 'storage_area_id');
+    }
 
     /**
      * إرجاع الحالة إذا كانت المنطقة مشغولة.

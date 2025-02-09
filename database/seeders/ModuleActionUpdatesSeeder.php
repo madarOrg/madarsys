@@ -134,7 +134,9 @@ class ModuleActionUpdatesSeeder extends Seeder
                     [
                         'name'       => $child['text'],
                         'route'      => $child['href'],
-                        'icon'       => $child['icon'] ?? null
+                        'icon'       => $child['icon'] ?? null,
+                        'branch_id'  => 2 // إضافة البرانش 2 هنا
+
                     ]
                 );
             }

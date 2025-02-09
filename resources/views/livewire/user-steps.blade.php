@@ -1,10 +1,10 @@
 <div>
     <!-- عرض الرسائل الناجحة -->
-    @if (session()->has('success'))
+    {{-- @if (session()->has('success'))
         <div class="alert alert-success">
             {{ session('success') }}
         </div>
-    @endif
+    @endif --}}
 
     <ol class="pt-12 flex items-center w-full text-sm text-gray-500 font-medium sm:text-base mb-12">
         <!-- Step 1 -->
