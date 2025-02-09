@@ -41,6 +41,7 @@ class InventoryTransactionController extends Controller
             'department_id' => $request->department_id,
             'warehouse_id' => $request->warehouse_id,
             'notes' => $request->notes,
+            'inventory_request_id' => $request->inventory_request_id, // إضافة رقم الطلب
         ]);
 
         // تخزين تفاصيل العملية المخزنية

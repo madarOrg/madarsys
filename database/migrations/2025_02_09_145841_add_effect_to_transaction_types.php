@@ -19,9 +19,6 @@ return new class extends Migration {
         DB::table('transaction_types')
             ->whereIn('name', ['بيع', 'إرجاع لمورد', 'تلف', 'سرقة', 'صرف', 'تحويل مخزني', 'انتهاء الصلاحية'])
             ->update(['effect' => '-']);
-     DB::table('transaction_types')
-            ->whereIn('name', ['شراء', 'إرجاع من عميل', 'إنتاج داخلي', 'استرجاع من الإنتاج'])
-            ->update(['effect' => '+']);
     }
 
     public function down(): void

@@ -13,7 +13,14 @@
                     <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-full">
                         <!-- بيانات الحركة -->
                         <div class="col-span-1">
-                            <x-file-input id="transaction_type_id" name="transaction_type_id" label="نوع العملية" type="select" :options="$transactionTypes" required="true" />
+                            <label for="transaction_type_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">نوع العملية</label>
+                            <select id="transaction_type_id" name="transaction_type_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50" required>
+                                @foreach($transactionTypes as $transactionType)
+                                    <option value="{{ $transactionType->id }}" {{ old('transaction_type_id') == $transactionType->id ? 'selected' : '' }}>
+                                        {{ $transactionType->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('transaction_type_id')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -34,7 +41,14 @@
                         </div>
 
                         <div class="col-span-1">
-                            <x-file-input id="partner_id" name="partner_id" label="الشريك" type="select" :options="$partners" />
+                            <label for="partner_id" class="block text-sm font-medium text-gray-700 dark:text-gray-300">الشريك</label>
+                            <select id="partner_id" name="partner_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-500 focus:ring-opacity-50">
+                                @foreach($partners as $partner)
+                                    <option value="{{ $partner->id }}" {{ old('partner_id') == $partner->id ? 'selected' : '' }}>
+                                        {{ $partner->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                             @error('partner_id')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
