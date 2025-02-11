@@ -98,4 +98,51 @@ class ProductController extends Controller
         // إعادة التوجيه مع رسالة نجاح
         return redirect()->route('products.index')->with('success', 'تم حذف المنتج بنجاح');
     }
+    // مثال: InventoryController.php أو أي Controller تستخدمه
+    public function getUnits($productId)
+{
+    // تحميل المنتج مع جميع مستويات الوحدات المتداخلة
+    $product = Product::with(['unit.childrenRecursive', 'unit.parentRecursive'])->find($productId);
+
+    // التحقق من وجود المنتج والوحدة
+    if (!$product || !$product->unit) {
+        return response()->json(['units' => []]);
+    }
+
+    $units = [];
+
+    // إضافة الوحدة الأساسية الخاصة بالمنتج
+    $units[] = $product->unit;
+
+    // استرجاع جميع الأبناء المتداخلين
+    $this->getAllChildren($product->unit, $units);
+
+    // استرجاع جميع الآباء المتداخلين
+    $this->getAllParents($product->unit, $units);
+
+    return response()->json(['units' => $units]);
 }
+
+/**
+ * جلب جميع الوحدات الأبناء بشكل متداخل
+ */
+private function getAllChildren($unit, &$units)
+{
+    foreach ($unit->children as $child) {
+        $units[] = $child;
+        $this->getAllChildren($child, $units);
+    }
+}
+
+/**
+ * جلب جميع الوحدات الآباء بشكل متداخل
+ */
+private function getAllParents($unit, &$units)
+{
+    if ($unit->parent) {
+        $units[] = $unit->parent;
+        $this->getAllParents($unit->parent, $units);
+    }
+}
+
+}    

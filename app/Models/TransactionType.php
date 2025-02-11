@@ -17,7 +17,8 @@ class TransactionType extends Model
     protected $fillable = [
         'name',
         'description',
-        'branch_id'
+        'branch_id',
+        'effect'
     ];
 
     // للحصول على علاقة مع العمليات المخزنية

@@ -24,7 +24,8 @@ return new class extends Migration {
         $table->foreignId('inventory_transaction_id')->constrained('inventory_transactions')->onDelete('cascade'); // معرف العملية
         $table->foreignId('product_id')->constrained('products')->onDelete('cascade'); // المنتج
         $table->integer('quantity'); // الكمية (موجبة أو سالبة)
-        $table->decimal('unit_price', 10, 2)->nullable(); // سعر الوحدة
+        $table->foreignId('unit_id')->nullable()->constrained('units')->onDelete('set null'); // حقل الوحدة
+        $table->decimal('converted_quantity', 10, 4)->nullable(); // حقل الكمية المحولة
         $table->decimal('total', 15, 2)->nullable(); // إجمالي السعر
         $table->foreignId('warehouse_location_id') // معرف موقع التخزين
             ->nullable()

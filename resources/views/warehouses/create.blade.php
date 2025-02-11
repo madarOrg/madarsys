@@ -116,15 +116,15 @@
                                 placeholder="المساحة" required="true" />
                         </div>
 
-                        <div class="col-span-1">
+                        {{-- <div class="col-span-1">
                             <x-file-input id="shelves-count" name="shelves_count" label="عدد الأرفف" type="number"
                                 placeholder="10" required="true" />
-                        </div>
+                        </div> --}}
 
-                        <div class="col-span-1">
+                        {{-- <div class="col-span-1">
                             <x-file-input id="capacity" name="capacity" label="السعة التخزينية (متر مكعب)"
                                 type="number" placeholder="1000" required="true" />
-                        </div>
+                        </div> --}}
 
                         <div class="col-span-1">
                             <x-file-input id="temperature" name="temperature" label="درجة الحرارة" type="number"

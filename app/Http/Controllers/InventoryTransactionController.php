@@ -5,16 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\InventoryTransaction;
 use App\Models\InventoryTransactionItem;
 use App\Models\Product;
+use App\Models\Unit;
 use App\Models\WarehouseLocation;
 use App\Models\TransactionType;
 use App\Models\Partner;
 use App\Models\Department;
-USE App\Models\Warehouse;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreInventoryTransactionRequest;
+use App\Traits\HandlesInventoryCalculations;
 
 class InventoryTransactionController extends Controller
 {
+    use HandlesInventoryCalculations;
+
     // عرض النموذج لإنشاء عملية مخزنية جديدة
     public function create()
     {
@@ -23,42 +27,58 @@ class InventoryTransactionController extends Controller
         $partners = Partner::all();
         $departments = Department::all();
         $warehouses = Warehouse::all();
-        $products = Product::all();
+        $products = Product::with('unit')->get(); // جلب المنتجات مع الوحدات
+        $units = Unit::all(); // جلب جميع الوحدات
         $warehouseLocations = WarehouseLocation::all();
 
         return view('inventory.transactions.create', compact('transactionTypes', 'partners', 'departments', 'warehouses', 'products', 'warehouseLocations'));
     }
 
-    // تخزين العملية المخزنية وتفاصيلها
-    public function store(StoreInventoryTransactionRequest $request)
-    {
-        // بداية العملية المخزنية
-        $transaction = InventoryTransaction::create([
-            'transaction_type_id' => $request->transaction_type_id,
-            'transaction_date' => $request->transaction_date,
-            'reference' => $request->reference,
-            'partner_id' => $request->partner_id,
-            'department_id' => $request->department_id,
-            'warehouse_id' => $request->warehouse_id,
-            'notes' => $request->notes,
-            'inventory_request_id' => $request->inventory_request_id, // إضافة رقم الطلب
-        ]);
-
-        // تخزين تفاصيل العملية المخزنية
-        foreach ($request->products as $index => $productId) {
-            InventoryTransactionItem::create([
-                'inventory_transaction_id' => $transaction->id,
-                'product_id' => $productId,
-                'quantity' => $request->quantities[$index],
-                'unit_price' => $request->unit_prices[$index],
-                'total' => $request->totals[$index],
-                'warehouse_location_id' => $request->warehouse_locations[$index],
+  
+    
+        public function store(StoreInventoryTransactionRequest $request)
+        {
+            // إنشاء العملية المخزنية
+            $transaction = InventoryTransaction::create([
+                'transaction_type_id'  => $request->transaction_type_id,
+                'effect'              => $request->effect,
+                'transaction_date'    => $request->transaction_date,
+                'reference'           => $request->reference,
+                'partner_id'          => $request->partner_id,
+                'department_id'       => $request->department_id,
+                'warehouse_id'        => $request->warehouse_id,
+                'notes'               => $request->notes,
+                'inventory_request_id' => $request->inventory_request_id,
             ]);
+    
+            // التكرار على المنتجات المخزنية
+            foreach ($request->products as $index => $productId) {
+                $quantity = $request->quantities[$index];
+                $unitId = $request->units[$index] ?? null;
+    
+                // تطبيق التأثير على الكمية
+                $quantity = $this->applyEffectToQuantity($quantity, $request->effect);
+                // حساب الكمية المحولة
+                $convertedQuantity = $this->calculateConvertedQuantity($quantity, $unitId);
+                // dd($convertedQuantity);
+
+                // حفظ تفاصيل العملية
+                InventoryTransactionItem::create([
+                    'inventory_transaction_id' => $transaction->id,
+                    'unit_id'                  => $unitId,
+                    'product_id'               => $productId,
+                    'quantity'                 => $quantity,
+                    'unit_price'               => $request->unit_prices[$index] ?? 0,
+                    'total'                    => $request->totals[$index] ?? 0,
+                    'warehouse_location_id'    => $request->warehouse_locations[$index] ?? null,
+                    'converted_quantity'       => $convertedQuantity,
+                ]);
+            }
+    
+            return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
         }
-
-        return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
-    }
-
+    
+    
     // عرض تفاصيل العملية المخزنية
     public function show($id)
     {

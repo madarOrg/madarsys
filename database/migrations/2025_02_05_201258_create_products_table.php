@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->unsignedInteger('stock_quantity')->default(0); // الكمية المتاحة في المخزون
             $table->unsignedInteger('min_stock_level')->default(1); // الحد الأدنى للمخزون
             $table->unsignedInteger('max_stock_level')->nullable(); // الحد الأقصى للمخزون
-            $table->string('unit', 50)->default('pcs'); // وحدة القياس
+            $table->foreignId('unit_id')->after('max_stock_level')->constrained('units')->onDelete('cascade'); // إضافة الوحدة المرتبطة
             $table->boolean('is_active')->default(true); // حالة تفعيل المنتج
             $table->timestamps(); // created_at & updated_at
         });

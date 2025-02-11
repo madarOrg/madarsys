@@ -36,6 +36,16 @@ class Product extends Model
     {
         return $this->belongsTo(Category::class);
     }
+    // Product model (Product.php)
+     // app/Models/Product.php
+
+
+        public function unit()
+        {
+            return $this->belongsTo(Unit::class, 'unit_id', 'id');
+        }
+        
+
 
     // العلاقة مع المورد
     public function supplier()

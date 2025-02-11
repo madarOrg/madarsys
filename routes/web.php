@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Livewire\WarehouseReports;
+use App\Models\Product;
 
 use App\Http\Controllers\
 {AuthController,
@@ -197,6 +198,9 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::put('/{product}', [ProductController::class, 'update'])->name('update'); // تحديث المنتج
     Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy'); // حذف المنتج
 });
+
+
+Route::get('/get-units/{productId}', [ProductController::class, 'getUnits']);
 
 Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(function () {
     // عرض صفحة إنشاء عملية مخزنية جديدة

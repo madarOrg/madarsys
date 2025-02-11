@@ -4,20 +4,28 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\HasBranch;
 
 class InventoryTransaction extends Model
 {
-    use HasFactory;
+    use HasBranch,HasFactory;
 
     protected $fillable = [
         'transaction_type_id',
+        'effect',
         'transaction_date',
         'partner_id',
         'department_id',
         'warehouse_id',
         'notes',
+        'branch_id',
+        'inventory_request_id'
     ];
-
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class);
+    }
+    
     public function items()
     {
         return $this->hasMany(InventoryTransactionItem::class);
