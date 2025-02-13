@@ -26,8 +26,8 @@ class StoreInventoryTransactionRequest extends FormRequest
         return [
             'transaction_type_id' => 'required|exists:transaction_types,id',
             'transaction_date' => 'required|date',
-            'reference' => 'nullable|string|max:255',
-            'partner_id' => 'nullable|exists:partners,id',
+            'reference' => 'required|string|max:255',
+            'partner_id' => 'required|exists:partners,id',
             'department_id' => 'nullable|exists:departments,id',
             'warehouse_id' => 'required|exists:warehouses,id',
             'notes' => 'nullable|string',

@@ -66,6 +66,7 @@ class InventoryTransactionController extends Controller
                 InventoryTransactionItem::create([
                     'inventory_transaction_id' => $transaction->id,
                     'unit_id'                  => $unitId,
+                    'unit_product_id'          => Product::find($productId)->unit_id, // الوحدة الأساسية للمنتج
                     'product_id'               => $productId,
                     'quantity'                 => $quantity,
                     'unit_price'               => $request->unit_prices[$index] ?? 0,
