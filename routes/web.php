@@ -22,7 +22,8 @@ ZoneController,
 CategoryController,
 PartnerController,
 ProductController,
-InventoryTransactionController};
+InventoryTransactionController,
+SettingController};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -198,10 +199,12 @@ Route::prefix('products')->name('products.')->group(function () {
     Route::put('/{product}', [ProductController::class, 'update'])->name('update'); // تحديث المنتج
     Route::delete('/{product}', [ProductController::class, 'destroy'])->name('destroy'); // حذف المنتج
 });
+//settings
+ Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
+Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 
-
+//inventory/transactions
 Route::get('/get-units/{productId}', [ProductController::class, 'getUnits']);
-
 Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(function () {
     // عرض صفحة إنشاء عملية مخزنية جديدة
     Route::get('/create', [InventoryTransactionController::class, 'create'])
