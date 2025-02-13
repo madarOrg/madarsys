@@ -36,8 +36,9 @@ class InventoryTransactionController extends Controller
 
   
     
-        public function store(StoreInventoryTransactionRequest $request)
-        {
+    public function store(StoreInventoryTransactionRequest $request)
+    {
+        try {
             // إنشاء العملية المخزنية
             $transaction = InventoryTransaction::create([
                 'transaction_type_id'  => $request->transaction_type_id,
@@ -60,8 +61,7 @@ class InventoryTransactionController extends Controller
                 $quantity = $this->applyEffectToQuantity($quantity, $request->effect);
                 // حساب الكمية المحولة
                 $convertedQuantity = $this->calculateConvertedQuantity($quantity, $unitId);
-                // dd($convertedQuantity);
-
+    
                 // حفظ تفاصيل العملية
                 InventoryTransactionItem::create([
                     'inventory_transaction_id' => $transaction->id,
@@ -77,7 +77,14 @@ class InventoryTransactionController extends Controller
             }
     
             return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
+    
+        } catch (\Exception $e) {
+            // في حالة وجود خطأ، نعيد المستخدم إلى النموذج مع البيانات السابقة والأخطاء
+            return redirect()->back()
+                             ->withInput() // إعادة البيانات المدخلة
+                             ->withErrors(['error' => 'حدث خطأ أثناء إضافة العملية المخزنية: ' . $e->getMessage()]);
         }
+    }
     
     
     // عرض تفاصيل العملية المخزنية
