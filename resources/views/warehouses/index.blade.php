@@ -37,12 +37,19 @@
             <tbody>
                 @foreach($warehouses as $warehouse)
                 <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                    {{-- @if(!$warehouse->is_active) border-4 border-red-500 @endif"> --}}
+
                     <td class="p-4">
                         <input type="checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600">
                     </td>
                     <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-300">
-                        <a href="javascript:void(0)" onclick="toggleWarehouseDetails({{ $warehouse->id }})">{{ $warehouse->name }}</a>
+                        <a href="javascript:void(0)" 
+                           onclick="toggleWarehouseDetails({{ $warehouse->id }})" 
+                           class="@if(!$warehouse->is_active) text-red-500 @endif">
+                           {{ $warehouse->name }}
+                        </a>
                     </td>
+                    
                     <td class="px-6 py-4">
                         {{ $warehouse->branch->company->name ?? 'لا يوجد' }} / 
                         {{ $warehouse->branch->name ?? 'لا يوجد' }}

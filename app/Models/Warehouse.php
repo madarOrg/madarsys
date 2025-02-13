@@ -29,7 +29,8 @@ class Warehouse extends Model
         'has_automated_systems',
         'temperature',
         'humidity',
-        'code'
+        'code',
+        'is_active'
     ];
 
     // علاقة المستودع مع الفرع

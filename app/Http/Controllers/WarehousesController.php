@@ -72,6 +72,8 @@ class WarehousesController extends Controller
                 'has_cctv' => 'boolean',
                 'temperature' => 'nullable|numeric',
                 'humidity' => 'nullable|numeric',
+                'is_active' => 'boolean',
+
             ]);
             
             // تخزين البيانات في قاعدة البيانات
@@ -139,6 +141,8 @@ public function update(Request $request, string $id)
             'has_cctv' => 'boolean',
             'temperature' => 'nullable|numeric',
             'humidity' => 'nullable|numeric',
+            'is_active' => 'boolean',
+
         ]);
 
         // العثور على المستودع وتحديثه
@@ -159,6 +163,9 @@ public function update(Request $request, string $id)
             'has_cctv' => $request->has('has_cctv') ? $validated['has_cctv'] : false,
             'temperature' => $validated['temperature'],
             'humidity' => $validated['humidity'],
+            'is_active' => $request->has('is_active') ? $validated['is_active'] : false,
+
+
         ]);
 
         // إعادة التوجيه مع رسالة نجاح

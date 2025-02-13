@@ -189,6 +189,14 @@
                         <div class="sm:col-span-4 flex items-center space-x-8">
                             <input 
                                 type="checkbox" 
+                                id="is_active" 
+                                name="is_active" 
+                                value="1" 
+                                {{ old('is_active', $warehouse->is_active) ? 'checked' : '' }}>
+                            <label for="is-active" class="block text-sm font-medium text-gray-600 dark:text-gray-400">هل المستودع متاح؟</label>
+                        
+                            <input 
+                                type="checkbox" 
                                 id="is_smart" 
                                 name="is_smart" 
                                 value="1" 
