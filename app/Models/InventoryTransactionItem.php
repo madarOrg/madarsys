@@ -12,13 +12,15 @@ class InventoryTransactionItem extends Model
 
     protected $fillable = [
         'inventory_transaction_id',
+        'unit_id',
         'product_id',
+        'unit_prices',
         'quantity',
         'total',
         'warehouse_location_id',
         'branch_id',
-        'unit_id',
-        'converted_quantity'
+        'converted_quantity',
+        'unit_product_id'  
 
     ];
     public function branch()

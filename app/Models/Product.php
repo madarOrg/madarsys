@@ -23,9 +23,12 @@ class Product extends Model
         'stock_quantity',
         'min_stock_level',
         'max_stock_level',
-        'unit',
+        'unit_id',
         'is_active',
-        'branch_id'
+        'branch_id',
+
+        
+        
     ];
     public function branch()
     {

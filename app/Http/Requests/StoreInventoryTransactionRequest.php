@@ -50,10 +50,12 @@ class StoreInventoryTransactionRequest extends FormRequest
             'notes' => 'nullable|string',
             'products' => 'required|array',
             'products.*' => 'exists:products,id',
+            // 'prices.*' => ['numeric', 'min:0.01'],
+            // 'totals.*' => ['numeric', 'min:0.01'],
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:0.01',
             'warehouse_locations' => 'nullable|array',
-            'warehouse_locations.*' => 'exists:warehouse_locations,id',
+            'warehouse_locations.*' =>'nullable|exists:warehouse_locations,id',
         ];
     }
 

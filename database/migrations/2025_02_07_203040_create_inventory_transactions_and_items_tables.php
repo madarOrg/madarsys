@@ -27,7 +27,8 @@ return new class extends Migration {
         $table->foreignId('unit_id')->nullable()->constrained('units')->onDelete('set null'); // حقل الوحدة
         $table->foreignId('unit_product_id')->nullable()->constrained('units')->onDelete('set null'); // حقل الوحدة
         $table->decimal('converted_quantity', 10, 4)->nullable(); // حقل الكمية المحولة
-        $table->decimal('total', 15, 2)->nullable(); // إجمالي السعر
+        $table->decimal('unit_prices', 15, 2)->nullable(); // إجمالي السعر
+        $table->decimal('total', 20, 6)->nullable(); // إجمالي السعر
         $table->foreignId('warehouse_location_id') // معرف موقع التخزين
             ->nullable()
             ->constrained('warehouse_locations') // ربطه بجدول warehouse_locations

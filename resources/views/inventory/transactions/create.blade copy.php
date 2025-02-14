@@ -16,25 +16,33 @@
                         class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                         <option value="">اختر نوع العملية</option>
                         @foreach ($transactionTypes as $transactionType)
-                            <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">
-                                {{ $transactionType->name }}
-                            </option>
+                        <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">
+                            {{ $transactionType->name }}
+                        </option>
                         @endforeach
                     </select>
+
+                  <!-- حقل خيارات + أو - -->
+<div id="options-container" class="mt-4 hidden">
+    <label for="options" class="block text-sm font-medium text-gray-600 dark:text-gray-400">
+        اختر الخيار
+    </label>
+    <div class="flex space-x-4">
+        <button type="button" id="increase" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">
+            +
+        </button>
+        <button type="button" id="decrease" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+            -
+        </button>
+    </div>
+</div>
+
+<!-- حقل مخفي لتمرير القيمة -->
+<input type="hidden" id="effect" name="effect" value="0">
 
                     <!-- تاريخ العملية -->
                     <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية" type="date"
                         required="true" />
-                    <!-- حقل التأثير -->
-                    <label for="effect" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mt-2">
-                        التأثير
-                    </label>
-                    <select name="effect" id="effect"
-                        class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                        <option value="1">+</option>
-                        <option value="-1">-</option>
-                    </select>
-                    <input type="hidden" id="hidden-effect" name="hidden-effect" value="0">
 
                     <!-- الرقم المرجعي -->
                     <x-file-input id="reference" name="reference" label="الرقم المرجعي (اختياري)" type="text" />
@@ -45,7 +53,7 @@
                     <select id="partner_id" name="partner_id"
                         class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                         @foreach ($partners as $partner)
-                            <option value="{{ $partner->id }}">{{ $partner->name }}</option>
+                        <option value="{{ $partner->id }}">{{ $partner->name }}</option>
                         @endforeach
                     </select>
 
@@ -56,7 +64,7 @@
                         class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                         <option value=""></option>
                         @foreach ($departments as $department)
-                            <option value="{{ $department->id }}">{{ $department->name }}</option>
+                        <option value="{{ $department->id }}">{{ $department->name }}</option>
                         @endforeach
                     </select>
 
@@ -66,7 +74,7 @@
                     <select id="warehouse_id" name="warehouse_id"
                         class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                         @foreach ($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
 
@@ -100,53 +108,53 @@
                         </thead>
                         <tbody>
                             @foreach (old('products', []) as $index => $productId)
-                                <tr
-                                    class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
-                                    <td class="px-6 py-4">
-                                        <select name="products[]"
-                                            class="w-full product-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                                            <option value="">اختر منتج</option>
-                                            @foreach ($products as $product)
-                                                <option value="{{ $product->id }}">{{ $product->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <select name="units[]"
-                                            class="w-full units-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                                            <option value="">اختر وحدة</option>
-                                        </select>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <input type="number" name="quantities[]"
-                                            class="w-full bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <input type="number" name="unit_prices[]"
-                                            class="w-full bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
-                                            min="0" step="0.01" />
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <input type="number" name="totals[]"
-                                            class="w-full bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
-                                            min="0" step="0.01" />
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <select name="warehouse_locations[]"
-                                            class="w-full warehouse-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                                            <option value="">اختر موقع التخزين</option>
-                                            @foreach ($warehouseLocations as $location)
-                                                <option value="{{ $location->id }}">{{ $location->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <button type="button" class="text-red-600 hover:text-red-800"
-                                            onclick="removeProductRow(this)">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
+                            <tr
+                                class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+                                <td class="px-6 py-4">
+                                    <select name="products[]"
+                                        class="w-full product-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                        <option value="">اختر منتج</option>
+                                        @foreach ($products as $product)
+                                        <option value="{{ $product->id }}">{{ $product->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <select name="units[]"
+                                        class="w-full units-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                        <option value="">اختر وحدة</option>
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <input type="number" name="quantities[]"
+                                        class="w-full bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <input type="number" name="unit_prices[]"
+                                        class="w-full bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
+                                        min="0" step="0.01" />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <input type="number" name="totals[]"
+                                        class="w-full bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
+                                        min="0" step="0.01" />
+                                </td>
+                                <td class="px-6 py-4">
+                                    <select name="warehouse_locations[]"
+                                        class="w-full warehouse-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                        <option value="">اختر موقع التخزين</option>
+                                        @foreach ($warehouseLocations as $location)
+                                        <option value="{{ $location->id }}">{{ $location->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="px-6 py-4">
+                                    <button type="button" class="text-red-600 hover:text-red-800"
+                                        onclick="removeProductRow(this)">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </td>
+                            </tr>
                             @endforeach
                         </tbody>
                     </table>
@@ -183,7 +191,7 @@
                     <td class="px-6 py-4">
                              <select name="units[]" 
                                             class="w-full units-select
-                                                bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500
+                                              product-select  bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500
                                             ">
                             <option value="">اختر وحدة</option>
                         </select>
@@ -224,10 +232,75 @@
     </script>
 
     <!-- كود AJAX لجلب الوحدات بناءً على اختيار المنتج -->
-    @vite([
-        
-        'resources/js/inventory.js',
-        
-    ])    
+    <script>
+        document.addEventListener('change', function(event) {
+            if (event.target.classList.contains('product-select')) {
+                const productId = event.target.value;
+                const row = event.target.closest('.product-row');
+                if (!row) return;
+                const unitsSelect = row.querySelector('.units-select');
+                if (!unitsSelect) return;
 
+                // إعادة تعيين قائمة الوحدات
+                unitsSelect.innerHTML = '<option value="">اختر وحدة</option>';
+
+                if (productId) {
+                    fetch(`/get-units/${productId}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            data.units.forEach(unit => {
+                                const option = document.createElement('option');
+                                option.value = unit.id;
+                                option.textContent = unit.name;
+                                unitsSelect.appendChild(option);
+                            });
+                        })
+                        .catch(error => {
+                            console.error("خطأ في جلب الوحدات:", error);
+                        });
+                }
+            }
+        });
+    </script>
+   
+<script>
+    // وظيفة لتحديث قيمة التأثير عند اختيار نوع العملية
+    function updateEffectValue() {
+        const transactionTypeSelect = document.getElementById('transaction_type_id');
+        const effectInput = document.getElementById('effect');
+        const optionsContainer = document.getElementById('options-container');
+        const hiddenEffectInput = document.getElementById('effect');
+
+        const selectedOption = transactionTypeSelect.options[transactionTypeSelect.selectedIndex];
+        const effectValue = selectedOption.getAttribute('data-effect');
+
+        effectInput.value = effectValue; // تعيين قيمة التأثير تلقائيًا
+
+        // إذا كان التأثير 0، نعرض خيارات + و -
+        if (effectValue == 0) {
+            optionsContainer.classList.remove('hidden');
+            hiddenEffectInput.value = 0; // تعيين القيمة المخفية إلى 0
+        } else {
+            optionsContainer.classList.add('hidden');
+            hiddenEffectInput.value = effectValue; // تمرير القيمة الأصلية إذا لم تكن 0
+        }
+    }
+
+    // وظيفة لتحديث القيمة المخفية بناءً على اختيار المستخدم
+    document.getElementById('increase').addEventListener('click', function() {
+        const hiddenEffectInput = document.getElementById('hidden-effect');
+        hiddenEffectInput.value = parseInt(hiddenEffectInput.value) + 1;
+    });
+
+    document.getElementById('decrease').addEventListener('click', function() {
+        const hiddenEffectInput = document.getElementById('hidden-effect');
+        hiddenEffectInput.value = parseInt(hiddenEffectInput.value) - 1;
+    });
+
+    // استدعاء وظيفة التحديث عند تغيير نوع العملية
+    document.getElementById('transaction_type_id').addEventListener('change', updateEffectValue);
+    
+    // استدعاء التحديث عند تحميل الصفحة (لتحديد التأثير عند تحميل الصفحة أولاً)
+    window.onload = updateEffectValue;
+</script>
 </x-layout>
