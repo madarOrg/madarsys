@@ -3,14 +3,23 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\Warehouse;
+use App\Services\InventoryValidationService;
 
 class StoreInventoryTransactionRequest extends FormRequest
 {
+    protected $inventoryValidationService;
+
+    /**
+     * حقن خدمة التحقق من المخزون في الطلب
+     */
+    public function __construct(InventoryValidationService $inventoryValidationService)
+    {
+        parent::__construct();
+        $this->inventoryValidationService = $inventoryValidationService;
+    }
+
     /**
      * تحديد ما إذا كان المستخدم يملك الصلاحية لإجراء هذا الطلب.
-     *
-     * @return bool
      */
     public function authorize()
     {
@@ -19,20 +28,24 @@ class StoreInventoryTransactionRequest extends FormRequest
 
     /**
      * تحديد قواعد التحقق من الصحة.
-     *
-     * @return array
      */
     public function rules()
     {
         return [
             'transaction_type_id' => 'required|exists:transaction_types,id',
-            'transaction_date' => 'required|date',
+            'transaction_date' => ['required', 'date', function ($attribute, $value, $fail) {
+                $errorMessage = $this->inventoryValidationService->validateTransactionDate($value);
+                if ($errorMessage) {
+                    $fail($errorMessage);
+                }
+            }],
             'reference' => 'required|string|max:255',
             'partner_id' => 'required|exists:partners,id',
             'department_id' => 'nullable|exists:departments,id',
-            'warehouse_id' => ['required', 'exists:warehouses,id', 
-                function ($attribute, $value, $fail) {
-                $this->validateWarehouseStatus($value, $fail);
+            'warehouse_id' => ['required', 'exists:warehouses,id', function ($attribute, $value, $fail) {
+                if (!$this->inventoryValidationService->isWarehouseActive($value)) {
+                    $fail('المستودع مغلق، لا يمكنك إضافة عمليات مخزنية.');
+                }
             }],
             'notes' => 'nullable|string',
             'products' => 'required|array',
@@ -46,8 +59,6 @@ class StoreInventoryTransactionRequest extends FormRequest
 
     /**
      * تخصيص الرسائل عند حدوث أخطاء التحقق.
-     *
-     * @return array
      */
     public function messages()
     {
@@ -56,20 +67,5 @@ class StoreInventoryTransactionRequest extends FormRequest
             'transaction_date.required' => 'يجب تحديد تاريخ العملية.',
             'products.required' => 'يجب إضافة المنتجات للعملية.',
         ];
-    }
-
-    /**
-     * دالة للتحقق مما إذا كان المستودع نشطًا أم لا.
-     *
-     * @param int $warehouseId
-     * @param callable $fail
-     */
-    private function validateWarehouseStatus($warehouseId, $fail)
-    {
-        $warehouse = Warehouse::find($warehouseId);
-
-        if ($warehouse && !$warehouse->is_active) {
-            $fail('المستودع مغلق، لا يمكنك إضافة عمليات مخزنية.');
-        }
     }
 }

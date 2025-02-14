@@ -13,11 +13,18 @@ use App\Models\Department;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreInventoryTransactionRequest;
-use App\Traits\HandlesInventoryCalculations;
+
+use App\Services\InventoryCalculationService;
+
 
 class InventoryTransactionController extends Controller
-{
-    use HandlesInventoryCalculations;
+{    protected $inventoryTransactionService;
+
+    public function __construct(InventoryCalculationService $inventoryTransactionService)
+    {
+        $this->inventoryTransactionService = $inventoryTransactionService;
+    }
+    
 
     // عرض النموذج لإنشاء عملية مخزنية جديدة
     public function create()
@@ -35,20 +42,19 @@ class InventoryTransactionController extends Controller
     }
 
   
-    
     public function store(StoreInventoryTransactionRequest $request)
     {
         try {
             // إنشاء العملية المخزنية
             $transaction = InventoryTransaction::create([
                 'transaction_type_id'  => $request->transaction_type_id,
-                'effect'              => $request->effect,
-                'transaction_date'    => $request->transaction_date,
-                'reference'           => $request->reference,
-                'partner_id'          => $request->partner_id,
-                'department_id'       => $request->department_id,
-                'warehouse_id'        => $request->warehouse_id,
-                'notes'               => $request->notes,
+                'effect'               => $request->effect,
+                'transaction_date'     => $request->transaction_date,
+                'reference'            => $request->reference,
+                'partner_id'           => $request->partner_id,
+                'department_id'        => $request->department_id,
+                'warehouse_id'         => $request->warehouse_id,
+                'notes'                => $request->notes,
                 'inventory_request_id' => $request->inventory_request_id,
             ]);
     
@@ -56,30 +62,31 @@ class InventoryTransactionController extends Controller
             foreach ($request->products as $index => $productId) {
                 $quantity = $request->quantities[$index];
                 $unitId = $request->units[$index] ?? null;
-    
-                // تطبيق التأثير على الكمية
-                $quantity = $this->applyEffectToQuantity($quantity, $request->effect);
-                // حساب الكمية المحولة
-                $convertedQuantity = $this->calculateConvertedQuantity($quantity, $unitId);
-    
-                // حفظ تفاصيل العملية
+        
+                // تطبيق التأثير على الكمية (إدخال أو إخراج)
+                $quantity = $this->inventoryTransactionService->applyEffectToQuantity($quantity, $request->effect);
+                // حساب الكمية المحولة بناءً على معامل التحويل للوحدة
+                $convertedQuantity = $this->inventoryTransactionService->calculateConvertedQuantity($quantity, $unitId);
+        
+                // حفظ تفاصيل العملية المخزنية
                 InventoryTransactionItem::create([
                     'inventory_transaction_id' => $transaction->id,
-                    'unit_id'                  => $unitId,
-                    'unit_product_id'          => Product::find($productId)->unit_id, // الوحدة الأساسية للمنتج
-                    'product_id'               => $productId,
-                    'quantity'                 => $quantity,
-                    'unit_price'               => $request->unit_prices[$index] ?? 0,
-                    'total'                    => $request->totals[$index] ?? 0,
-                    'warehouse_location_id'    => $request->warehouse_locations[$index] ?? null,
-                    'converted_quantity'       => $convertedQuantity,
+                    'unit_id'                   => $unitId,
+                    'unit_product_id'           => Product::find($productId)->unit_id, // الوحدة الأساسية للمنتج
+                    'product_id'                => $productId,
+                    'quantity'                  => $quantity,
+                    'unit_price'                => $request->unit_prices[$index] ?? 0,
+                    'total'                     => $request->totals[$index] ?? 0,
+                    'warehouse_location_id'     => $request->warehouse_locations[$index] ?? null,
+                    'converted_quantity'        => $convertedQuantity,
                 ]);
             }
     
+            // إعادة التوجيه مع رسالة نجاح
             return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
-    
+        
         } catch (\Exception $e) {
-            // في حالة وجود خطأ، نعيد المستخدم إلى النموذج مع البيانات السابقة والأخطاء
+            // التعامل مع الأخطاء في حال حدوث استثناء
             return redirect()->back()
                              ->withInput() // إعادة البيانات المدخلة
                              ->withErrors(['error' => 'حدث خطأ أثناء إضافة العملية المخزنية: ' . $e->getMessage()]);
