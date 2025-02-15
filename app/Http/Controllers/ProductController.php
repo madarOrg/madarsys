@@ -98,8 +98,7 @@ class ProductController extends Controller
         // إعادة التوجيه مع رسالة نجاح
         return redirect()->route('products.index')->with('success', 'تم حذف المنتج بنجاح');
     }
-    ///
-        // مثال: InventoryController.php أو أي Controller تستخدمه
+    ///get units of products
         public function getUnits($productId)
         {
             // تحميل المنتج مع جميع مستويات الوحدات المتداخلة

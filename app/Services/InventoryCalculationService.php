@@ -35,10 +35,24 @@ class InventoryCalculationService
      * @param float $pricePerUnit السعر لكل وحدة
      * @return float إجمالي السعر
      */
-    public function calculateTotalPrice($quantity, $pricePerUnit)
-    {
-        return round(abs($quantity) * $pricePerUnit, 6); // تقريب إلى خانتين عشريتين
+    public function calculateTotalPrice($quantity, $pricePerUnit, $priceTotal)
+{
+    if ($quantity == 0) {
+        return 0; // تجنب القسمة على صفر
     }
+
+    if ($pricePerUnit == 0 && $priceTotal != 0) {
+        return round($priceTotal / abs($quantity), 6);
+    }
+
+    if ($priceTotal == 0 && $pricePerUnit != 0) {
+        return round(abs($quantity) * $pricePerUnit, 6);
+    }
+
+    return null; // حالة غير محددة
+}
+
+    
 
      // دالة لجلب تأثير نوع العملية
      public function getEffectByTransactionType($transactionTypeId)

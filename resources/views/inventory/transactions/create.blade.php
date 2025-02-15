@@ -34,7 +34,7 @@
                         <option value="1">+</option>
                         <option value="-1">-</option>
                     </select>
-                    <input type="hidden" id="hidden-effect" name="hidden-effect" value="0">
+                    <input type="hidden" id="hidden-effect" name="effect" value="0">
 
                     <!-- الرقم المرجعي -->
                     <x-file-input id="reference" name="reference" label="الرقم المرجعي (اختياري)" type="text" />

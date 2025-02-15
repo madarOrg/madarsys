@@ -91,7 +91,8 @@ class InventoryTransactionController extends Controller
 
                 //  dd($productUnit);
                 $unitPrice = $request->unit_prices[$index] ?? 0;
-        
+                $totalPrice = $request->totals[$index] ?? 0;
+
                 // تطبيق التأثير على الكمية (إدخال أو إخراج)
                 $quantity = $this->inventoryTransactionService->applyEffectToQuantity($quantity, $request->effect);
                 
@@ -99,7 +100,7 @@ class InventoryTransactionController extends Controller
                 $convertedQuantity = $this->inventoryTransactionService->calculateConvertedQuantity($quantity, $unitId);
                 
                 // حساب إجمالي السعر
-                $totalPrice = $this->inventoryTransactionService->calculateTotalPrice($convertedQuantity, $unitPrice);
+                $totalPrice = $this->inventoryTransactionService->calculateTotalPrice($convertedQuantity, $unitPrice,$totalPrice);
         
                 // حفظ تفاصيل العملية المخزنية
                 InventoryTransactionItem::create([
