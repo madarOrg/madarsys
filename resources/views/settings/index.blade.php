@@ -15,13 +15,14 @@
         <input type="date" id="system_start_date" name="system_start_date"
                class="form-control" value="{{ old('system_start_date', $settings->where('key', 'system_start_date')->first()->value ?? '') }}" required>
     </div>
-            <!-- أقل تاريخ مسموح للحركات المخزنية -->
-            <div class="mb-3">
-                <label for="inventory_transaction_min_date" class="form-label">أقل تاريخ مسموح للحركات المخزنية</label>
-                <input type="date" id="inventory_transaction_min_date" name="inventory_transaction_min_date"
-                       class="form-control" value="{{ old('inventory_transaction_min_date', $settings->where('key', 'inventory_transaction_min_date')->first()->value ?? '') }}" required>
-            </div>
-    
+          <!-- أقل تاريخ مسموح للحركات المخزنية -->
+<div class="mb-3">
+    <label for="inventory_transaction_min_date" class="form-label">أقل تاريخ مسموح للحركات المخزنية (بالأيام)</label>
+    <input type="number" id="inventory_transaction_min_date" name="inventory_transaction_min_date"
+           class="form-control" value="{{ old('inventory_transaction_min_date', $settings->where('key', 'inventory_transaction_min_date')->first()->value ?? '') }}" required>
+</div>
+
+
             <!-- تاريخ نهاية السنة المالية -->
             <div class="mb-3">
                 <label for="fiscal_year_end_date" class="form-label">تاريخ نهاية السنة المالية</label>

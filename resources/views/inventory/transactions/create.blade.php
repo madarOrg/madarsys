@@ -25,6 +25,16 @@
                     <!-- تاريخ العملية -->
                     <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية" type="date"
                         required="true" />
+                    <!-- حقل التأثير -->
+                    <label for="effect" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mt-2">
+                        التأثير
+                    </label>
+                    <select name="effect" id="effect"
+                        class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                        <option value="1">+</option>
+                        <option value="-1">-</option>
+                    </select>
+                    <input type="hidden" id="hidden-effect" name="effect" value="0">
 
                     <!-- الرقم المرجعي -->
                     <x-file-input id="reference" name="reference" label="الرقم المرجعي (اختياري)" type="text" />
@@ -75,7 +85,7 @@
                 <!-- تفاصيل العملية (تأخذ ثلاثة أرباع الصفحة) -->
                 <div class="col-span-1 md:col-span-3  p-4 rounded-lg shadow w-full overflow-x-auto">
                     <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300">تفاصيل المنتجات</h2>
-            
+
                     <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400 mt-4">
                         <thead class="text-xs text-gray-700 bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
@@ -147,7 +157,6 @@
                             + إضافة منتج
                         </button>
                     </div>
-
                 </div>
             </div>
 
@@ -174,7 +183,7 @@
                     <td class="px-6 py-4">
                              <select name="units[]" 
                                             class="w-full units-select
-                                              product-select  bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500
+                                                bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500
                                             ">
                             <option value="">اختر وحدة</option>
                         </select>
@@ -215,34 +224,10 @@
     </script>
 
     <!-- كود AJAX لجلب الوحدات بناءً على اختيار المنتج -->
-    <script>
-        document.addEventListener('change', function(event) {
-            if (event.target.classList.contains('product-select')) {
-                const productId = event.target.value;
-                const row = event.target.closest('.product-row');
-                if (!row) return;
-                const unitsSelect = row.querySelector('.units-select');
-                if (!unitsSelect) return;
+    @vite([
+        
+        'resources/js/inventory.js',
+        
+    ])    
 
-                // إعادة تعيين قائمة الوحدات
-                unitsSelect.innerHTML = '<option value="">اختر وحدة</option>';
-
-                if (productId) {
-                    fetch(`/get-units/${productId}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            data.units.forEach(unit => {
-                                const option = document.createElement('option');
-                                option.value = unit.id;
-                                option.textContent = unit.name;
-                                unitsSelect.appendChild(option);
-                            });
-                        })
-                        .catch(error => {
-                            console.error("خطأ في جلب الوحدات:", error);
-                        });
-                }
-            }
-        });
-    </script>
 </x-layout>

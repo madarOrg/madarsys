@@ -39,7 +39,9 @@
             'resources/css/nucleo-icons.css',
             'resources/css/nucleo-svg.css',
             'resources/css/soft-ui-dashboard-tailwind.css',
+            
             'resources/js/app.js',
+            'resources/js/inventory.js',
             'resources/js/plugins/chartjs.min.js', //<!-- Plugin for Charts -->
              'resources/js/plugins/perfect-scrollbar.min.js', //Plugin for Scrollbar
             'resources/js/soft-ui-dashboard-tailwind.js',// <!-- Main Script File -->

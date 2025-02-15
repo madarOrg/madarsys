@@ -204,6 +204,9 @@ Route::prefix('products')->name('products.')->group(function () {
 Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
 
 //inventory/transactions
+// في ملف routes/web.php
+Route::get('transaction-effect/{transactionType}', [InventoryTransactionController::class, 'getEffectByTransactionType']);
+
 Route::get('/get-units/{productId}', [ProductController::class, 'getUnits']);
 Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(function () {
     // عرض صفحة إنشاء عملية مخزنية جديدة

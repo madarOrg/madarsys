@@ -118,5 +118,10 @@ class SettingsSeeder extends Seeder
             ['value' => 'true'],
             ['branch_id'=>'2']
         );
+        DB::table('settings')->updateOrInsert(
+            ['key' => 'password_protection_enabled'],
+            ['value' => 'true'],
+            ['branch_id'=>'2']
+        );
     }
 }
