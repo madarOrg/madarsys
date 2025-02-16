@@ -7,7 +7,7 @@
 
                 <!-- بيانات الحركة (تأخذ ربع الصفحة) -->
                 <div class="col-span-1  p-4 rounded-lg shadow w-full overflow-x-auto">
-                    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300">بيانات الحركة</h2>
+                    <x-title :title="' بيانات الحركة '"></x-title>
 
                     <!-- اختيار نوع العملية -->
                     <label for="transaction_type_id"
@@ -75,17 +75,15 @@
 
                     <!-- زر الإضافة -->
                     <div class="flex justify-end mt-4">
-                        <button type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            إضافة
-                        </button>
+                        <x-button type="submit">
+                        إضافة
+                        </x-button>
                     </div>
                 </div>
 
                 <!-- تفاصيل العملية (تأخذ ثلاثة أرباع الصفحة) -->
                 <div class="col-span-1 md:col-span-3  p-4 rounded-lg shadow w-full overflow-x-auto">
-                    <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-300">تفاصيل المنتجات</h2>
-
+                    <x-title :title="' تفاصيل الحركة '"></x-title>
                     <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400 mt-4">
                         <thead class="text-xs text-gray-700 bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
@@ -152,11 +150,11 @@
                     </table>
                     <!-- زر إضافة منتج -->
                     <div class="flex justify-end mt-4">
-                        <button type="button" onclick="addProductRow()"
-                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-green-500">
+                        <x-button-secondary type="button" onclick="addProductRow()">
                             + إضافة منتج
-                        </button>
+                        </x-button-secondary>
                     </div>
+                    
                 </div>
             </div>
 

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\InventoryTransaction;
 
 use App\Models\Unit;
 use App\Models\Product;

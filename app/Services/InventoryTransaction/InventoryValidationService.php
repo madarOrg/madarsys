@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\InventoryTransaction;
 
 use App\Models\Warehouse;
 use App\Models\Setting;
@@ -42,6 +42,25 @@ class InventoryValidationService
             return " لا يمكن إدخال عملية مخزنية بتاريخ أقدم من تاريخ بداية النظام$sysStart.";
         }
 
+        return false;
+    }
+    public static function validateMaxOperationsBeforeRepeat($transactionDate)
+    {
+
+        $maxOperationsBeforeRepeat = 5; // السماح بالتكرار بعد 5 عمليات أخرى
+
+        $operationsCount = DB::table('inventory_transactions')
+            ->where('product_id', $product_id)
+            ->where('warehouse_id', $warehouse_id)
+            ->where('type', $type)
+            ->where('date', now()->toDateString())
+            ->count();
+
+        if ($operationsCount >= $maxOperationsBeforeRepeat) {
+            if ($transactionDate < $sysStart) {
+                return " لا يمكن إدخال عملية مخزنية بتاريخ أقدم من تاريخ بداية النظام$sysStart.";
+            }
+        }
         return false;
     }
 }

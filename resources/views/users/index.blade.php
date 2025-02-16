@@ -2,13 +2,16 @@
  <div class="relative mt-1 flex items-center">
 
     <x-title :title="'إدارة المستخدمين'"></x-title>
-    <!-- حقل البحث وزر الإضافة -->
-    <x-search-input 
-    id="users-id"
-    name="search"
-    placeholder="ابحث عن المستخدمين"
-    :value="request()->input('search')"
-/>
+        <!-- نموذج البحث -->
+        <form action="{{ route('users.index') }}" method="GET">
+            <x-search-input 
+                id="search"
+                name="search"
+                placeholder="ابحث عن المستخدمين"
+                :value="request()->input('search')"
+            />
+        </form>
+
 </div>       
                 
                 <!-- زر إضافة مستخدم جديد -->
@@ -64,5 +67,7 @@
                 @endforeach
             </tbody>
         </table>
+        <x-pagination-links :paginator="$users" />
+
     </div>
 </x-layout>

@@ -1,16 +1,16 @@
 <x-layout>
   <section>
-    <div class="container py-24">
+    <div class="container">
       <div class="relative">
-        <div class="relative flex justify-start">
-          <span class="bg-white pr-3 text-lg font-medium text-gray-600">
-            جميع المنتجات
-          </span>
-        </div>
+        
+          <x-title :title="'  جميع المنتجات '"></x-title>
+         
+  
+       
       </div>
-      <div class="relative overflow-x-auto shadow-md sm:rounded-lg mt-6">
-        <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
-          <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <div class="relative overflow-auto shadow-md sm:rounded-lg mt-6">
+        <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+          <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" class="px-6 py-3">الصورة</th>
               <th scope="col" class="px-6 py-3">اسم المنتج</th>

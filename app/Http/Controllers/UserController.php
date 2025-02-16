@@ -14,11 +14,18 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
-    {
-        $users = User::all(); // جلب جميع المستخدمين
-        return view('users.index', compact('users'));
-    }
+    public function index(Request $request)
+{
+    $search = $request->input('search'); // الحصول على نص البحث
+
+    $users = User::when($search, function ($query, $search) {
+        return $query->where('name', 'like', "%{$search}%")
+                     ->orWhere('email', 'like', "%{$search}%");
+    })->paginate(7); // جلب 7 مستخدمين في كل صفحة
+
+    return view('users.index', compact('users'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -57,7 +64,7 @@ class UserController extends Controller
         $role = \App\Models\Role::where('name', $request->role)->first(); // استرجاع الدور بناءً على الاسم
         $user->roles()->attach($role->id); // ربط المستخدم بالدور
 
-        return redirect()->route('users.create')->with('success', 'Account created successfully.');
+        return redirect()->route('users.create')->with('success', 'تم إنشاء الحساب بنجاح');
     }
 
 
@@ -92,7 +99,6 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
             'status' => 'nullable|in:active,inactive,pending',
-            'role' => 'required|exists:roles,name',
         ];
     
         // تحقق من كلمة المرور فقط إذا كانت محدثة

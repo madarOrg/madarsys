@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\InventoryTransaction;
-use App\Models\InventoryTransactionItem;
 use App\Models\Product;
 use App\Models\Unit;
 use App\Models\WarehouseLocation;
@@ -14,13 +13,13 @@ use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use App\Http\Requests\StoreInventoryTransactionRequest;
 
-use App\Services\InventoryCalculationService;
+use App\Services\InventoryTransaction\InventoryTransactionService;
 
 
 class InventoryTransactionController extends Controller
 {    protected $inventoryTransactionService;
 
-    public function __construct(InventoryCalculationService $inventoryTransactionService)
+    public function __construct(InventoryTransactionService $inventoryTransactionService)
     {
         $this->inventoryTransactionService = $inventoryTransactionService;
     }
@@ -65,67 +64,30 @@ class InventoryTransactionController extends Controller
 
         return view('inventory.transactions.create', compact('transactionTypes', 'partners', 'departments', 'warehouses', 'products', 'warehouseLocations'));
     }
+//////////////////////////////////////////
 
-  
     public function store(StoreInventoryTransactionRequest $request)
-{       
-   try {
-            // إنشاء العملية المخزنية
-            $transaction = InventoryTransaction::create([
-                'transaction_type_id'  => $request->transaction_type_id,
-                'effect'               => $request->effect,
-                'transaction_date'     => $request->transaction_date,
-                'reference'            => $request->reference,
-                'partner_id'           => $request->partner_id,
-                'department_id'        => $request->department_id,
-                'warehouse_id'         => $request->warehouse_id,
-                'notes'                => $request->notes,
-                'inventory_request_id' => $request->inventory_request_id,
-            ]);
-    
-            // التكرار على المنتجات المخزنية
-            foreach ($request->products as $index => $productId) {
-                $quantity = $request->quantities[$index];
-                $unitId = $request->units[$index] ?? null;
-                $productUnit=Product::find($productId)->unit_id; // الوحدة الأساسية للمنتج
+    {
+        try {
+            // استدعاء الخدمة لإنشاء العملية المخزنية
+            $transaction = $this->inventoryTransactionService->createTransaction($request->all());
 
-                //  dd($productUnit);
-                $unitPrice = $request->unit_prices[$index] ?? 0;
-                $totalPrice = $request->totals[$index] ?? 0;
-
-                // تطبيق التأثير على الكمية (إدخال أو إخراج)
-                $quantity = $this->inventoryTransactionService->applyEffectToQuantity($quantity, $request->effect);
-                
-                // حساب الكمية المحولة بناءً على معامل التحويل للوحدة
-                $convertedQuantity = $this->inventoryTransactionService->calculateConvertedQuantity($quantity, $unitId);
-                
-                // حساب إجمالي السعر
-                $totalPrice = $this->inventoryTransactionService->calculateTotalPrice($convertedQuantity, $unitPrice,$totalPrice);
-        
-                // حفظ تفاصيل العملية المخزنية
-                InventoryTransactionItem::create([
-                    'inventory_transaction_id' => $transaction->id,
-                    'unit_id'                   => $unitId,
-                    'product_id'                => $productId,
-                    'quantity'                  => $quantity,
-                    'unit_prices'               => $unitPrice,
-                    'total'                     => $totalPrice,
-                    'warehouse_location_id'     => $request->warehouse_locations[$index] ?? null,
-                    'converted_quantity'        => $convertedQuantity,
-                    'unit_product_id'           => $productUnit,//Product::find($productId)->unit_id, // الوحدة الأساسية للمنتج
-
-                ]);
+            // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'تمت إضافة العملية المخزنية بنجاح',
+                    'transaction' => $transaction
+                ], 201);
             }
-    
-            // إعادة التوجيه مع رسالة نجاح
+
             return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
-        
         } catch (\Exception $e) {
             return redirect()->back()
-                             ->withInput()
-                             ->withErrors(['error' => 'حدث خطأ أثناء إضافة العملية المخزنية: ' . $e->getMessage()]);
+                ->withInput()
+                ->withErrors(['error' => $e->getMessage()]);
         }
-    }    
+    }
+
     // عرض تفاصيل العملية المخزنية
     public function show($id)
     {
