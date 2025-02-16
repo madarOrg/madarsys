@@ -91,59 +91,61 @@
         @endif
 
         @if ($currentStep == 2)
-            <div class="flex flex-col justify-between items-start">
-                <form wire:submit.prevent="assignRoles">
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div class="mb-4">
-                        <label class="block mb-2 text-sm font-medium text-gray-700">اختر دور</label>
-                        <select wire:model="selectedRole"
-                            class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1">
-                            <option value="">اختر دور</option>
-                            @foreach ($roles as $role)
-                                <option value="{{ $role->id }}">{{ $role->name }}</option>
-                            @endforeach
-                        </select>
-                        @error('selectedRole')
-                            <span class="text-red-500">{{ $message }}</span>
-                        @enderror
-                    </div>
-                    <!-- عرض الأدوار الحالية داخل إطار -->
-                    
-                        @if (!empty($userRoles))
-                        <div class="mt-6 border border-gray-300 dark:border-gray-700 p-4 rounded-lg">
-                            <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">الأدوار الحالية:
-                            </h3>
-                            <ul>
-                                @foreach ($userRoles as $role)
-                                    <li wire:key="role-{{ $role['id'] }}"
-                                        class="flex items-center text-gray-700 mb-2">
-                                        <span class="mr-2">{{ $role['name'] }}</span>
-                                        <button type="button" wire:click="removeRole({{ $role['id'] }})"
-                                            class="text-red-500 hover:text-red-700">
-                                            x
-                                        </button>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                
+        <div class="flex flex-col justify-between items-start">
+            <form wire:submit.prevent="assignRoles">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                <div class="mb-4">
+                    <label class="block mb-2 text-sm font-medium text-gray-700">اختر دور</label>
+                    <select wire:model="selectedRole"
+                        class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1">
+                        <option value="">اختر دور</option>
+                        @foreach ($roles as $role)
+                            <option value="{{ $role->id }}">{{ $role->name }}</option>
+                        @endforeach
+                    </select>
+                    @error('selectedRole')
+                        <span class="text-red-500">{{ $message }}</span>
+                    @enderror
                 </div>
-                    <div class="flex justify-end mb-4">
-                        <button type="submit"
-                            class="w-52 h-12 shadow-sm rounded-lg border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 text-gray-700 dark:text-gray-400 text-base font-semibold leading-7">
-                            إضافة
-                        </button>
-                        <button type="button" wire:click="goToStep(1)"
-                            class="w-52 h-12 shadow-sm rounded-lg border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 text-gray-700 dark:text-gray-400 text-base font-semibold leading-7 ml-2">
-                            رجوع
-                        </button>
+                <!-- عرض الأدوار الحالية داخل إطار -->
+                
+                    @if (!empty($userRoles))
+                    <div class="mt-6 border border-gray-300 dark:border-gray-700 p-4 rounded-lg">
+                        <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">الأدوار الحالية:
+                        </h3>
+                        <ul>
+                            @foreach ($userRoles as $role)
+                                <li wire:key="role-{{ $role['id'] }}"
+                                    class="flex items-center text-gray-700 mb-2">
+                                    <span class="mr-2">{{ $role['name'] }}</span>
+                                    <button type="button" wire:click="removeRole({{ $role['id'] }})"
+                                        class="text-red-500 hover:text-red-700 text-xl font-bold">
+                                        x
+                                    </button>
+                                </li>
+                            @endforeach
+                        </ul>
                     </div>
-                </form>
-
-
+                @endif
+            
             </div>
-        @endif
+                <div class="flex justify-end mb-4">
+                    <button type="submit"
+                        class="w-52 h-12 shadow-sm rounded-lg border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 text-gray-700 dark:text-gray-400 text-base font-semibold leading-7">
+                        إضافة
+                    </button>
+                    <button type="button" wire:click="goToStep(1)"
+                        class="w-52 h-12 shadow-sm rounded-lg border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 text-gray-700 dark:text-gray-400 text-base font-semibold leading-7 ml-2">
+                        رجوع
+                    </button>
+                </div>
+            </form>
+
+
+        </div>
+    @endif
+
+       
 
 
     </div>

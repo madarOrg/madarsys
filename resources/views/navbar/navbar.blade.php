@@ -9,10 +9,11 @@
         <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">مدار</span>
       </a>
     <li class="flex items-center px-4">
-      <a href="{{ route('companies.index') }}" class="p-0 transition-all text-sm ease-nav-brand text-slate-500 dark:text-white">
+      <a href="{{ route('settings.index') }}" class="p-0 transition-all text-sm ease-nav-brand text-slate-500 dark:text-white">
         <i class="cursor-pointer fa fa-cog" aria-hidden="true"></i>
       </a>
     </li>
+    
   </div>
 
   <!-- الجزء الخاص بالروابط والإعدادات في أقصى اليسار -->

@@ -37,7 +37,7 @@
                     </div>
 
                     <div class="sm:col-span-6 flex justify-end mt-6">
-                        <x-button type="submit">حفظ الفئة</x-button>
+                        <x-button type="submit">حفظ </x-button>
                     </div>
                 </div>
             </div>

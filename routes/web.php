@@ -85,8 +85,32 @@ Route::middleware('auth')->group(function () {
     });
     
 // users
-Route::resource('users', UserController::class);
-  
+ Route::resource('users', UserController::class);
+
+// Route::prefix('users')->name('users.')->group(function () {
+//     // مسار عرض جميع المستخدمين (GET)
+//     Route::get('/', [UserController::class, 'index'])->name('index');
+
+//     // مسار عرض نموذج إضافة مستخدم جديد (GET)
+//     // Route::get('/create', [UserController::class, 'create'])->name('create');
+
+//     // مسار تخزين بيانات المستخدم الجديد (POST)
+//     Route::post('/', [UserController::class, 'store'])->name('store');
+
+//     // مسار عرض تفاصيل المستخدم (GET)
+//     Route::get('/{user}', [UserController::class, 'show'])->name('show');
+
+//     // مسار عرض نموذج تعديل المستخدم (GET)
+//     Route::get('/{user}/edit', [UserController::class, 'edit'])->name('edit');
+
+//     // مسار تحديث بيانات المستخدم (PUT/PATCH)
+//     Route::put('/{user}', [UserController::class, 'update'])->name('update');
+//     Route::patch('/{user}', [UserController::class, 'update'])->name('update');
+
+//     // مسار حذف المستخدم (DELETE)
+//     Route::delete('/{user}', [UserController::class, 'destroy'])->name('destroy');
+// });
+
 // user roles
 Route::resource('users-roles', RoleUserController::class);
 
@@ -95,9 +119,9 @@ Route::post('/users-roles', [RoleUserController::class, 'store'])->name('users-r
 
 //create user in steps
 // Route::get('/user/create', UserSteps::class)->name('user.create');
-Route::get('/user/create', function () {
+Route::get('/users/create', function () {
     return view('users.create');
-})->name('users.index');
+})->name('users.create');
 
 
     // عرض معلومات

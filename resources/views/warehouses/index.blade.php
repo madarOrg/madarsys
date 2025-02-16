@@ -28,7 +28,7 @@
                     <th class="px-6 py-3">اسم المستودع</th>
                     <th class="px-6 py-3">الشركة / الفرع</th>
                     <th class="px-6 py-3">العنوان</th>
-                    <th class="px-6 py-3">القدرة</th>
+                    <th class="px-6 py-3">القدرة الاستعابية</th>
                     <th class="px-6 py-3"> مناطق تخزينية</th>
                     <th class="px-6 py-3"> المواقع التخزينية</th>
                     <th class="px-6 py-3">الإجراءات</th>

@@ -112,8 +112,8 @@
                         </div>
 
                         <div class="col-span-1">
-                            <x-file-input id="area" name="area" label="المساحة (متر مربع)" type="number"
-                                placeholder="المساحة" required="true" />
+                            <x-file-input id="capacity" name="capacity" label="القدرة الاستعابية (متر مربع)" type="number"
+                                placeholder="القدرة الاستعابية" required="true" />
                         </div>
 
                         {{-- <div class="col-span-1">
@@ -141,43 +141,51 @@
                                 type="date" value="2025-01-8" required="true" />
                         </div>
                     </div>
-                    <div class="sm:col-span-4 flex items-center space-x-8">
-                        <input type="checkbox" id="is_active" name="is_active" value="1"
-                        {{ old('is_active') ? 'checked' : '' }}>
-                    <label for="is-active" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل
-                     المستودع
-                        متاح؟</label>
-                        <input type="checkbox" id="is_smart" name="is_smart" value="1"
-                            {{ old('is_smart') ? 'checked' : '' }}>
-                        <label for="is-smart" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل
-                            هو مستودع
-                            ذكي؟</label>
-
-                        <input type="checkbox" name="has_security_system" id="has-security-system"
-                            class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
-                        <label for="has-security-system"
-                            class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد نظام
-                            أمني؟</label>
-
-                        <input type="checkbox" id="has_cctv" name="has_cctv" value="1"
-                            {{ old('has_cctv') ? 'checked' : '' }}>
-                        <label for="has-cctv" class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل
-                            يوجد
-                            CCTV؟</label>
-
-                        <input type="checkbox" name="is_integrated_with_wms" id="is-integrated-with-wms"
-                            class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
-                        <label for="is-integrated-with-wms"
-                            class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل هو مدمج مع نظام
-                            إدارة المستودعات؟</label>
-
-                        <input type="checkbox" name="has_automated_systems" id="has-automated-systems"
-                            class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm">
-                        <label for="has-automated-systems"
-                            class="block text-sm font-medium  text-gray-600 dark:text-gray-400">هل يوجد أنظمة
-                            آلية؟</label>
+                    <div class="sm:col-span-4 flex flex-wrap items-center gap-6">
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="is_active" name="is_active" value="1"
+                                class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                {{ old('is_active') ? 'checked' : '' }}>
+                            <label for="is_active" class="text-sm font-medium text-gray-600 dark:text-gray-400">هل المستودع متاح؟</label>
+                        </div>
+                    
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="is_smart" name="is_smart" value="1"
+                                class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                {{ old('is_smart') ? 'checked' : '' }}>
+                            <label for="is_smart" class="text-sm font-medium text-gray-600 dark:text-gray-400">هل هو مستودع ذكي؟</label>
+                        </div>
+                    
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" name="has_security_system" id="has_security_system" value="1"
+                                class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                {{ old('has_security_system') ? 'checked' : '' }}>
+                            <label for="has_security_system" class="text-sm font-medium text-gray-600 dark:text-gray-400">هل يوجد نظام أمني؟</label>
+                        </div>
+                    
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" id="has_cctv" name="has_cctv" value="1"
+                                class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                {{ old('has_cctv') ? 'checked' : '' }}>
+                            <label for="has_cctv" class="text-sm font-medium text-gray-600 dark:text-gray-400">هل يوجد CCTV؟</label>
+                        </div>
+                    
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" name="is_integrated_with_wms" id="is_integrated_with_wms" value="1"
+                                class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                {{ old('is_integrated_with_wms') ? 'checked' : '' }}>
+                            <label for="is_integrated_with_wms" class="text-sm font-medium text-gray-600 dark:text-gray-400">هل هو مدمج مع نظام إدارة المستودعات؟</label>
+                        </div>
+                    
+                        <div class="flex items-center space-x-2">
+                            <input type="checkbox" name="has_automated_systems" id="has_automated_systems" value="1"
+                                class="w-4 h-4 rounded-md bg-white text-gray-900 focus:outline focus:outline-2 focus:outline-indigo-600 sm:text-sm"
+                                {{ old('has_automated_systems') ? 'checked' : '' }}>
+                            <label for="has_automated_systems" class="text-sm font-medium text-gray-600 dark:text-gray-400">هل يوجد أنظمة آلية؟</label>
+                        </div>
                     </div>
-
+                    
+                </div>
                     <div class="sm:col-span-6 flex justify-end">
                         <x-button type="submit">حفظ </x-button>
                     </div>

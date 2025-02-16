@@ -1,6 +1,10 @@
 <x-layout>
     <div class="container">
-        <h2>إعدادات النظام</h2>
+        <x-title :title="' إعدادات النظام'"></x-title>
+        <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
+            تتيح لك إعدادات النظام التحكم الكامل في الوظائف الأساسية, يرجى ضبط الإعدادات وفقًا لاحتياجات العمل لضمان تجربة مثالية للمستخدمين
+        </p>
+        
     
         @if(session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
@@ -80,8 +84,10 @@
                 <input type="number" id="max_file_size" name="max_file_size"
                        class="form-control" value="{{ old('max_file_size', $settings->where('key', 'max_file_size')->first()->value ?? '') }}" required>
             </div>
-
-            <button type="submit" class="btn btn-primary">حفظ</button>
+            <div class="sm:col-span-6 flex justify-end">
+                <x-button type="submit">حفظ </x-button>
+            </div>
+            {{-- <button type="submit" class="btn btn-primary">حفظ</button> --}}
         </form>
     </div>
 </x-layout>
