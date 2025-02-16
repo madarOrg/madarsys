@@ -98,7 +98,7 @@ class UserController extends Controller
         $rules = [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
-            'status' => 'nullable|in:active,inactive,pending',
+            'status' => 'required|in:0,1', // (1=فعال، 0=متوقف)
         ];
     
         // تحقق من كلمة المرور فقط إذا كانت محدثة
@@ -108,7 +108,6 @@ class UserController extends Controller
     
         // التحقق من البيانات
         $validated = $request->validate($rules);
-    
         // إذا كانت كلمة المرور محدثة، قم بتعيين كلمة المرور الجديدة
         if ($request->filled('password')) {
             $validated['password'] = bcrypt($request->password);

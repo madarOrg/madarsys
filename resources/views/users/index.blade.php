@@ -50,8 +50,10 @@
                     <td class="px-6 py-4">{{ $user->email }}</td>
                    
                     <td class="px-6 py-4">{{ $user->role }}</td>
-                    <td class="px-6 py-4">{{ $user->status }}</td>
-                    <td class="px-6 py-4 flex space-x-2">
+                    <td class="px-6 py-4">
+                        {{ $user->status == 1 ? 'فعال' : 'موقف' }}
+                    </td>
+                                        <td class="px-6 py-4 flex space-x-2">
                         <a href="{{ route('users.edit', $user->id) }}" class="text-blue-600 hover:underline dark:text-blue-500">
                             <i class="fa-solid fa-pen"></i>
                         </a>

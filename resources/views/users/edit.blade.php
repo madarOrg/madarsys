@@ -56,7 +56,7 @@
                     /> --}}
 
                     <!-- قائمة اختيار حالة المستخدم -->
-                    <x-select-dropdown id="status" name="status" label="حالة المستخدم" :options="['active' => 'فعال', 'inactive' => 'متوقف', 'pending' => 'قيد الانتظار']"
+                    <x-select-dropdown id="status" name="status" label="حالة المستخدم" :options="['1' => 'فعال', '0' => 'موقف']"
                         :selected="old('status', $user->status ?? '')" required />
 
                     <!-- زر إرسال -->
