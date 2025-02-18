@@ -20,7 +20,6 @@ return new class extends Migration {
             'permissions',
             'products',
             'users',
-            'transaction_types'
         ];
 
         foreach ($tables as $table) {

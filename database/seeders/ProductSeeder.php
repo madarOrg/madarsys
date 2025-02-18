@@ -32,7 +32,7 @@ class ProductSeeder extends Seeder
                 'stock_quantity' => rand(10, 100), // كمية عشوائية في المخزون
                 'min_stock_level' => rand(1, 10), // الحد الأدنى للمخزون
                 'max_stock_level' => rand(100, 200), // الحد الأقصى للمخزون
-                'unit' => 'pcs', // وحدة القياس
+                'unit_id' => '1', // وحدة القياس
                 'is_active' => true, // حالة التفعيل
                 'branch_id'      => 2,
             ]);
