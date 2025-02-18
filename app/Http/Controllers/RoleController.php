@@ -17,7 +17,7 @@ class RoleController extends Controller
             return view('roles.index', compact('roles'));
         } catch (\Exception $e) {
             // Log the error for debugging
-            \Log::error('Error in RoleController@index: ' . $e->getMessage());
+            // \Log::error('Error in RoleController@index: ' . $e->getMessage());
             return response()->view('errors.500', [], 500);
         }
     }

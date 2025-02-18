@@ -79,9 +79,9 @@ class User extends Authenticatable
     }
 
     // جمع معرفات الشركات المرتبطة بالمستخدم بناءً على الأدوار
-    $roles = $this->roles()->with('rolecompanies')->get(); // جلب الأدوار مع الشركات المرتبطة بهم
+    $roles = $this->roles()->with('companies')->get(); // جلب الأدوار مع الشركات المرتبطة بهم
     $companyIds = $roles->flatMap(function ($role) {
-        return $role->rolecompanies->pluck('id'); // استخراج معرّفات الشركات
+        return $role->companies->pluck('id'); // استخراج معرّفات الشركات
     })->unique();
 
     // استرجاع الشركات بناءً على المعرفات

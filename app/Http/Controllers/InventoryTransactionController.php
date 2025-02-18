@@ -28,7 +28,6 @@ class InventoryTransactionController extends Controller
     {
         try {
             $transactionType = TransactionType::find($transactionTypeId);
-            
             if ($transactionType) {
                 return response()->json([
                     'effect' => $transactionType->effect ?? '-'

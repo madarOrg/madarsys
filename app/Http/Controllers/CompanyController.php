@@ -8,55 +8,7 @@ use Illuminate\Support\Facades\Storage;
 
 class CompanyController extends Controller
 {
-    /**
-     * عرض قائمة الشركات.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    // public function index()
-    // {
-    //     // التأكد من وجود مستخدم مسجل الدخول
-    //     if (!auth()->check()) {
-    //         return redirect()->route('login')->with('error', 'You must be logged in to access this page.');
-    //     }
-    
-    //     $user = auth()->user();
-    
-    //     // التحقق إذا كان المستخدم لديه دور admin
-    //     $isAdmin = $user->roles->contains(function ($role) {
-    //         return $role->is_admin; // التحقق من إذا كان أي دور هو دور admin
-    //     });
-    
-    //     // إذا كان المستخدم admin، عرض جميع الشركات والمستودعات
-    //     if ($isAdmin) {
-    //         // استرجاع كل الشركات والمستودعات
-    //         $companies = Company::all();
-    //         $warehouses = Warehouse::all();
-    //         $branches = Branch::all();
-    //     } else {
-    //         // استرجاع الأدوار المرتبطة بالمستخدم مع الفروع والمستودعات
-    //         $roles = $user->roles()->with('branches.warehouses')->get();
-    
-    //         // جمع جميع الفروع المرتبطة بالأدوار
-    //         $branches = $roles->flatMap(function ($role) {
-    //             return $role->branches;
-    //         });
-    
-    //         // جمع جميع الشركات المرتبطة بالفروع باستخدام المعرفات (company_id)
-    //         $companyIds = $branches->pluck('company_id')->unique();
-    
-    //         // استرجاع الشركات المرتبطة بالفروع فقط
-    //         $companies = Company::whereIn('id', $companyIds)->get();
-    
-    //         // جمع جميع المستودعات المرتبطة بالفروع
-    //         $warehouses = $branches->flatMap(function ($branch) {
-    //             return $branch->warehouses;
-    //         });
-    //     }
-    
-    //     // إرجاع البيانات إلى الـ view
-    //     return view('companies.index', compact('companies', 'branches', 'warehouses'));
-    // }
+   
     public function index(Request $request)
 {
     // التأكد من وجود مستخدم مسجل الدخول

@@ -20,7 +20,7 @@ class SettingsSeeder extends Seeder
         
         DB::table('settings')->updateOrInsert(
             ['key' => 'inventory_transaction_min_date'],
-            ['value' => '2025-01-01'],
+            ['value' => '30'],
             ['branch_id'=>'2']
         );
 
