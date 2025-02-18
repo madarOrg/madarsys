@@ -1,66 +1,152 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+### **README.md لـ نظام مدار**
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+```markdown
+# مدار - MadarSys
 
-## About Laravel
+**معلومات عن المشروع:**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+مدار هو نظام لإدارة العمليات المخزنية والمحاسبية. يهدف إلى تسهيل وتتبع العمليات المخزنية، مثل الشراء، البيع، الإرجاع، والتلف، وكذلك توفير تقارير دقيقة ومفصلة حول هذه العمليات. يتيح النظام التعامل مع المخزون بشكل مرن ويضمن تدفقاً جيداً للبيانات بين الأقسام المختلفة.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+**التنزيل من الريبو:**
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+يمكنك تنزيل نسخة من الريبو عبر Git باستخدام الرابط التالي:
 
-## Learning Laravel
+```bash
+git clone https://github.com/madarOrg/madarsys.git
+```
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+**الخطوات التالية لتثبيت وتشغيل النظام على جهازك:**
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+## 1. تثبيت Laravel
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+نظام مدار يعتمد على **Laravel** لتطوير التطبيق الخلفي (Backend). لتثبيت Laravel، يجب أن يكون لديك **PHP 8.3+** و **Composer** مثبتين على جهازك.
 
-## Laravel Sponsors
+### **الخطوات لتثبيت Laravel:**
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+1. بعد تنزيل الريبو، انتقل إلى مجلد المشروع:
 
-### Premium Partners
+   ```bash
+   cd madarsys
+   ```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+2. قم بتثبيت **التبعيات** باستخدام **Composer**:
 
-## Contributing
+   ```bash
+   composer install
+   ```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+3. **إعداد البيئة**: نسخ ملف البيئة الافتراضي إلى `.env`:
 
-## Code of Conduct
+   ```bash
+   cp .env.example .env
+   ```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+4. قم بتوليد **مفتاح تطبيق Laravel**:
 
-## Security Vulnerabilities
+   ```bash
+   php artisan key:generate
+   ```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+5. **إعداد قاعدة البيانات**: قم بفتح ملف `.env` وأدخل تفاصيل الاتصال بقاعدة البيانات الخاصة بك (مثل اسم المستخدم، كلمة المرور، نوع قاعدة البيانات).
 
-## License
+6. **تشغيل الهجرات**: لتثبيت الجداول في قاعدة البيانات:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+   ```bash
+   php artisan migrate
+   ```
+
+   إذا كنت بحاجة إلى تعبئة البيانات الافتراضية:
+
+   ```bash
+   php artisan db:seed
+   ```
+
+## 2. تثبيت Node.js و NPM
+
+لإدارة الواجهات الأمامية (Frontend) للنظام، ستحتاج إلى **Node.js** و **NPM** (مدير الحزم لـ Node.js).
+
+### **الخطوات لتثبيت Node.js و NPM:**
+
+1. إذا لم تكن قد قمت بتثبيت **Node.js** و **NPM**، يمكنك تنزيلها من الموقع الرسمي [Node.js](https://nodejs.org/).
+
+2. بعد تثبيت **Node.js**، انتقل إلى مجلد المشروع:
+
+   ```bash
+   cd madarsys
+   ```
+
+3. قم بتثبيت **التبعيات الخاصة بالواجهة الأمامية** باستخدام **NPM**:
+
+   ```bash
+   npm install
+   ```
+
+## 3. تشغيل السيرفر المحلي
+
+### **تشغيل Laravel:**
+
+1. لتشغيل تطبيق **Laravel**، استخدم الأمر التالي:
+
+   ```bash
+   php artisan serve
+   ```
+
+   يمكنك الوصول إلى التطبيق عبر الرابط [http://localhost:8000](http://localhost:8000).
+
+### **تشغيل واجهة المستخدم (Frontend):**
+
+1. بعد تثبيت الحزم عبر **npm**، لتشغيل واجهة المستخدم (Frontend)، استخدم الأمر التالي:
+
+   ```bash
+   npm run dev
+   ```
+
+   سيبدأ هذا الأمر الخادم المحلي لـ Vue.js أو أي إطار عمل تستخدمه في الواجهة الأمامية. يمكنك الوصول إليها عبر [http://localhost:3000](http://localhost:3000).
+
+## 4. بناء البيئة الإنتاجية (اختياري)
+
+إذا كنت بحاجة إلى بناء تطبيق الإنتاج (Production Build):
+
+1. استخدم الأمر التالي لبناء ملفات الإنتاج:
+
+   ```bash
+   npm run build
+   ```
+
+2. لتشغيل النظام في بيئة الإنتاج، يمكنك استخدام الخادم المخصص مثل **Nginx** أو **Apache**، مع إعدادات خاصة لنقل التطبيق إلى الإنتاج.
+
+## 5. المشاكل الشائعة
+
+### **المشكلة 1: "Command 'php artisan serve' not found"**
+   - تأكد من أنك تستخدم **PHP 8.1+** وأنت في مجلد المشروع الصحيح.
+   
+### **المشكلة 2: "npm run dev" لا يعمل بشكل صحيح**
+   - تأكد من أنك قد قمت بتثبيت **Node.js** و **npm** بشكل صحيح، ثم قم بتشغيل `npm install` لتثبيت التبعيات.
+
+### **المشكلة 3: مشاكل في الاتصال بقاعدة البيانات**
+   - تأكد من أنك قد قمت بتحديث تفاصيل الاتصال بقاعدة البيانات في ملف `.env`.
+
+## 6. المساهمة في المشروع
+
+إذا كنت ترغب في المساهمة في هذا المشروع، يرجى اتباع الخطوات التالية:
+
+1. قم بإنشاء **Fork** لهذا الريبو.
+2. قم بإنشاء فرع جديد (`git checkout -b new-feature`).
+3. أضف التغييرات الخاصة بك وقم بكتابة اختبارات إذا لزم الأمر.
+4. قم بعمل **Push** إلى الفرع الجديد (`git push origin new-feature`).
+5. قدم **Pull Request** لدمج التغييرات في الريبو الرئيسي.
+
+**ملاحظات إضافية:**
+- تأكد من أنك قمت بقراءة [التوثيق الخاص بـ Laravel](https://laravel.com/docs) و [التوثيق الخاص بـ Vue.js](https://vuejs.org/) إذا كنت ستعمل على تطوير التطبيق بشكل كامل.
+- هذا المشروع يستخدم **MySQL** كقاعدة بيانات، لذا تأكد من أنك قد قمت بإعداد قاعدة البيانات وتحديث التفاصيل في ملف `.env`.
+
+**نظام مدار** - إدارة المخزون بكل سهولة واحترافية.
+
+```
+
+---
+
+### **الملاحظات:**
+- في هذا الملف، تم تقديم خطوات تنزيل الريبو من GitHub، وتثبيت Laravel و Node.js، وأيضاً كيفية تشغيل النظام.
+- تم التطرق إلى بعض المشاكل الشائعة وكيفية حلها.
+
