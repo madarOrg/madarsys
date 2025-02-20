@@ -44,7 +44,8 @@
    ```bash
    cp .env.example .env
    ```
-
+  php artisan storage:link
+  
 3. قم بتحديث إعدادات قاعدة البيانات في ملف `.env` بما يتناسب مع بيئة العمل الخاصة بك:
    ```env
    DB_CONNECTION=mysql
@@ -95,6 +96,8 @@
 لتشغيل خادم Laravel على البيئة المحلية:
 ```bash
 php artisan serve
+or
+php -S 127.0.0.1:8000 -t public 
 ```
 
 ### **تشغيل واجهة JavaScript (إذا كانت موجودة):**

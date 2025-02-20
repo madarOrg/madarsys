@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Services\InventoryTransaction\InventoryValidationService;
+use App\Models\TransactionType;
 
 class StoreInventoryTransactionRequest extends FormRequest
 {
@@ -31,6 +32,10 @@ class StoreInventoryTransactionRequest extends FormRequest
      */
     public function rules()
     {
+        $transactionTypeId = $this->input('transaction_type_id');
+        $transactionType = TransactionType::find($transactionTypeId);
+        $secondaryWarehouseId = $this->input('secondary_warehouse_id'); // تجنب الخطأ عند عدم وجوده
+
         return [
             'transaction_type_id' => 'required|exists:transaction_types,id',
             'transaction_date' => ['required', 'date', function ($attribute, $value, $fail) {
@@ -47,17 +52,31 @@ class StoreInventoryTransactionRequest extends FormRequest
                     $fail('المستودع مغلق، لا يمكنك إضافة عمليات مخزنية.');
                 }
             }],
+            'secondary_warehouse_id' => [
+                'nullable',
+                'exists:warehouses,id',
+                function ($attribute, $value, $fail) use ($transactionType) {
+                    if ($transactionType && $transactionType->inventory_movement_count == 2) {
+                        if (!$value) {
+                            $fail('المستودع الثانوي مطلوب عند إجراء عملية مخزنية تتطلب مستودعين.');
+                        }
+                    } elseif ($value) {
+                        $fail('لا يمكن تحديد مستودع ثانوي إلا إذا كانت العملية تتطلب مستودعين.');
+                    }
+                }
+            ],
             'notes' => 'nullable|string',
             'products' => 'required|array',
             'products.*' => 'exists:products,id',
-            // 'prices.*' => 'numeric|min:0.01',
-            // 'totals.*' => 'numeric|min:0.01',
             'quantities' => 'required|array',
             'quantities.*' => 'numeric|min:0.01',
             'warehouse_locations' => 'nullable|array',
-            'warehouse_locations.*' =>'nullable|exists:warehouse_locations,id',
+            'warehouse_locations.*' => 'nullable|exists:warehouse_locations,id',
         ];
     }
+
+   
+    
 
     /**
      * تخصيص الرسائل عند حدوث أخطاء التحقق.
@@ -65,47 +84,29 @@ class StoreInventoryTransactionRequest extends FormRequest
     public function messages()
     {
         return [
-            // 'transaction_type_id.required' => 'يجب تحديد نوع العملية المخزنية.',
-            // 'transaction_date.required' => 'يجب تحديد تاريخ العملية.',
-            // 'products.required' => 'يجب إضافة المنتجات للعملية.',
-       'transaction_type_id.required' => 'نوع العملية مطلوب.',
-        'transaction_type_id.exists' => 'نوع العملية المحدد غير صالح.',
-        
-        'transaction_date.required' => 'يجب تحديد تاريخ العملية.',
-        'transaction_date.date' => 'يجب أن يكون التاريخ صالحًا.',
-        
-        'reference.required' => 'حقل المرجع مطلوب.',
-        'reference.string' => 'يجب أن يكون المرجع نصيًا.',
-        'reference.max' => 'يجب ألا يتجاوز المرجع 255 حرفًا.',
-        
-        'partner_id.required' => 'يجب تحديد الشريك.',
-        'partner_id.exists' => 'الشريك المحدد غير صالح.',
-        
-        'department_id.exists' => 'القسم المحدد غير صالح.',
-        
-        'warehouse_id.required' => 'المستودع مطلوب.',
-        'warehouse_id.exists' => 'المستودع المحدد غير صالح.',
-        
-        'notes.string' => 'يجب أن تكون الملاحظات نصية.',
-        
-        'products.required' => 'يجب تحديد المنتجات.',
-        'products.array' => 'يجب أن يكون تنسيق المنتجات كمصفوفة.',
-        'products.*.exists' => 'أحد المنتجات المحددة غير صالح.',
-        
-        'prices.*.numeric' => 'يجب أن يكون السعر رقمًا.',
-        'prices.*.min' => 'يجب أن يكون السعر أكبر من 0.01.',
-        
-        'totals.*.numeric' => 'يجب أن يكون الإجمالي رقمًا.',
-        'totals.*.min' => 'يجب أن يكون الإجمالي أكبر من 0.01.',
-        
-        'quantities.required' => 'يجب تحديد الكميات.',
-        'quantities.array' => 'يجب أن يكون تنسيق الكميات كمصفوفة.',
-        'quantities.*.numeric' => 'يجب أن تكون الكمية رقمًا.',
-        'quantities.*.min' => 'يجب أن تكون الكمية أكبر من 0.01.',
-        
-        'warehouse_locations.array' => 'يجب أن يكون تنسيق مواقع المستودعات كمصفوفة.',
-        'warehouse_locations.*.exists' => 'أحد مواقع المستودع المحددة غير صالح.',
-       
+            'transaction_type_id.required' => 'نوع العملية مطلوب.',
+            'transaction_type_id.exists' => 'نوع العملية المحدد غير صالح.',
+            'transaction_date.required' => 'يجب تحديد تاريخ العملية.',
+            'transaction_date.date' => 'يجب أن يكون التاريخ صالحًا.',
+            'reference.required' => 'حقل المرجع مطلوب.',
+            'reference.string' => 'يجب أن يكون المرجع نصيًا.',
+            'reference.max' => 'يجب ألا يتجاوز المرجع 255 حرفًا.',
+            'partner_id.required' => 'يجب تحديد الشريك.',
+            'partner_id.exists' => 'الشريك المحدد غير صالح.',
+            'department_id.exists' => 'القسم المحدد غير صالح.',
+            'warehouse_id.required' => 'المستودع مطلوب.',
+            'warehouse_id.exists' => 'المستودع المحدد غير صالح.',
+            'notes.string' => 'يجب أن تكون الملاحظات نصية.',
+            'products.required' => 'يجب تحديد المنتجات.',
+            'products.array' => 'يجب أن يكون تنسيق المنتجات كمصفوفة.',
+            'products.*.exists' => 'أحد المنتجات المحددة غير صالح.',
+            'quantities.required' => 'يجب تحديد الكميات.',
+            'quantities.array' => 'يجب أن يكون تنسيق الكميات كمصفوفة.',
+            'quantities.*.numeric' => 'يجب أن تكون الكمية رقمًا.',
+            'quantities.*.min' => 'يجب أن تكون الكمية أكبر من 0.01.',
+            'warehouse_locations.array' => 'يجب أن يكون تنسيق مواقع المستودعات كمصفوفة.',
+            'warehouse_locations.*.exists' => 'أحد مواقع المستودع المحددة غير صالح.',
+            'secondary_warehouse_id.exists' => 'المستودع الثانوي المحدد غير صالح.',
         ];
     }
 }

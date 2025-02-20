@@ -16,8 +16,8 @@
                         class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                         <option value="">اختر نوع العملية</option>
                         @foreach ($transactionTypes as $transactionType)
-                            <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">
-                                {{ $transactionType->name }}
+                            <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">{{
+                                $transactionType->name }}
                             </option>
                         @endforeach
                     </select>
@@ -25,11 +25,12 @@
                     <!-- تاريخ العملية -->
                     <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية" type="date"
                         required="true" />
+
                     <!-- حقل التأثير -->
                     <label for="effect" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mt-2">
                         التأثير
                     </label>
-                    <select name="effect" id="effect"
+                    <select id="effect"
                         class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                         <option value="1">+</option>
                         <option value="-1">-</option>
@@ -65,10 +66,34 @@
                         class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع</label>
                     <select id="warehouse_id" name="warehouse_id"
                         class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                        <option value="" disabled selected>اختر مستودعًا</option> <!-- الخيار الفارغ -->
                         @foreach ($warehouses as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
+
+                    <!-- المستودع الثانوي -->
+                    {{-- <label for="secondary_warehouse_id"
+                        class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع الثانوي</label>
+                    <select id="secondary_warehouse_id" name="secondary_warehouse_id"
+                        class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                        @foreach ($warehouses as $warehouse)
+                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                        @endforeach
+                    </select> --}}
+                    <div id="secondary_warehouse_container" style="display: none;">
+                        <label for="secondary_warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">
+                            المستودع الثانوي
+                        </label>
+                        <select id="secondary_warehouse_id" name="secondary_warehouse_id"
+                            class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                            <option value="">اختر مستودعًا</option> <!-- إضافة خيار فارغ -->
+                            @foreach ($warehouses as $warehouse)
+                            {{-- <option value="{{ $warehouse->id }}" {{ old('secondary_warehouse_id') == $warehouse->id ? 'selected' : '' }}> --}}
+                                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                @endforeach
+                        </select>
+                    </div>
 
                     <!-- ملاحظات -->
                     <x-file-input id="notes" name="notes" label="ملاحظات" type="textarea" />
@@ -98,8 +123,7 @@
                         </thead>
                         <tbody>
                             @foreach (old('products', []) as $index => $productId)
-                                <tr
-                                    class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+                                <tr class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
                                     <td class="px-6 py-4">
                                         <select name="products[]"
                                             class="w-full product-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
@@ -157,8 +181,6 @@
                     
                 </div>
             </div>
-
-
         </form>
     </section>
 
@@ -170,8 +192,7 @@
                 <tr class="product-row border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
                     <td class="px-6 py-4">
                         <select name="products[]" 
-                                class="w-full product-select   bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500
-                        ">
+                                class="w-full product-select bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500">
                             <option value="">اختر منتج</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
@@ -180,9 +201,7 @@
                     </td>
                     <td class="px-6 py-4">
                              <select name="units[]" 
-                                            class="w-full units-select
-                                                bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500
-                                            ">
+                                            class="w-full units-select bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500">
                             <option value="">اختر وحدة</option>
                         </select>
                     </td>
@@ -197,9 +216,7 @@
                     </td>
                     <td class="px-6 py-4">
                         <select name="warehouse_locations[]" 
-                                            
-                                            class="w-full warehouse-select  bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500
-                                            ">
+                                             class="w-full warehouse-select  bg-gray-100 rounded border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 mt-1 focus:outline-blue-500">
                             <option value="">اختر موقع التخزين</option>
                             @foreach ($warehouseLocations as $location)
                                 <option value="{{ $location->id }}">{{ $location->name }}</option>
@@ -211,14 +228,29 @@
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </td>
-                </tr>
-            `;
+                </tr>`;
             tableBody.insertAdjacentHTML('beforeend', newRow);
         }
 
         function removeProductRow(button) {
-            button.closest('tr').remove();
+            const row = button.closest('tr');
+            row.remove();
         }
+        //   تعديل ظهور المستودع الثانوي عند التخحويل المخزني
+        document.addEventListener("DOMContentLoaded", function () { //تحديد العناصر المطلوبة
+            const transactionTypeSelect = document.getElementById("transaction_type_id");
+            const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container"); 
+        // تعريف الدالة المسؤولة عن إظهار أو إخفاء المستودع الثانوي
+            function toggleSecondaryWarehouse() {
+                const selectedTransaction = transactionTypeSelect.options[transactionTypeSelect.selectedIndex];
+                const isStockTransfer = selectedTransaction.text.includes("تحويل مخزني"); 
+                secondaryWarehouseContainer.style.display = isStockTransfer ? "block" : "none";
+            }
+
+            transactionTypeSelect.addEventListener("change", toggleSecondaryWarehouse);
+            toggleSecondaryWarehouse(); //  استدعاء الدالة عند تحميل الصفحة للتحقق من الاختيار الافتراضي لضبط حالة العرض بناءً على القيمة الافتراضية في القائمة
+        });
+
     </script>
 
     <!-- كود AJAX لجلب الوحدات بناءً على اختيار المنتج -->
@@ -227,5 +259,5 @@
         'resources/js/inventory.js',
         
     ])    
-
 </x-layout>
+

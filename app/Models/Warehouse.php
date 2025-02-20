@@ -62,4 +62,8 @@ class Warehouse extends Model
     {
         return $this->hasMany(WarehouseLocation::class);
     }
+    public function inventoryTransactions()
+    {
+        return $this->hasMany(InventoryTransaction::class);
+    }
 }

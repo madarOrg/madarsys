@@ -28,6 +28,7 @@ class InventoryTransactionController extends Controller
     {
         try {
             $transactionType = TransactionType::find($transactionTypeId);
+            // dd($transactionType);
             if ($transactionType) {
                 return response()->json([
                     'effect' => $transactionType->effect ?? '-'
@@ -65,27 +66,31 @@ class InventoryTransactionController extends Controller
     }
 //////////////////////////////////////////
 
+    
     public function store(StoreInventoryTransactionRequest $request)
-    {
-        try {
-            // استدعاء الخدمة لإنشاء العملية المخزنية
-            $transaction = $this->inventoryTransactionService->createTransaction($request->all());
+{
+    try {
+       
 
-            // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'تمت إضافة العملية المخزنية بنجاح',
-                    'transaction' => $transaction
-                ], 201);
-            }
+        // استدعاء الخدمة لإنشاء العملية المخزنية
+        $transaction = $this->inventoryTransactionService->createTransaction($request->all());
 
-            return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => $e->getMessage()]);
+        // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'تمت إضافة العملية المخزنية بنجاح',
+                'transaction' => $transaction
+            ], 201);
         }
+
+        return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
+    } catch (\Exception $e) {
+        return redirect()->back()
+            ->withInput()
+            ->withErrors(['error' => $e->getMessage()]);
     }
+}
+
 
     // عرض تفاصيل العملية المخزنية
     public function show($id)
@@ -113,6 +118,7 @@ class InventoryTransactionController extends Controller
     // تحديث العملية المخزنية
     public function update(Request $request, $id)
     {
+        try {
         $transaction = InventoryTransaction::findOrFail($id);
         $transaction->update([
             'transaction_type_id' => $request->transaction_type_id,
@@ -127,15 +133,22 @@ class InventoryTransactionController extends Controller
         // هنا يمكن إضافة منطق تحديث تفاصيل العملية المخزنية أيضًا حسب الحاجة.
 
         return redirect()->route('inventory.transactions.show', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+    }
     }
 
     // حذف العملية المخزنية
     public function destroy($id)
     {
+        try {
         $transaction = InventoryTransaction::findOrFail($id);
         $transaction->delete();
 
         return redirect()->route('inventory.transactions.index')->with('success', 'تم حذف العملية المخزنية بنجاح');
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+    }   
     }
 
 

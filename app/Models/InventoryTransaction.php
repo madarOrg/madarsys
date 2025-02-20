@@ -14,12 +14,14 @@ class InventoryTransaction extends Model
         'transaction_type_id',
         'effect',
         'transaction_date',
+        'reference',
         'partner_id',
         'department_id',
         'warehouse_id',
         'notes',
         'branch_id',
-        'inventory_request_id'
+        'inventory_request_id',
+        'secondary_warehouse_id'
     ];
     public function branch()
     {
@@ -47,5 +49,9 @@ class InventoryTransaction extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+    public function secondaryWarehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'secondary_warehouse_id');
     }
 }

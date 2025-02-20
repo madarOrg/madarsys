@@ -28,49 +28,30 @@ class InventoryCalculationService
         return ($effect === '-1') ? -abs($quantity) : abs($quantity);
     }
 
-    /**
-     * حساب إجمالي السعر بناءً على الكمية والسعر لكل وحدة
-     *
-     * @param float $quantity الكمية
-     * @param float $pricePerUnit السعر لكل وحدة
-     * @return float إجمالي السعر
-     */
+    public function calculateUnitPrice($quantity, $pricePerUnit, $priceTotal)
+    {
+        return $pricePerUnit ?: ($priceTotal / $quantity);
+    }
+
     public function calculateTotalPrice($quantity, $pricePerUnit, $priceTotal)
-{
-    if ($quantity == 0) {
-        return 0; // تجنب القسمة على صفر
+    {
+        return $priceTotal ? $quantity * $priceTotal : $quantity * $pricePerUnit;
     }
+    // دالة لجلب تأثير نوع العملية
+    public function getEffectByTransactionType($transactionTypeId)
+    {
+        // البحث عن نوع العملية باستخدام 'id' بدلاً من 'name'
+        $transactionType = TransactionType::find($transactionTypeId);
 
-    if ($pricePerUnit == 0 && $priceTotal != 0) {
-        return round($priceTotal / abs($quantity), 6);
+        if ($transactionType) {
+            return response()->json([
+                'effect' => $transactionType->effect ?? '-'
+            ], 200, ['Content-Type' => 'application/json']);
+        }
+
+        // في حال لم يتم العثور على نوع العملية، ارجع 0 كقيمة افتراضية
+        return response()->json([
+            'effect' => '-'
+        ], 200, ['Content-Type' => 'application/json']);
     }
-
-    if ($priceTotal == 0 && $pricePerUnit != 0) {
-        return round(abs($quantity) * $pricePerUnit, 6);
-    }
-
-    return null; // حالة غير محددة
-}
-
-    
-
-     // دالة لجلب تأثير نوع العملية
-     public function getEffectByTransactionType($transactionTypeId)
-     {
-         // البحث عن نوع العملية باستخدام 'id' بدلاً من 'name'
-         $transactionType = TransactionType::find($transactionTypeId);
-     
-         if ($transactionType) {
-             return response()->json([
-                 'effect' => $transactionType->effect ?? '-'
-             ], 200, ['Content-Type' => 'application/json']);
-         }
-     
-         // في حال لم يتم العثور على نوع العملية، ارجع 0 كقيمة افتراضية
-         return response()->json([
-             'effect' => '-'
-         ], 200, ['Content-Type' => 'application/json']);
-     }
-     
-  
 }

@@ -20,7 +20,8 @@ class InventoryTransactionItem extends Model
         'warehouse_location_id',
         'branch_id',
         'converted_quantity',
-        'unit_product_id'  
+        'unit_product_id' ,
+        'target_warehouse_id' 
 
     ];
     public function branch()
@@ -40,5 +41,9 @@ class InventoryTransactionItem extends Model
     public function warehouseLocation()
     {
         return $this->belongsTo(WarehouseLocation::class);
+    }
+    public function targetWarehouse()
+    {
+        return $this->belongsTo(Warehouse::class, 'target_warehouse_id');
     }
 }
