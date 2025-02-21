@@ -7,7 +7,28 @@ use App\Models\Product;
 use App\Models\TransactionType;
 
 class InventoryCalculationService
+
 {
+    public function addStock($productId, $quantity)
+{
+    $product = Product::find($productId);
+    $product->stock += $quantity;
+    $product->save();
+}
+public function reduceStock($productId, $quantity)
+{
+    $product = Product::find($productId);
+
+    if ($product->stock >= $quantity) {
+        $product->stock -= $quantity;
+        $product->save();
+        return "تمت العملية بنجاح!";
+    } else {
+        return "عذرًا، الكمية غير متوفرة!";
+    }
+}
+
+
     /**
      * حساب الكمية المحولة بناءً على معامل التحويل للوحدة
      */
