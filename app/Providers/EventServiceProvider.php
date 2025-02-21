@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Listeners\ClearUserPermissionsCache;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -15,11 +14,17 @@ class EventServiceProvider extends ServiceProvider
      * @var array<class-string, array<int, class-string>>
      */
     protected $listen = [
+        // أحداث تسجيل الدخول والخروج
         Login::class => [
-            ClearUserPermissionsCache::class . '@handleLogin',
+            \App\Listeners\ClearUserPermissionsCache::class . '@handleLogin',
         ],
         Logout::class => [
-            ClearUserPermissionsCache::class . '@handleLogout',
+            \App\Listeners\ClearUserPermissionsCache::class . '@handleLogout',
+        ],
+
+        // حدث إنشاء حركة مخزنية
+        \App\Events\InventoryTransactionCreated::class => [
+            \App\Listeners\CreateInventoryTransactionListener::class,
         ],
     ];
 
