@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\
+{
+HasUser
+};
 class Warehouse extends Model
 {
-    use HasFactory;
+    use HasUser,HasFactory;
 
     // الحقول القابلة للتعبئة
     protected $fillable = [
@@ -30,7 +33,8 @@ class Warehouse extends Model
         'temperature',
         'humidity',
         'code',
-        'is_active'
+        'is_active',
+        'created_user', 'updated_user'
     ];
 
     // علاقة المستودع مع الفرع

@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\
+{
+HasUser
+};
 
 class WarehouseLocation extends Model
 {
-    use HasFactory;
+    use HasUser,HasFactory;
 
     // تعريف الجدول إذا كان مختلف عن الاسم الافتراضي
     protected $table = 'warehouse_locations';
@@ -22,7 +26,7 @@ class WarehouseLocation extends Model
         'barcode',           // باركود الموقع (يجب أن يكون فريدًا)
         'is_occupied',       // حالة الموقع (مشغول أو فارغ)
         'notes',             // ملاحظات إضافية
-    ];
+        'created_user', 'updated_user'];
 
     /**
      * العلاقة مع موديل Warehouse

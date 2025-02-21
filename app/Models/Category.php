@@ -4,17 +4,22 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasBranch;
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 
 class Category extends Model
 {
-    use HasBranch,HasFactory;
+    use HasUser,HasBranch,HasFactory;
 
     // الحقول القابلة للتعيين
     protected $fillable = [
         'name', 
         'description',
-        'branch_id'
+        'branch_id',
+        'created_user', 'updated_user'
     ];
     public function branch()
     {

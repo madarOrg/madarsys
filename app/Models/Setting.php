@@ -8,7 +8,7 @@ class Setting extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['key', 'value'];
+    protected $fillable = ['key', 'value','created_user', 'updated_user'];
 
     // دالة لاسترجاع القيم بسهولة
     public static function get($key, $default = null)

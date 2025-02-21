@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasBranch;
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 
 class Partner extends Model
 {
-    use HasBranch,HasFactory;
+    use HasUser,HasBranch,HasFactory;
 
     // الحقول القابلة للتعيين
     protected $fillable = [
@@ -20,7 +24,8 @@ class Partner extends Model
         'address',
         'tax_number',
         'is_active',
-        'branch_id'
+        'branch_id',
+        'created_user', 'updated_user'
     ];
     public function branch()
     {

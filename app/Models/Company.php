@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\
+{
+HasUser
+};
 
 class Company extends Model
 {
-    use HasFactory;
+    use HasUser,HasFactory;
 
     /**
      * اسم الجدول المرتبط بالمودل.
@@ -29,6 +33,7 @@ class Company extends Model
         'address',
         'additional_info',
         'settings',
+        'created_user', 'updated_user'
     ];
 
     /**

@@ -4,13 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasBranch;
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 
 class Unit extends Model
 {
-    use HasBranch,HasFactory;
+    use HasUser,HasBranch,HasFactory;
 
-    protected $fillable = ['name', 'parent_unit_id', 'conversion_factor','branch_id'
+    protected $fillable = ['name', 'parent_unit_id', 'conversion_factor','branch_id','created_user', 'updated_user'
 ];
 public function branch()
 {

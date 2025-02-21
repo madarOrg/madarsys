@@ -11,7 +11,8 @@ class Department extends Model
 
     protected $fillable = [
         'name',
-        'description', // إضافة وصف إذا كان مطلوبًا
+        'description', 
+    'created_user', 'updated_user'    
     ];
 
     public function inventoryTransactions()

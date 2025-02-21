@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasBranch;
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 
 class TransactionType extends Model
 {
-    use HasBranch,HasFactory;
+    use HasUser,HasBranch,HasFactory;
 
     // تحديد اسم الجدول (إذا كان مختلفًا عن الاسم الافتراضي)
     protected $table = 'transaction_types';
@@ -18,7 +22,8 @@ class TransactionType extends Model
         'name',
         'description',
         'branch_id',
-        'effect'
+        'effect',
+        'created_user', 'updated_user'
     ];
 
     // للحصول على علاقة مع العمليات المخزنية

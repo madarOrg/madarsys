@@ -4,10 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\
+{
+HasUser
+};
 class WarehouseStorageArea extends Model
 {
-    use HasFactory;
+    use HasUser,HasFactory;
 
     // تحديد الجدول في قاعدة البيانات
     protected $table = 'warehouse_storage_areas';
@@ -21,7 +24,7 @@ class WarehouseStorageArea extends Model
         'current_occupancy',
         'zone_id',
         'storage_conditions',
-    ];
+        'created_user', 'updated_user'];
 
     // تحديد العلاقة مع المستودعات
     public function warehouse()

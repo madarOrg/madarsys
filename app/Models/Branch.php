@@ -4,13 +4,17 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Traits\
+{
+HasUser
+};
 
 class Branch extends Model
 {
-    use HasFactory;
+    use HasUser,HasFactory;
 
     protected $fillable = [
-        'name', 'address', 'contact_info', 'company_id',
+        'name', 'address', 'contact_info', 'company_id','created_user', 'updated_user'
     ];
 
     // علاقة الفرع مع الشركة

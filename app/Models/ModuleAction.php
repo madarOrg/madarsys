@@ -8,7 +8,7 @@ use App\Traits\HasBranch;
 class ModuleAction extends Model {
     use HasBranch,HasFactory;
     
-    protected $fillable = ['module_id', 'name', 'action_key','icon', 'route','branch_id'];
+    protected $fillable = ['module_id', 'name', 'action_key','icon', 'route','branch_id','created_user', 'updated_user'];
     public function branch()
     {
         return $this->belongsTo(Branch::class);
