@@ -51,6 +51,10 @@
    ```bash
    php artisan storage:link
    ```
+   مسار تخزين الصور \madarsys\public\storage
+   \madarsys\public\storage\logos: للشعارات
+    \madarsys\public\storage\products: للمنتجات
+
 6. تشغيل الهجرة (Migrations) لإنشاء الجداول:
    ```bash
    php artisan migrate
