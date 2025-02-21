@@ -9,7 +9,6 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-   // database/migrations/xxxx_xx_xx_xxxxxx_create_user_warehouse_table.php
    public function up()
    {
        Schema::create('role_warehouse', function (Blueprint $table) {
@@ -29,7 +28,7 @@ return new class extends Migration
 
 public function down()
 {
-    Schema::dropIfExists('user_warehouse');
+    Schema::dropIfExists('role_warehouse');
 }
 
 };

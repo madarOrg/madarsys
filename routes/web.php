@@ -18,12 +18,15 @@ RolePermissionController,
 NavbarController,
 WarehouseStorageAreaController,
 WarehouseLocationController,
-ZoneController,
+ZonesController,
 CategoryController,
 PartnerController,
 ProductController,
 InventoryTransactionController,
-SettingController};
+SettingController,
+RoleWarehouseController,
+
+};
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
@@ -59,6 +62,15 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy'); // حذف الدور
     });
     
+    //roleWarehouse
+
+Route::prefix('role-warehouse')->name('role-warehouse.')->group(function () {
+    Route::get('/', [RoleWarehouseController::class, 'index'])->name('index');
+    Route::post('/store', [RoleWarehouseController::class, 'store'])->name('store');
+    Route::put('/update/{id}', [RoleWarehouseController::class, 'update'])->name('update');
+    Route::delete('/delete/{id}', [RoleWarehouseController::class, 'destroy'])->name('destroy');
+});
+
    
    //role primissions 
     Route::prefix('role-permissions')->name('role-permissions.')->group(function () {
@@ -181,7 +193,7 @@ Route::prefix('warehouses/{warehouse}/locations')->group(function () {
 });
 
 
-Route::resource('zones', ZoneController::class);
+Route::resource('zones', ZonesController::class);
 
 //Categroy routers
 Route::prefix('categories')->name('categories.')->group(function () {

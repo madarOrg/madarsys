@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasBranch;
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 
 class InventoryTransaction extends Model
 {
-    use HasBranch,HasFactory;
+    use HasUser,HasBranch,HasFactory;
 
     protected $fillable = [
         'transaction_type_id',
@@ -21,7 +25,8 @@ class InventoryTransaction extends Model
         'notes',
         'branch_id',
         'inventory_request_id',
-        'secondary_warehouse_id'
+        'secondary_warehouse_id',
+        'created_user', 'updated_user'
     ];
     public function branch()
     {

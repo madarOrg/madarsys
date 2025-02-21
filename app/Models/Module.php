@@ -3,12 +3,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasBranch;
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 
 class Module extends Model {
     
-    use HasBranch,HasFactory;
-    protected $fillable = ['name', 'key', 'scope_level','branch_id'];
+    use HasUser,HasBranch,HasFactory;
+    protected $fillable = ['name', 'key', 'scope_level','branch_id','created_user', 'updated_user'];
     public function branch()
     {
         return $this->belongsTo(Branch::class);

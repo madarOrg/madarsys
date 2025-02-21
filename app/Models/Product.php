@@ -4,11 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\HasBranch;
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 
 class Product extends Model
 {
-    use HasBranch,HasFactory;
+    use HasUser,HasBranch,HasFactory;
 
     // الحقول القابلة للتعيين
     protected $fillable = [
@@ -26,7 +30,7 @@ class Product extends Model
         'unit_id',
         'is_active',
         'branch_id',
-
+'created_user', 'updated_user'
         
         
     ];

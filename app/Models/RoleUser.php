@@ -10,6 +10,7 @@ class RoleUser extends Pivot
     protected $fillable = [
         'user_id',
         'role_id',
+        'created_user', 'updated_user'
         // أي أعمدة إضافية في جدول الربط
     ];
 

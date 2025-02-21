@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 class Permission extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','module_id', 'module_action_id', 'permission_key', 'scope_level'];
+    protected $fillable = ['name','module_id', 'module_action_id', 'permission_key', 'scope_level','created_user', 'updated_user'];
 
     public function module() {
         return $this->belongsTo(Module::class, 'module_id');
