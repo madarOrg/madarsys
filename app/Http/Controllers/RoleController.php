@@ -10,25 +10,37 @@ class RoleController extends Controller
     /**
      * عرض جميع الأدوار.
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $roles = Role::all();//withCount('users')->get();
+            // الحصول على كلمة البحث من الطلب
+            $search = $request->input('search');
+    
+            // جلب الأدوار مع البحث في جميع الحقول
+            $roles = Role::when($search, function ($query, $search) {
+                $query->where('name', 'LIKE', "%{$search}%")   // البحث في اسم الدور
+                      ->orWhere('description', 'LIKE', "%{$search}%");  // البحث في وصف الدور إذا كان موجوداً
+            })
+            ->paginate(7);  // تحديد عدد الأدوار المعروضة في الصفحة
+    
             return view('roles.index', compact('roles'));
         } catch (\Exception $e) {
-            // Log the error for debugging
-            // \Log::error('Error in RoleController@index: ' . $e->getMessage());
-            return response()->view('errors.500', [], 500);
+            // في حالة حدوث خطأ
+            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب الأدوار: ' . $e->getMessage()], 500);
         }
     }
-    
 
     /**
      * إظهار نموذج إضافة دور جديد.
      */
     public function create()
     {
-        return view('roles.create');
+        try {
+            return view('roles.create');
+        } catch (\Exception $e) {
+            // في حالة حدوث خطأ
+            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء عرض نموذج إضافة الدور: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -36,14 +48,19 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:roles',
-            'status' => 'required|boolean',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:roles',
+                'status' => 'required|boolean',
+            ]);
 
-        Role::create($request->all());
+            Role::create($request->all());
 
-        return redirect()->route('roles.index')->with('success', 'تمت إضافة الدور بنجاح.');
+            return redirect()->route('roles.index')->with('success', 'تمت إضافة الدور بنجاح.');
+        } catch (\Exception $e) {
+            // في حالة حدوث خطأ
+            return back()->withErrors(['error' => 'حدث خطأ أثناء إضافة الدور: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -51,7 +68,12 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        return view('roles.show', compact('role'));
+        try {
+            return view('roles.show', compact('role'));
+        } catch (\Exception $e) {
+            // في حالة حدوث خطأ
+            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء عرض تفاصيل الدور: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -59,7 +81,12 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
-        return view('roles.edit', compact('role'));
+        try {
+            return view('roles.edit', compact('role'));
+        } catch (\Exception $e) {
+            // في حالة حدوث خطأ
+            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء عرض نموذج تعديل الدور: ' . $e->getMessage()], 500);
+        }
     }
 
     /**
@@ -67,14 +94,19 @@ class RoleController extends Controller
      */
     public function update(Request $request, Role $role)
     {
-        $request->validate([
-            'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
-            'status' => 'required|boolean',
-        ]);
+        try {
+            $request->validate([
+                'name' => 'required|string|max:255|unique:roles,name,' . $role->id,
+                'status' => 'required|boolean',
+            ]);
 
-        $role->update($request->all());
+            $role->update($request->all());
 
-        return redirect()->route('roles.index')->with('success', 'تم تعديل الدور بنجاح.');
+            return redirect()->route('roles.index')->with('success', 'تم تعديل الدور بنجاح.');
+        } catch (\Exception $e) {
+            // في حالة حدوث خطأ
+            return back()->withErrors(['error' => 'حدث خطأ أثناء تعديل الدور: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -82,7 +114,12 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        $role->delete();
-        return redirect()->route('roles.index')->with('success', 'تم حذف الدور بنجاح.');
+        try {
+            $role->delete();
+            return redirect()->route('roles.index')->with('success', 'تم حذف الدور بنجاح.');
+        } catch (\Exception $e) {
+            // في حالة حدوث خطأ
+            return back()->withErrors(['error' => 'حدث خطأ أثناء حذف الدور: ' . $e->getMessage()]);
+        }
     }
 }

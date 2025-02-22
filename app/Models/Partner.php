@@ -59,7 +59,7 @@ class Partner extends Model
     }
     public function partnerType()
 {
-    return $this->belongsTo(PartnerType::class, 'type', 'name');
+    return $this->belongsTo(PartnerType::class, 'type', 'id');
 }
 
 }

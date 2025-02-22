@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="bg-gray-50 dark:bg-gray-900">
+    <section class="">
         <form action="{{ route('partners.store') }}" method="POST">
             @csrf
 
@@ -81,11 +81,12 @@
 
                         <div class="flex items-center space-x-2">
                             <input id="partner-is_active" name="is_active" type="checkbox" value="1" 
-                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-900 dark:text-white dark:border-gray-700 focus:border-indigo-500 focus:outline-none">
+                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-900  dark:border-gray-700 focus:border-indigo-500 focus:outline-none">
                             
                             <label for="partner-is_active" class="text-sm font-medium text-gray-700 dark:text-gray-300">
-                                نشط
+                                فعال
                             </label>
+                           
                         
                             @error('is_active')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

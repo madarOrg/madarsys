@@ -1,22 +1,25 @@
 <x-layout>
-    <div class="relative mt-4 flex flex-col md:flex-row items-center justify-between">
+    <div class="relative mt-1 flex  md:flex-row items-center ">
         <x-title :title="'إدارة الأدوار'" />
         
         <div class="flex items-center space-x-2">
-            <x-search-input 
-                id="roles-search"
-                name="search"
-                placeholder="ابحث عن الأدوار"
-                :value="request()->input('search')"
-            />
-            <x-button :href="route('roles.create')" type="button">
-                <i class="fas fa-plus mr-2"></i> إضافة دور جديد
-            </x-button>
+            <form action="{{ route('roles.index') }}" method="GET">
+                <x-search-input 
+                    id="roles-search"
+                    name="search"
+                    placeholder="ابحث عن الأدوار"
+                    :value="request()->input('search')"
+                />
+            </form>
         </div>
+        
     </div>
+    <x-button :href="route('roles.create')" type="button">
+        <i class="fas fa-plus mr-2"></i> إضافة دور جديد
+    </x-button>
     
     <!-- جدول الأدوار -->
-    <div class="overflow-x-auto mt-4">
+    <div class="overflow-x-auto mt-1">
         <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400 border border-gray-300 rounded-lg">
             <thead class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-300">
                 <tr>
@@ -40,7 +43,7 @@
                     </td>
                     <td class="px-4 py-3 flex space-x-2">
                         <a href="{{ route('roles.edit', $role->id) }}" class="text-blue-600 hover:underline dark:text-blue-400">
-                            <i class="fas fa-edit"></i>
+                            <i class="fa-solid fa-pen"></i>
                         </a>
                         <a href="{{ route('roles.show', $role->id) }}" class="text-gray-600 hover:underline dark:text-gray-300">
                             <i class="fas fa-eye"></i>
@@ -57,5 +60,9 @@
                 @endforeach
             </tbody>
         </table>
+        <x-pagination-links :paginator="$roles" />
     </div>
 </x-layout>
+
+
+

@@ -3,10 +3,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\
+{
+HasUser
+};
 class Inventory extends Model
 {
-    use HasFactory;
+    use HasUser,HasFactory;
 
     // تحديد اسم الجدول في قاعدة البيانات
     protected $table = 'inventory';
