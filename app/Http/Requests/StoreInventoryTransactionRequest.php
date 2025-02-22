@@ -35,13 +35,20 @@ class StoreInventoryTransactionRequest extends FormRequest
         $transactionTypeId = $this->input('transaction_type_id');
         $transactionType = TransactionType::find($transactionTypeId);
         $secondaryWarehouseId = $this->input('secondary_warehouse_id'); // تجنب الخطأ عند عدم وجوده
-
+        $warehouseId = $this->input('warehouse_id'); // استخراج معرف المستودع
         return [
             'transaction_type_id' => 'required|exists:transaction_types,id',
-            'transaction_date' => ['required', 'date', function ($attribute, $value, $fail) {
-                $errorMessage = $this->inventoryValidationService->validateTransactionDate($value);
+            'transaction_date' => ['required', 'date', function ($attribute, $value, $fail)  use ($warehouseId, $secondaryWarehouseId) {
+                $errorMessage = $this->inventoryValidationService->validateTransactionDate($value, $warehouseId);
                 if ($errorMessage) {
                     $fail($errorMessage);
+                }
+                // التحقق من تاريخ المخزون في المستودع الثانوي (إذا كان موجودًا)
+                if ($secondaryWarehouseId) {
+                    $errorMessageSecondary = $this->inventoryValidationService->validateTransactionDate($value, $secondaryWarehouseId);
+                    if ($errorMessageSecondary) {
+                        $fail($errorMessageSecondary);
+                    }
                 }
             }],
             'reference' => 'required|string|max:255',
@@ -75,8 +82,8 @@ class StoreInventoryTransactionRequest extends FormRequest
         ];
     }
 
-   
-    
+
+
 
     /**
      * تخصيص الرسائل عند حدوث أخطاء التحقق.
