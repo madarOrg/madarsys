@@ -81,3 +81,5 @@
         </tbody>
     </table>
 </x-layout>
+    <x-pagination-links :paginator="$warehouses" />
+

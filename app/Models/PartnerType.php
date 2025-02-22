@@ -26,6 +26,6 @@ class PartnerType extends Model
      */
     public function partners()
     {
-        return $this->hasMany(Partner::class, 'type', 'name');
+        return $this->hasMany(Partner::class, 'type', 'id');
     }
 }

@@ -7,7 +7,7 @@
                     <x-title :title="'إضافة منطقة تخزين'" />
                     <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">يرجى إدخال بيانات منطقة التخزين بدقة لضمان تنظيم البيانات.</p>
                     
-                    <div class="mt-0 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 min-h-full">
+                    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-full">
                         
                         <!-- اسم المنطقة التخزينية -->
                         <div class="col-span-1">

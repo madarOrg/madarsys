@@ -13,7 +13,7 @@ class WarehouseStorageAreaController extends Controller
         $warehouse = Warehouse::findOrFail($warehouseId);
         $storageAreas = WarehouseStorageArea::where('warehouse_id', $warehouse->id)
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(7);
 
         return view('warehouses.storage-areas.index', compact('storageAreas', 'warehouse'));
     }

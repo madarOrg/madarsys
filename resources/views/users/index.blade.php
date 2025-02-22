@@ -1,5 +1,5 @@
 <x-layout dir="rtl">
- <div class="relative mt-1 flex items-center">
+ <div class="relative mt-1 flex items-center md:flex-row">
 
     <x-title :title="'إدارة المستخدمين'"></x-title>
         <!-- نموذج البحث -->
@@ -51,8 +51,9 @@
                    
                     <td class="px-6 py-4">{{ $user->role }}</td>
                     <td class="px-6 py-4">
-                        {{ $user->status == 1 ? 'فعال' : 'موقف' }}
-                    </td>
+                        <span class="px-2 py-1 rounded text-white text-xs {{ $user->status ? 'bg-green-500' : 'bg-red-500' }}">
+                            {{ $user->status ? 'فعال' : 'غير فعال' }}
+                        </span>                    </td>
                                         <td class="px-6 py-4 flex space-x-2">
                         <a href="{{ route('users.edit', $user->id) }}" class="text-blue-600 hover:underline dark:text-blue-500">
                             <i class="fa-solid fa-pen"></i>
@@ -73,3 +74,4 @@
 
     </div>
 </x-layout>
+

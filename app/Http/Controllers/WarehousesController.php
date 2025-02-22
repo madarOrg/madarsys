@@ -30,7 +30,7 @@ class WarehousesController extends Controller
     }
 
     // جلب المستودعات
-    $warehouses = $query->paginate(10);
+    $warehouses = $query->paginate(7);
 
     return view('warehouses.index', compact('warehouses'));
 }

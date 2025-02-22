@@ -119,7 +119,9 @@
                 @endforeach
             </tbody>
         </table>
+        <x-pagination-links :paginator="$warehouses" />
     </div>
+    
 
     <script>
         function toggleWarehouseDetails(warehouseId) {
@@ -128,3 +130,4 @@
         }
     </script>
 </x-layout>
+

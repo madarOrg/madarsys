@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -11,41 +12,59 @@ class RoleWarehouseController extends Controller
 {
     public function index()
     {
-        $roleWarehouses = RoleWarehouse::with(['role', 'warehouse', 'branch'])->get();
-        $roles = Role::all();
-        $warehouses = Warehouse::all();
-        $branches = Branch::all();
+        try {
+            $roleWarehouses = RoleWarehouse::with(['role', 'warehouse', 'branch'])->get();
+            $roles = Role::all();
+            $warehouses = Warehouse::all();
+            $branches = Branch::all();
 
-        return view('role-warehouse.index', compact('roleWarehouses', 'roles', 'warehouses', 'branches'));
+            return view('role-warehouse.index', compact('roleWarehouses', 'roles', 'warehouses', 'branches'));
+        } catch (\Exception $e) {
+            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب البيانات: ' . $e->getMessage()], 500);
+        }
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'role_id' => 'required|exists:roles,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'branch_id' => 'required|exists:branches,id',
-        ]);
+        try {
+            $request->validate([
+                'role_id' => 'required|exists:roles,id',
+                'warehouse_id' => 'required|exists:warehouses,id',
+                'branch_id' => 'required|exists:branches,id',
+            ]);
 
-        RoleWarehouse::create($request->all());
-        return response()->json(['success' => 'تمت الإضافة بنجاح']);
+            RoleWarehouse::create($request->all());
+            return response()->json(['success' => 'تمت الإضافة بنجاح']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'حدث خطأ أثناء إضافة البيانات: ' . $e->getMessage()]);
+        }
     }
 
     public function update(Request $request, $id)
     {
-        $request->validate([
-            'role_id' => 'required|exists:roles,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'branch_id' => 'required|exists:branches,id',
-        ]);
+        try {
+            $request->validate([
+                'role_id' => 'required|exists:roles,id',
+                'warehouse_id' => 'required|exists:warehouses,id',
+                'branch_id' => 'required|exists:branches,id',
+            ]);
 
-        RoleWarehouse::find($id)->update($request->all());
-        return response()->json(['success' => 'تم التحديث بنجاح']);
+            $roleWarehouse = RoleWarehouse::findOrFail($id);
+            $roleWarehouse->update($request->all());
+            return response()->json(['success' => 'تم التحديث بنجاح']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'حدث خطأ أثناء تحديث البيانات: ' . $e->getMessage()]);
+        }
     }
 
     public function destroy($id)
     {
-        RoleWarehouse::find($id)->delete();
-        return response()->json(['success' => 'تم الحذف بنجاح']);
+        try {
+            $roleWarehouse = RoleWarehouse::findOrFail($id);
+            $roleWarehouse->delete();
+            return response()->json(['success' => 'تم الحذف بنجاح']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'حدث خطأ أثناء حذف البيانات: ' . $e->getMessage()]);
+        }
     }
 }
