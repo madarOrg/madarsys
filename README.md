@@ -16,6 +16,12 @@
 1. استنساخ المستودع إلى جهازك:
    ```bash
    git clone https://github.com/madarOrg/madarsys.git
+   or
+   git clone git@github.com:madarOrg/madarsys.git
+   ```
+   ادخل المفتاح 
+   ```bash
+   Enter passphrase for key 'C:\Users\ASUS/.ssh/id_rsa':
    ```
 2. انتقل إلى مجلد المشروع:
    ```bash

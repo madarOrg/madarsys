@@ -1,33 +1,33 @@
 
 /////////units
-// document.addEventListener('change', function(event) {
-//     if (event.target.classList.contains('product-select')) {
-//         const productId = event.target.value;
-//         const row = event.target.closest('.product-row');
-//         if (!row) return;
-//         const unitsSelect = row.querySelector('.units-select');
-//         if (!unitsSelect) return;
+document.addEventListener('change', function(event) {
+    if (event.target.classList.contains('product-select')) {
+        const productId = event.target.value;
+        const row = event.target.closest('.product-row');
+        if (!row) return;
+        const unitsSelect = row.querySelector('.units-select');
+        if (!unitsSelect) return;
 
-//         // إعادة تعيين قائمة الوحدات
-//         unitsSelect.innerHTML = '<option value="">اختر وحدة</option>';
+        // إعادة تعيين قائمة الوحدات
+        unitsSelect.innerHTML = '<option value="">اختر وحدة</option>';
 
-//         if (productId) {
-//             fetch(`/get-units/${productId}`)
-//                 .then(response => response.json())
-//                 .then(data => {
-//                     data.units.forEach(unit => {
-//                         const option = document.createElement('option');
-//                         option.value = unit.id;
-//                         option.textContent = unit.name;
-//                         unitsSelect.appendChild(option);
-//                     });
-//                 })
-//                 .catch(error => {
-//                     console.error("خطأ في جلب الوحدات:", error);
-//                 });
-//         }
-//     }
-// });
+        if (productId) {
+            fetch(`/get-units/${productId}`)
+                .then(response => response.json())
+                .then(data => {
+                    data.units.forEach(unit => {
+                        const option = document.createElement('option');
+                        option.value = unit.id;
+                        option.textContent = unit.name;
+                        unitsSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error("خطأ في جلب الوحدات:", error);
+                });
+        }
+    }
+});
 document.addEventListener('change', function(event) {
     if (event.target.classList.contains('product-select')) {
         const productId = event.target.value;
