@@ -29,6 +29,9 @@
                     <th class="px-6 py-3">الشركة / الفرع</th>
                     <th class="px-6 py-3">العنوان</th>
                     <th class="px-6 py-3">القدرة الاستعابية</th>
+                    <th class="px-6 py-3">عدد المناطق الجغرافية</th>
+
+                    <th class="px-6 py-3">المناطق الجغرافية</th>
                     <th class="px-6 py-3"> مناطق تخزينية</th>
                     <th class="px-6 py-3"> المواقع التخزينية</th>
                     <th class="px-6 py-3">الإجراءات</th>
@@ -56,7 +59,16 @@
                     </td>
                     <td class="px-6 py-4">{{ $warehouse->address }}</td>
                     <td class="px-6 py-4">{{ $warehouse->capacity }} متر مربع</td>
-                 <!--  أيقونة الانتقال إلى المناطق التخزينية -->
+                    <td class="px-6 py-4">{{ $warehouse->zones_count }}</td> <!-- عرض العدد -->
+
+                   <!--  أيقونة الانتقال إلى المناطق الجغرافية -->
+                   <td class="px-6 py-4">
+                    <a href="{{ route('warehouses.zones.index', ['warehouse' => $warehouse->id]) }}" style="color: #FF8b00; hover:underline;">
+                        <i class="fas fa-warehouse" style="color: #007bff;"></i>
+                        <!-- أيقونة المناطق التخزينية -->
+                   
+                </td>
+                    <!--  أيقونة الانتقال إلى المناطق التخزينية -->
                  <td class="px-6 py-4">
                     <a href="{{ route('warehouse.storage-areas.create', ['warehouse' => $warehouse->id]) }}" style="color: #FF8b00; hover:underline;">
                         <i class="fas fa-box"></i> <!-- أيقونة المناطق التخزينية -->

@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests\StoreInventoryTransactionRequest;
 use App\Services\InventoryTransaction\InventoryTransactionService;
 
+
 class InventoryTransactionController extends Controller
 {
     protected $inventoryTransactionService;
@@ -67,6 +68,7 @@ class InventoryTransactionController extends Controller
     public function store(StoreInventoryTransactionRequest $request)
     {
         try {
+            // dd($request->all());
             // استدعاء الخدمة لإنشاء العملية المخزنية
             $transaction = $this->inventoryTransactionService->createTransaction($request->all());
 
@@ -117,21 +119,18 @@ class InventoryTransactionController extends Controller
         }
     }
 
-    // تحديث العملية المخزنية
     public function update(Request $request, $id)
     {
         try {
             $transaction = InventoryTransaction::findOrFail($id);
-            $transaction->update([
-                'transaction_type_id' => $request->transaction_type_id,
-                'transaction_date' => $request->transaction_date,
-                'reference' => $request->reference,
-                'partner_id' => $request->partner_id,
-                'department_id' => $request->department_id,
-                'warehouse_id' => $request->warehouse_id,
-                'notes' => $request->notes,
-            ]);
-
+$transaction = $this->inventoryTransactionService->updateTransaction($id, $request->all());
+     // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
+     if ($request->expectsJson()) {
+        return response()->json([
+            'message' => 'تمت إضافة العملية المخزنية بنجاح',
+            'transaction' => $transaction
+        ], 201);
+    }
             return redirect()->route('inventory.transactions.show', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحديث العملية المخزنية: ' . $e->getMessage()]);
@@ -150,4 +149,7 @@ class InventoryTransactionController extends Controller
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء حذف العملية المخزنية: ' . $e->getMessage()]);
         }
     }
+
+
+    
 }

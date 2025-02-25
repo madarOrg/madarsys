@@ -70,4 +70,9 @@ class Warehouse extends Model
     {
         return $this->hasMany(InventoryTransaction::class);
     }
+    //  العلاقة مع المناطق Zones 
+    public function zones()
+    {
+        return $this->hasMany(Zone::class);
+    }
 }

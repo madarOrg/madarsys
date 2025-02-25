@@ -1,8 +1,7 @@
 <x-layout dir="rtl">
     <div class="relative mt-1 flex items-center">
         <x-title :title="'إدارة المناطق التخزينية'"></x-title>
-
-        <form action="{{ route('warehouses.storage-areas.index', $warehouse) }}" method="GET">
+        <form action="{{ route('warehouse.storage-areas.index', ['warehouse' => $warehouse]) }}" method="GET">
             <x-search-input id="custom-id" name="search" placeholder="ابحث عن المناطق التخزينية" :value="request()->input('search')" />
         </form>
     </div>

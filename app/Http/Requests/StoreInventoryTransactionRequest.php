@@ -16,6 +16,7 @@ class StoreInventoryTransactionRequest extends FormRequest
     public function __construct(InventoryValidationService $inventoryValidationService)
     {
         parent::__construct();
+
         $this->inventoryValidationService = $inventoryValidationService;
     }
 
@@ -41,6 +42,7 @@ class StoreInventoryTransactionRequest extends FormRequest
             'transaction_date' => ['required', 'date', function ($attribute, $value, $fail)  use ($warehouseId, $secondaryWarehouseId) {
                 $errorMessage = $this->inventoryValidationService->validateTransactionDate($value, $warehouseId);
                 if ($errorMessage) {
+
                     $fail($errorMessage);
                 }
                 // التحقق من تاريخ المخزون في المستودع الثانوي (إذا كان موجودًا)

@@ -13,8 +13,8 @@ class CategoryController extends Controller
     public function index()
     {
         try {
-            $categories = Category::all();
-            return view('categories.index', compact('categories'));
+            $categories = Category::paginate(7);
+        return view('categories.index', compact('categories'));
         } catch (Exception $e) {
             return redirect()->route('categories.index')->with('error', 'حدث خطأ أثناء تحميل الفئات: ' . $e->getMessage());
         }

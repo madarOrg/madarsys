@@ -39,6 +39,8 @@ class WarehouseLocationController extends Controller
     
         // تمرير البيانات إلى القالب
         return view('warehouses.locations.create', compact('warehouse', 'storageAreas'));
+        $zones = Zone::all(); // استرجاع جميع المناطق
+        return view('warehouses.locations.create', compact('zones')); // تمرير المناطق إلى الصفحة
     }
     
     /**
