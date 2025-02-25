@@ -6,17 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Traits\
 {
-HasUser
+    HasBranch,
+    HasUser
 };
 
 class WarehouseLocation extends Model
 {
-    use HasUser,HasFactory;
+    use HasUser,HasBranch,HasFactory;
 
     // تعريف الجدول إذا كان مختلف عن الاسم الافتراضي
     protected $table = 'warehouse_locations';
 
     protected $fillable = [
+        'branch_id',
         'warehouse_id',      // معرف المستودع
         'storage_area_id',   // معرف منطقة التخزين
         'aisle',             // رقم الممر

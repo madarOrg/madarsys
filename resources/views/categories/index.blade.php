@@ -48,5 +48,5 @@
             @endforeach
         </tbody>
     </table>
-    {{-- <x-pagination-links :paginator="$partners" /> --}}
+    <x-pagination-links :paginator=" $categories" />
 </x-layout>

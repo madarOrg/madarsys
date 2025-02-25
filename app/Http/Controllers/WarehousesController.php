@@ -17,7 +17,7 @@ class WarehousesController extends Controller
      */
     public function index(Request $request)
 {
-    $query = Warehouse::query();
+    $query = Warehouse::withCount('zones'); // جلب عدد المناطق مع كل مستودع
 
     // تطبيق البحث
     if ($request->filled('search')) {

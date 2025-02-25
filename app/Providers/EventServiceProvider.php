@@ -26,6 +26,11 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\InventoryTransactionCreated::class => [
             \App\Listeners\CreateInventoryTransactionListener::class,
         ],
+            \App\Events\InventoryTransactionUpdated::class => [
+                \App\Listeners\UpdateInventoryTransactionListener::class,
+            ],
+        
+        
     ];
 
     /**

@@ -15,12 +15,13 @@
 #### **كيفية تحميل المستودع:**
 1. استنساخ المستودع إلى جهازك:
    ```bash
+   HTTPS:
    git clone https://github.com/madarOrg/madarsys.git
-   or
-   git clone git@github.com:madarOrg/madarsys.git
    ```
+   SSH keys:
    ادخل المفتاح 
    ```bash
+   git clone git@github.com:madarOrg/madarsys.git
    Enter passphrase for key 'C:\Users\ASUS/.ssh/id_rsa':
    ```
 2. انتقل إلى مجلد المشروع:

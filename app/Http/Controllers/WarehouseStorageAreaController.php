@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Zone;
 use App\Models\Warehouse;
 use App\Models\WarehouseStorageArea;
 use Illuminate\Http\Request;
@@ -22,6 +22,8 @@ class WarehouseStorageAreaController extends Controller
     {
         $warehouse = Warehouse::findOrFail($warehouseId);
         return view('warehouses.storage-areas.create', compact('warehouse'));
+        $zones = Zone::all(); // استرجاع جميع المناطق
+        return view('warehouses.storage-areas.create', compact('zones')); // تمرير المناطق إلى الصفحة
     }
 
     public function store(Request $request, $warehouseId)
@@ -29,8 +31,8 @@ class WarehouseStorageAreaController extends Controller
         $request->validate([
             'area_name' => 'required|string',
             'area_type' => 'required|string',
-            'capacity' => 'required|numeric',
-            'current_occupancy' => 'required|numeric',
+            'capacity' => 'required|numeric',// السعة التخزينية 
+            'current_occupancy' => 'required|numeric',// الكمية المشغولة حاليًا 
             'zone_id' => 'nullable|exists:zones,id',
             'storage_conditions' => 'nullable|string',
         ]);

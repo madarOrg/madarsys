@@ -169,7 +169,7 @@ Route::get('warehouses/{warehouse}', [WarehousesController::class, 'show'])->nam
 Route::get('warehouses/{warehouse}/edit', [WarehousesController::class, 'edit'])->name('warehouses.edit'); // عرض صفحة تعديل المستودع
 Route::put('warehouses/{warehouse}', [WarehousesController::class, 'update'])->name('warehouses.update'); // تحديث بيانات المستودع
 Route::delete('warehouses/{warehouse}', [WarehousesController::class, 'destroy'])->name('warehouses.destroy'); // حذف مستودع
-
+ 
 // Routes for Warehouse Storage Areas
 Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-areas.')->group(function () {
     Route::get('/', [WarehouseStorageAreaController::class, 'index'])->name('index');           // عرض مناطق التخزين
@@ -193,7 +193,34 @@ Route::prefix('warehouses/{warehouse}/locations')->group(function () {
 });
 
 
-Route::resource('zones', ZonesController::class);
+// Route::prefix('warehouses')->name('warehouses.')->group(function () {
+//     Route::resource('zones', ZonesController::class);
+// });
+
+Route::prefix('warehouses/{warehouse}/zones')->name('warehouses.zones.')->group(function () {
+    // عرض جميع المناطق
+    Route::get('/', [ZonesController::class, 'index'])->name('index');
+
+    // عرض نموذج إضافة منطقة جديدة
+    Route::get('/create', [ZonesController::class, 'create'])->name('create');
+
+    // حفظ منطقة جديدة
+    Route::post('/', [ZonesController::class, 'store'])->name('store');
+
+    // عرض تفاصيل منطقة معينة
+    Route::get('/{zone}', [ZonesController::class, 'show'])->name('show');
+
+    // عرض نموذج تعديل منطقة معينة
+    Route::get('/{zone}/edit', [ZonesController::class, 'edit'])->name('edit');
+
+    // تحديث بيانات منطقة معينة
+    Route::put('/{zone}', [ZonesController::class, 'update'])->name('update');
+
+    // حذف منطقة معينة
+    Route::delete('/{zone}', [ZonesController::class, 'destroy'])->name('destroy');
+});
+
+
 
 //Categroy routers
 Route::prefix('categories')->name('categories.')->group(function () {
@@ -269,6 +296,9 @@ Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(
     Route::delete('/{id}', [InventoryTransactionController::class, 'destroy'])
         ->name('destroy');
 });
+
+
+
 
 
 

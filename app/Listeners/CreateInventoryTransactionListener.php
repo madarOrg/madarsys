@@ -103,8 +103,8 @@ class CreateInventoryTransactionListener
             // تحديث الكميات في جدول المخزون
 
             $this->updateInventoryStock($data['secondary_warehouse_id'], $productId, $inQuantity, $pricePerUnit);
-        } else {
-
+        } 
+        else if ($transactionType && $transactionType->inventory_movement_count == 1) {
             // إنشاء حركة عادية مثل بيع أو شراء
             if ($transactionType && $transactionType->effect != 0) {
                 $effect = $transactionType->effect; 
