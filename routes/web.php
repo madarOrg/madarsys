@@ -184,12 +184,12 @@ Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-a
     
 
 Route::prefix('warehouses/{warehouse}/locations')->group(function () {
-    Route::get('/', [WarehouseLocationController::class, 'index'])->name('warehouse.locations.index');
-    Route::get('/create', [WarehouseLocationController::class, 'create'])->name('warehouse.locations.create');
-    Route::post('/', [WarehouseLocationController::class, 'store'])->name('warehouse.locations.store');
-    Route::get('/{warehouse_location}/edit', [WarehouseLocationController::class, 'edit'])->name('warehouse.locations.edit');
-    Route::put('/{warehouse_location}', [WarehouseLocationController::class, 'update'])->name('warehouse.locations.update');
-    Route::delete('/{warehouse_location}', [WarehouseLocationController::class, 'destroy'])->name('warehouse.locations.destroy');
+    Route::get('/', [WarehouseLocationController::class, 'index'])->name('warehouses.locations.index');
+    Route::get('/create', [WarehouseLocationController::class, 'create'])->name('warehouses.locations.create');
+    Route::post('/', [WarehouseLocationController::class, 'store'])->name('warehouses.locations.store');
+    Route::get('/{warehouse_location}/edit', [WarehouseLocationController::class, 'edit'])->name('warehouses.locations.edit');
+    Route::put('/{warehouse_location}', [WarehouseLocationController::class, 'update'])->name('warehouses.locations.update');
+    Route::delete('/{warehouse_location}', [WarehouseLocationController::class, 'destroy'])->name('warehouses.locations.destroy');
 });
 
 
@@ -218,6 +218,10 @@ Route::prefix('warehouses/{warehouse}/zones')->name('warehouses.zones.')->group(
 
     // حذف منطقة معينة
     Route::delete('/{zone}', [ZonesController::class, 'destroy'])->name('destroy');
+});
+Route::prefix('warehouses/zones')->name('warehouses.zones.')->group(function () {
+    // عرض جميع المناطق بغض النظر عن المستودع
+    Route::get('/all', [ZonesController::class, 'index'])->name('all.index');
 });
 
 

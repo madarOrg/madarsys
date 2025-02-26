@@ -20,7 +20,7 @@
                     </select>
 
                     <!-- تاريخ العملية -->
-                    <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية" type="date" required="true" />
+                    <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية" type="datetime-local" required="true" value="{{ now()->format('Y-m-d\TH:i') }}" />
 
                     <!-- التأثير (تحديث تلقائي عند اختيار نوع العملية) -->
                     <label for="effect" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mt-2">التأثير</label>

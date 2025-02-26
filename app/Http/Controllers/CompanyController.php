@@ -69,8 +69,8 @@ class CompanyController extends Controller
                 $warehouses = $branches->flatMap(function ($branch) use ($search) {
                     return $branch->warehouses()->where(function ($query) use ($search) {
                         $query->where('name', 'LIKE', "%{$search}%")
-                            ->orWhere('address', 'LIKE', "%{$search}%")
-                            ->orWhere('supervisor_name', 'LIKE', "%{$search}%");
+                            ->orWhere('address', 'LIKE', "%{$search}%");
+                            // ->orWhere('supervisor_name', 'LIKE', "%{$search}%");
                     })->get();
                 });
             }

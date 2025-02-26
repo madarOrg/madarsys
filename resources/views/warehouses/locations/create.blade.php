@@ -1,6 +1,6 @@
 <x-layout>
-    <section class="bg-gray-50 dark:bg-gray-900">
-        <form action="{{ route('warehouse.locations.store', ['warehouse' => $warehouse->id]) }}" method="POST">
+    <section class="">
+        <form action="{{ route('warehouses.locations.store', ['warehouse' => $warehouse->id]) }}" method="POST">
             @csrf
             <div class="space-y-12 dark:bg-gray-900 mb-24">
                 <div class="pb-12">
@@ -14,19 +14,16 @@
 
                         <!-- اختيار منطقة التخزين -->
                         <div class="col-span-1">
-                            <label for="storage_area_id"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">اختر منطقة
-                                التخزين</label>
-                            <select name="storage_area_id" id="storage_area_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 shadow-sm dark:bg-gray-700 dark:border-gray-600">
-                                <option value="">-- اختر منطقة التخزين --</option>
-                                @foreach ($storageAreas as $area)
-                                    <option value="{{ $area->id }}"
-                                        {{ old('storage_area_id') == $area->id ? 'selected' : '' }}>
-                                        {{ $area->name }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            
+                                 <x-select-dropdown 
+                                        id="storage_area_id" 
+                                        name="storage_area_id" 
+                                        label="اختر منطقة التخزين"  
+                                        :options="$storageAreas->pluck('area_name', 'id')->toArray()" 
+                                        :selected="old('storage_area_id')" 
+                                    />
+
+                                
                             @error('storage_area_id')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
@@ -78,8 +75,8 @@
                         </div>
 
                         <!-- الملاحظات -->
-                        <div class="col-span-1 sm:col-span-2">
-                            <x-file-input id="notes" name="notes" label="الملاحظات" type="textarea"
+                        <div class="col-span-1">
+                            <x-textarea id="notes" name="notes" label="الملاحظات" type="textarea"
                                 placeholder="أدخل الملاحظات (اختياري)" />
                             @error('notes')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

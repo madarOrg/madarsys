@@ -1,7 +1,10 @@
 <x-layout>
     <section class="bg-gray-50 dark:bg-gray-900">
-        <form action="{{ route('warehouses.zones.update', ['warehouse' => $zone->warehouse_id, 'zone' => $zone->id]) }}" method="POST">
-            @csrf @method('PUT')
+        {{-- <form action="{{ route('warehouses.zones.update', ['warehouse' => $zone->warehouse_id, 'zone' => $zone->id]) }}" method="POST"> --}}
+        <form action="{{ route('warehouses.zones.update', ['warehouse' => $warehouse, 'zone' => $zone->id]) }}" method="POST">
+
+            @csrf
+             @method('PUT')
             <div class="space-y-12 mb-24">
                 <div class="pb-12">
                     <x-title :title="' تعديل المنطقة التخزينية الجغرافية'" />

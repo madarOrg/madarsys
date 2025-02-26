@@ -32,15 +32,13 @@ class WarehouseLocationController extends Controller
      * @return \Illuminate\View\View
      */
     
-    public function create(Warehouse $warehouse)
-    {
-        // جلب مناطق التخزين من قاعدة البيانات
-        $storageAreas = WarehouseStorageArea::all(); 
+     public function create(Warehouse $warehouse)
+     {
+         // جلب المناطق التخزينية الخاصة بهذا المستودع فقط
+         $storageAreas = $warehouse->storageAreas; 
     
         // تمرير البيانات إلى القالب
         return view('warehouses.locations.create', compact('warehouse', 'storageAreas'));
-        $zones = Zone::all(); // استرجاع جميع المناطق
-        return view('warehouses.locations.create', compact('zones')); // تمرير المناطق إلى الصفحة
     }
     
     /**
@@ -51,7 +49,7 @@ class WarehouseLocationController extends Controller
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request, Warehouse $warehouse)
-    {
+    { 
         $data = $request->validate([
             'storage_area_id' => 'required|exists:warehouse_storage_areas,id',
             'aisle'           => 'required|string|max:255',
@@ -64,12 +62,12 @@ class WarehouseLocationController extends Controller
         ]);
 
         // ربط الموقع بالمستودع باستخدام معرف المستودع
-        $data['warehouse_id'] = $warehouse->id;
+    $data['warehouse_id'] = $warehouse->id;
 
         WarehouseLocation::create($data);
 
-        return redirect()->route('warehouses.locations.index', ['warehouse' => $warehouse->id])
-                         ->with('success', 'تم إضافة موقع المستودع بنجاح.');
+        return redirect()->route('warehouses.locations.index', ['warehouse' => $warehouse->id])  // يجب تطابقه مع الرواتر
+        ->with('success', 'تم إضافة موقع المستودع بنجاح.');
     }
 
     /**
@@ -92,9 +90,13 @@ class WarehouseLocationController extends Controller
      * @return \Illuminate\View\View
      */
     public function edit(Warehouse $warehouse, WarehouseLocation $warehouse_location)
-    {
-        return view('warehouses.locations.edit', compact('warehouse', 'warehouse_location'));
-    }
+{
+    // جلب مناطق التخزين الخاصة بالمستودع المحدد فقط
+    $storageAreas = WarehouseStorageArea::where('warehouse_id', $warehouse->id)->get();
+
+    return view('warehouses.locations.edit', compact('warehouse', 'warehouse_location', 'storageAreas'));
+}
+    
 
     /**
      * تحديث بيانات موقع مستودع معين.

@@ -17,7 +17,6 @@ class InventoryTransaction extends Model
     protected $fillable = [
         'transaction_type_id',
         'effect',
-        'transaction_date',
         'reference',
         'partner_id',
         'department_id',
@@ -28,6 +27,10 @@ class InventoryTransaction extends Model
         'secondary_warehouse_id',
         'created_user', 'updated_user'
     ];
+    protected $casts = [
+        'transaction_date' => 'datetime',
+    ];
+    
     public function branch()
     {
         return $this->belongsTo(Branch::class);

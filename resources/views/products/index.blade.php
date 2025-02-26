@@ -47,6 +47,7 @@
                 <td class="px-6 py-4">
                   {{ $product->stock_quantity }} {{ $product->unit }}
                 </td>
+                
                 <td class="px-6 py-4">
                   <span class="px-2 py-1 text-xs font-medium rounded-md {{ $product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
                     {{ $product->is_active ? 'متاح' : 'غير متاح' }}
@@ -54,7 +55,7 @@
                 </td>
                 <td class="px-6 py-4">
                  
-                 <a href="{{ route('products.show', $product->id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">عرض</a>
+                 <a href="{{ route('products.show', $product->id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline"> <i class="fas fa-eye"></i></a>
                  
                  <a href="{{ route('products.edit', $product->id) }}" class="text-blue-600 hover:underline dark:text-blue-500">
                     <i class="fa-solid fa-pen"></i>

@@ -18,14 +18,20 @@ class WarehouseStorageAreaController extends Controller
         return view('warehouses.storage-areas.index', compact('storageAreas', 'warehouse'));
     }
 
-    public function create($warehouseId)
+   
+    public function create(Warehouse $warehouse)
     {
-        $warehouse = Warehouse::findOrFail($warehouseId);
-        return view('warehouses.storage-areas.create', compact('warehouse'));
-        $zones = Zone::all(); // استرجاع جميع المناطق
-        return view('warehouses.storage-areas.create', compact('zones')); // تمرير المناطق إلى الصفحة
+        // جلب المناطق المرتبطة بالمستودع
+        $zones = Zone::where('warehouse_id', $warehouse->id)->pluck('name', 'id');
+    
+        if ($zones->isEmpty()) {
+            // إذا كانت المناطق فارغة، نعرض رسالة تحذير
+            session()->flash('warning', 'لا توجد مناطق لهذا المستودع.');
+        }
+    
+        // مرر المتغير zones مع باقي المتغيرات إلى الصفحة
+        return view('warehouses.storage-areas.create', compact('zones', 'warehouse'));
     }
-
     public function store(Request $request, $warehouseId)
     {
         $request->validate([
@@ -45,12 +51,14 @@ class WarehouseStorageAreaController extends Controller
                          ->with('success', 'تم إضافة منطقة التخزين بنجاح');
     }
 
-    public function edit($warehouseId, $storageAreaId)
+    public function edit(Warehouse $warehouse, $storageAreaId)
     {
-        $warehouse = Warehouse::findOrFail($warehouseId);
-        $storageArea = $warehouse->storageAreas()->findOrFail($storageAreaId);
+        $zones = Zone::where('warehouse_id', $warehouse->id)->pluck('name', 'id');  // جلب المناطق المرتبطة بالمستودع
 
-        return view('warehouses.storage-areas.edit', compact('warehouse', 'storageArea'));
+        // $warehouse = Warehouse::findOrFail($warehouseId);
+        $storageArea = $warehouse->storageAreas()->findOrFail($storageAreaId);  // جلب منطقة التخزين المحددة
+
+        return view('warehouses.storage-areas.edit', compact('zones', 'warehouse', 'storageArea'));
     }
 
     public function update(Request $request, $warehouseId, $storageAreaId)
@@ -67,10 +75,18 @@ class WarehouseStorageAreaController extends Controller
         $storageArea = $warehouse->storageAreas()->findOrFail($storageAreaId);
 
         $storageArea->update($request->all());
+// جلب المناطق المرتبطة بالمستودع
+    $zones = Zone::where('warehouse_id', $warehouse->id)->pluck('name', 'id');
 
-        return redirect()->route('warehouse.storage-areas.index', ['warehouse' => $warehouse->id])
-                         ->with('success', 'تم تحديث منطقة التخزين بنجاح');
+    // إذا كانت المناطق فارغة، نعرض رسالة تحذير
+    if ($zones->isEmpty()) {
+        session()->flash('warning', 'لا توجد مناطق لهذا المستودع.');
     }
+
+    // العودة إلى صفحة التعديل مع تمكين المستخدم من اختيار المناطق المتاحة
+    return view('warehouses.storage-areas.edit', compact('warehouse', 'storageArea', 'zones'))
+        ->with('success', 'تم تحديث منطقة التخزين بنجاح');
+}
 
     public function destroy($warehouseId, $storageAreaId)
     {

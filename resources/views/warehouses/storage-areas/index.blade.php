@@ -7,33 +7,32 @@
     </div>
 
     <!-- زر إضافة منطقة تخزينية جديدة -->
-    <x-button :href="route('warehouses.storage-areas.create', $warehouse)" type="button">
+    <x-button :href="route('warehouse.storage-areas.create', $warehouse)" type="button">
         <i class="fas fa-plus mr-2"></i> إضافة منطقة تخزينية جديدة
     </x-button>
 
     <!-- جدول المناطق التخزينية -->
-    <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+    <table class="w-full table-fixed text-sm text-right text-gray-500 dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th class="p-4">
                     <input id="checkbox-all-search" type="checkbox"
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600">
                 </th>
-                <th class="px-6 py-3"> اسم المنطقة التخزينية</th>
-                <th class="px-6 py-3">نوع المنطقة التخزينية</th>
-                <th class="px-6 py-3"> السعة القصوى للتخزين</th>
-                <th class="px-6 py-3">عدد المنتجات المخزنة</th>
-                <th class="px-6 py-3">المنطقة الفرعية</th>
-                <th class="px-6 py-3">شروط التخزين</th>
-                <th class="px-6 py-3"> تاريخ الإضافة</th>
-                <th class="px-6 py-3"> تاريخ آخر تحديث</th>
-                <th class="px-6 py-3">الإجراءات</th>
+                <th class="px-6 py-3 min-w-[200px]">اسم المنطقة التخزينية</th>
+                <th class="px-6 py-3 min-w-[150px]">نوع المنطقة التخزينية</th>
+                <th class="px-6 py-3 min-w-[200px]">السعة القصوى للتخزين</th>
+                <th class="px-6 py-3 min-w-[200px]">عدد المنتجات المخزنة</th>
+                <th class="px-6 py-3 min-w-[200px]">منطقة التخزين الجغرافية</th>
+                <th class="px-6 py-3 min-w-[200px]">شروط التخزين</th>
+                <th class="px-6 py-3 min-w-[200px]">تاريخ الإضافة</th>
+                <th class="px-6 py-3 min-w-[200px]">تاريخ آخر تحديث</th>
+                <th class="px-6 py-3 min-w-[150px]">الإجراءات</th>
             </tr>
         </thead>
         <tbody>
             @foreach ($storageAreas as $area)
-                <tr
-                    class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                     <td class="p-4">
                         <input type="checkbox"
                             class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600">
@@ -45,16 +44,16 @@
                     <td class="px-6 py-4">{{ $area->area_type }}</td>
                     <td class="px-6 py-4">{{ $area->capacity }}</td>
                     <td class="px-6 py-4">{{ $area->current_occupancy }}</td>
-                    <td class="px-6 py-4">{{ $area->zone_id }}</td>
+                    <td class="px-6 py-4">{{ $area->zone->name }}</td>
                     <td class="px-6 py-4">{{ $area->storage_conditions }}</td>
                     <td class="px-6 py-4">{{ $area->created_at->format('Y-m-d H:i:s') }}</td>
                     <td class="px-6 py-4">{{ $area->updated_at->format('Y-m-d H:i:s') }}</td>
                     <td class="px-6 py-4 flex space-x-2">
-                        <a href="{{ route('warehouses.storage-areas.edit', [$warehouse, $area->area_id]) }}"
+                        <a href="{{ route('warehouse.storage-areas.edit', [$warehouse, $area->id]) }}"
                             class="text-blue-600 hover:underline dark:text-blue-500">
                             <i class="fa-solid fa-pen"></i>
                         </a>
-                        <form action="{{ route('warehouses.storage-areas.destroy', [$warehouse, $area->area_id]) }}"
+                        <form action="{{ route('warehouse.storage-areas.destroy', [$warehouse, $area->id]) }}"
                             method="POST" class="inline-block">
                             @csrf
                             @method('DELETE')
@@ -67,6 +66,7 @@
             @endforeach
         </tbody>
     </table>
+    
 </x-layout>
 
 <script>

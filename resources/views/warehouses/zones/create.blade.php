@@ -1,6 +1,7 @@
 <x-layout>
     <section class="bg-gray-50 dark:bg-gray-900">
         <form action="{{ route('warehouses.zones.store', ['warehouse' => $warehouse->id]) }}" method="POST">
+            @csrf
             <div class="space-y-12  mb-24">
                 <div class="pb-12">
                     <x-title :title="'إضافة مناطق تخزينية جغرافية'" />

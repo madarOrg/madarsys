@@ -42,8 +42,9 @@
                     <td class="px-6 py-4">{{  $zone->name }}</td>
                     <td class="px-6 py-4">{{ $zone->code }}</td>
                     <td class="px-6 py-4">{{ $zone->description }}</td>
-                    <td class="px-6 py-4">{{ $zone->current_occupancy }}</td>
                     <td class="px-6 py-4">{{ $zone->capacity }}</td>
+                    <td class="px-6 py-4">{{ $zone->current_occupancy }}</td>
+                   
                     <td class="px-6 py-4">{{ $zone->created_at->format('Y-m-d H:i:s') }}</td>
                     <td class="px-6 py-4">{{ $zone->updated_at->format('Y-m-d H:i:s') }}</td>
                     <td class="px-6 py-4 flex space-x-2">

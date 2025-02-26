@@ -11,16 +11,6 @@ class StoreInventoryTransactionRequest extends FormRequest
     protected $inventoryValidationService;
 
     /**
-     * حقن خدمة التحقق من المخزون في الطلب
-     */
-    public function __construct(InventoryValidationService $inventoryValidationService)
-    {
-        parent::__construct();
-
-        $this->inventoryValidationService = $inventoryValidationService;
-    }
-
-    /**
      * تحديد ما إذا كان المستخدم يملك الصلاحية لإجراء هذا الطلب.
      */
     public function authorize()
@@ -33,21 +23,23 @@ class StoreInventoryTransactionRequest extends FormRequest
      */
     public function rules()
     {
+        $inventoryValidationService = app(InventoryValidationService::class);
+        
         $transactionTypeId = $this->input('transaction_type_id');
         $transactionType = TransactionType::find($transactionTypeId);
-        $secondaryWarehouseId = $this->input('secondary_warehouse_id'); // تجنب الخطأ عند عدم وجوده
-        $warehouseId = $this->input('warehouse_id'); // استخراج معرف المستودع
+        $secondaryWarehouseId = $this->input('secondary_warehouse_id'); 
+        $warehouseId = $this->input('warehouse_id'); 
+    
         return [
             'transaction_type_id' => 'required|exists:transaction_types,id',
-            'transaction_date' => ['required', 'date', function ($attribute, $value, $fail)  use ($warehouseId, $secondaryWarehouseId) {
-                $errorMessage = $this->inventoryValidationService->validateTransactionDate($value, $warehouseId);
+            'transaction_date' => ['required', 'date', function ($attribute, $value, $fail) use ($warehouseId, $secondaryWarehouseId, $inventoryValidationService) {
+                $errorMessage = $inventoryValidationService->validateTransactionDate($value, $warehouseId);
                 if ($errorMessage) {
-
                     $fail($errorMessage);
                 }
-                // التحقق من تاريخ المخزون في المستودع الثانوي (إذا كان موجودًا)
+    
                 if ($secondaryWarehouseId) {
-                    $errorMessageSecondary = $this->inventoryValidationService->validateTransactionDate($value, $secondaryWarehouseId);
+                    $errorMessageSecondary = $inventoryValidationService->validateTransactionDate($value, $secondaryWarehouseId);
                     if ($errorMessageSecondary) {
                         $fail($errorMessageSecondary);
                     }
@@ -56,8 +48,8 @@ class StoreInventoryTransactionRequest extends FormRequest
             'reference' => 'required|string|max:255',
             'partner_id' => 'required|exists:partners,id',
             'department_id' => 'nullable|exists:departments,id',
-            'warehouse_id' => ['required', 'exists:warehouses,id', function ($attribute, $value, $fail) {
-                if (!$this->inventoryValidationService->isWarehouseActive($value)) {
+            'warehouse_id' => ['required', 'exists:warehouses,id', function ($attribute, $value, $fail) use ($inventoryValidationService) {
+                if (!$inventoryValidationService->isWarehouseActive($value)) {
                     $fail('المستودع مغلق، لا يمكنك إضافة عمليات مخزنية.');
                 }
             }],
@@ -83,7 +75,7 @@ class StoreInventoryTransactionRequest extends FormRequest
             'warehouse_locations.*' => 'nullable|exists:warehouse_locations,id',
         ];
     }
-
+    
 
 
 
