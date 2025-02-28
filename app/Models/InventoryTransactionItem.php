@@ -26,7 +26,8 @@ class InventoryTransactionItem extends Model
         'converted_quantity',
         'unit_product_id' ,
         'target_warehouse_id',
-        'created_user', 'updated_user' 
+        'created_user', 'updated_user' ,
+        'converted_price' ,
 
     ];
     public function branch()

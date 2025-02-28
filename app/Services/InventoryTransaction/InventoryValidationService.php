@@ -29,49 +29,58 @@ class InventoryValidationService
      */
     public static function validateTransactionDate($transactionDate, $warehouseId)
     {  
+        // تحويل تاريخ الإدخال إلى كائن Carbon (يبقى بصيغة timestamp)
+        $transactionDate = Carbon::parse($transactionDate);
+    
         // جلب الحد الأدنى المسموح به من جدول الإعدادات
         $minDays = Setting::where('key', 'inventory_transaction_min_date')->value('value') ?? 30;
-        $sysStart = Setting::where('key', 'system_start_date')->value('value') ?? '2025-01-01';
-        // حساب التاريخ الأدنى المسموح به
-        $minDate = Carbon::now()->subDays($minDays)->toDateString();
+        $sysStart = Carbon::parse(Setting::where('key', 'system_start_date')->value('value') ?? '2025-01-01');
     
-        // جلب آخر عملية مخزنية لهذا المستودع
+        // حساب الحد الأدنى للتاريخ المسموح به كـ timestamp
+        $minDate = Carbon::now()->subDays($minDays);
+    
+        // جلب آخر عملية مخزنية لهذا المستودع بتنسيق timestamp
         $lastTransactionDate = InventoryTransaction::where('warehouse_id', $warehouseId)
             ->orderBy('transaction_date', 'desc')
             ->value('transaction_date');
-           
-        // التحقق من القيود الزمنية
-        if ($transactionDate < $minDate) {
-            return "لا يمكن إدخال عملية مخزنية بتاريخ أقدم من $minDate.";
-        }
-        if ($transactionDate < $sysStart) {
-            return "لا يمكن إدخال عملية مخزنية بتاريخ أقدم من تاريخ بداية النظام $sysStart.";
-        }
-        if ($lastTransactionDate && $transactionDate < $lastTransactionDate) {
-
-            return "تاريخ العملية يجب أن يكون أحدث من آخر عملية مخزنية تم تسجيلها بتاريخ: $lastTransactionDate.";
-        }
-
-        return true;
-    }
     
-    public static function validateMaxOperationsBeforeRepeat($transactionDate)
-    {
+            $lastTransactionDate = $lastTransactionDate ? Carbon::parse($lastTransactionDate)->toDateTimeString() : null;
+            // dd($lastTransactionDate);
+                
 
-        $maxOperationsBeforeRepeat = 5; // السماح بالتكرار بعد 5 عمليات أخرى
-
-        $operationsCount = DB::table('inventory_transactions')
-            ->where('product_id', $product_id)
-            ->where('warehouse_id', $warehouse_id)
-            ->where('type', $type)
-            ->where('date', now()->toDateString())
-            ->count();
-
-        if ($operationsCount >= $maxOperationsBeforeRepeat) {
-            if ($transactionDate < $sysStart) {
-                return " لا يمكن إدخال عملية مخزنية بتاريخ أقدم من تاريخ بداية النظام$sysStart.";
-            }
+        // التحقق من القيود الزمنية
+        if ($transactionDate->lessThan($minDate)) {
+            return "لا يمكن إدخال عملية مخزنية بتاريخ أقدم من " . $minDate->toDateTimeString();
         }
+        if ($transactionDate->lessThan($sysStart)) {
+            return "لا يمكن إدخال عملية مخزنية بتاريخ أقدم من تاريخ بداية النظام " . $sysStart->toDateTimeString();
+        }
+        if ($lastTransactionDate && $transactionDate->lessThan($lastTransactionDate)) {
+            return "تاريخ العملية يجب أن يكون أحدث من آخر عملية مخزنية تم تسجيلها بتاريخ: " . $lastTransactionDate->toDateTimeString();
+        }
+        // dd($lastTransactionDate);
+
         return false;
     }
+    
+    
+    // public static function validateMaxOperationsBeforeRepeat($transactionDate)
+    // {
+
+    //     $maxOperationsBeforeRepeat = 5; // السماح بالتكرار بعد 5 عمليات أخرى
+
+    //     $operationsCount = DB::table('inventory_transactions')
+    //         ->where('product_id', $product_id)
+    //         ->where('warehouse_id', $warehouse_id)
+    //         ->where('type', $type)
+    //         ->where('date', now()->toDateString())
+    //         ->count();
+
+    //     if ($operationsCount >= $maxOperationsBeforeRepeat) {
+    //         if ($transactionDate < $sysStart) {
+    //             return " لا يمكن إدخال عملية مخزنية بتاريخ أقدم من تاريخ بداية النظام$sysStart.";
+    //         }
+    //     }
+    //     return false;
+    // }
 }

@@ -18,16 +18,12 @@ class Zone extends Model
     // علاقة مع المستودعات 
     public function warehouse()
     {
-        return $this->belongsTo(Warehouse::class);
+        return $this->belongsTo(Warehouse::class, 'warehouse_id');
     }
     // علاقة مع المناطق التخزينيه 
     public function storageArea()
     {
         return $this->hasMany(WarehouseStorageArea::class);
     }
-    // علاقة مع المواقع  
-    public function  warehouseLocations()
-    {
-        return $this->hasMany(WarehouseLocation::class);
-    }
+
 }

@@ -40,7 +40,21 @@ public function reduceStock($productId, $quantity)
         }
         return $quantity;
     }
-
+    
+    /**
+     * حساب السعر  بناءً على معامل التحويل للوحدة
+     */
+    public function calculateConvertedPrice($pricePerUnit, $unitId)
+    {
+        $unit = Unit::find($unitId);
+        if ($unit && $unit->conversion_factor) {
+            // إذا كانت الوحدة لها معامل تحويل، نحسب السعر للوحدة الأساسية بقسمة السعر على معامل التحويل
+            return $pricePerUnit * $unit->conversion_factor;
+        }
+        // إذا لم توجد وحدة أو معامل تحويل، يرجع السعر كما هو
+        return $pricePerUnit;
+    }
+    
     /**
      * حساب الكمية مع التأثير (إدخال أو إخراج)
      */

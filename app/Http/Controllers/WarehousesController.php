@@ -17,8 +17,7 @@ class WarehousesController extends Controller
      */
     public function index(Request $request)
 {
-    $query = Warehouse::withCount('zones'); // جلب عدد المناطق مع كل مستودع
-
+    $query = Warehouse::withCount(['zones', 'storageAreas', 'warehouseLocations']);
     // تطبيق البحث
     if ($request->filled('search')) {
         $query->where('name', 'like', '%' . $request->search . '%')
@@ -192,6 +191,6 @@ public function update(Request $request, string $id)
         $warehouse->delete();
 
         // إعادة التوجيه مع رسالة نجاح
-        return redirect()->route('companies.index')->with('success', 'تم حذف المستودع بنجاح');
+        return redirect()->route('warehouses.index')->with('success', 'تم حذف المستودع بنجاح');
     }
 }

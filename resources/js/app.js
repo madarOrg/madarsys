@@ -1,7 +1,33 @@
 import './bootstrap';
 import { Dismiss } from 'flowbite';
 
-// الثيم
+    window.addEventListener('alert', event => {
+        Swal.fire({
+            icon: event.detail.type,
+            text: event.detail.message,
+            timer: 3000,
+            showConfirmButton: false
+        });
+    });
+
+
+    // Swal.fire({
+    //     title: "Custom width, padding, color, background.",
+    //     width: 600,
+    //     padding: "3em",
+    //     color: "#716add",
+    //     background: "#fff url(/images/trees.png)",
+    //     backdrop: `
+    //       rgba(0,0,123,0.4)
+    //       url("/storage/logos/cat_flye.gif")
+    //       left top
+    //       no-repeat
+    //     `
+    //   });
+    // });
+
+
+      // الثيم
 const themeToggle = document.getElementById('theme-toggle');
 if (themeToggle) {
     const icon = themeToggle.querySelector('i');

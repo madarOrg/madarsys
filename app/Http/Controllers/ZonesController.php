@@ -9,7 +9,8 @@ use App\Models\Warehouse;
 
 class ZonesController extends Controller
 {
-    // عرض جميع المناطق
+    
+    //  عرض جميع المناطق حسب مستودع
     public function index(Request $request, $warehouse)
     {
         // جلب قيمة البحث من الطلب
@@ -35,20 +36,21 @@ class ZonesController extends Controller
     }
     
     // حفظ منطقة جديدة
-    public function store(Request $request)
+    public function store(Request $request , Warehouse $warehouse)
     {
         $data = $request->validate([
             'name' => 'required|string|max:255|unique:zones,name',
             'code' => 'required|string|max:255|unique:zones,code',
             'description' => 'nullable|string',
             'warehouse_id' => 'required|exists:warehouses,id', // إضافة التحقق من المستودع
-
+            'capacity' => 'required|integer|min:1',
+        'current_occupancy' => 'required|integer|min:0|max:' . $request->capacity,
         ]);
-
+        $data['warehouse_id'] = $warehouse->id;
         Zone::create($data);
 
-        return redirect()->route('warehouses.zones.index')->with('success', 'تمت إضافة المنطقة الفرعية بنجاح.');
-    }
+return redirect()->route('warehouses.zones.index', ['warehouse' => $warehouse->id])
+                     ->with('success', 'تمت إضافة المنطقة الفرعية بنجاح.');    }
 
     // عرض تفاصيل منطقة معينة
     public function show(Zone $zone)
@@ -67,12 +69,16 @@ class ZonesController extends Controller
     
 
     // تحديث بيانات المنطقة
-    public function update(Request $request, $warehouse, Zone $zone)
-{
-    $data = $request->validate([
+    public function update(Request $request, $warehouse, $id)
+    {
+        $zone = Zone::where('warehouse_id', $warehouse)->findOrFail($id);
+
+     $data = $request->validate([
         'name' => 'required|string|max:255|unique:zones,name,' . $zone->id,
         'code' => 'required|string|max:255|unique:zones,code,' . $zone->id,
         'description' => 'nullable|string',
+        'capacity' => 'required|integer|min:1',
+        'current_occupancy' => 'required|integer|min:0|max:' . $request->capacity,
     ]);
 
     $zone->update($data);

@@ -33,6 +33,7 @@
 <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}" />
 {{-- Favicon --}}
 <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}" />
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         @vite([
             'resources/css/app.css',

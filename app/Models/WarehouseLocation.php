@@ -38,13 +38,7 @@ class WarehouseLocation extends Model
         return $this->belongsTo(Warehouse::class);
     }
 
-    /**
-     * العلاقة مع موديل Zone
-     */
-    public function zone()
-    {
-        return $this->belongsTo(Zone::class);
-    }
+   
 
      /**
      * العلاقة مع منطقة التخزين
