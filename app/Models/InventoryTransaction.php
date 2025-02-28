@@ -17,16 +17,20 @@ class InventoryTransaction extends Model
     protected $fillable = [
         'transaction_type_id',
         'effect',
+        'transaction_date', 
         'reference',
         'partner_id',
         'department_id',
         'warehouse_id',
+        'secondary_warehouse_id',
         'notes',
         'branch_id',
         'inventory_request_id',
-        'secondary_warehouse_id',
-        'created_user', 'updated_user'
+        'created_user', 
+        'updated_user',
+        'status',
     ];
+    
     protected $casts = [
         'transaction_date' => 'datetime',
     ];

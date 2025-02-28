@@ -47,11 +47,11 @@ class Product extends Model
      // app/Models/Product.php
 
 
-        public function unit()
-        {
-            return $this->belongsTo(Unit::class, 'unit_id', 'id');
-        }
-        
+     public function unit()
+     {
+         return $this->belongsTo(Unit::class, 'unit_id', 'id')->with('childrenRecursive');
+     }
+     
 
 
     // العلاقة مع المورد

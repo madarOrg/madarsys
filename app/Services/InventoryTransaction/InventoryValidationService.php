@@ -44,9 +44,10 @@ class InventoryValidationService
             ->orderBy('transaction_date', 'desc')
             ->value('transaction_date');
     
-        $lastTransactionDate = $lastTransactionDate ? Carbon::parse($lastTransactionDate) : null;
-    
-      dd($lastTransactionDate);
+            $lastTransactionDate = $lastTransactionDate ? Carbon::parse($lastTransactionDate)->toDateTimeString() : null;
+            // dd($lastTransactionDate);
+                
+
         // التحقق من القيود الزمنية
         if ($transactionDate->lessThan($minDate)) {
             return "لا يمكن إدخال عملية مخزنية بتاريخ أقدم من " . $minDate->toDateTimeString();
@@ -57,7 +58,8 @@ class InventoryValidationService
         if ($lastTransactionDate && $transactionDate->lessThan($lastTransactionDate)) {
             return "تاريخ العملية يجب أن يكون أحدث من آخر عملية مخزنية تم تسجيلها بتاريخ: " . $lastTransactionDate->toDateTimeString();
         }
-    
+        // dd($lastTransactionDate);
+
         return false;
     }
     
