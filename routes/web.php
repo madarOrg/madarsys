@@ -46,6 +46,8 @@ Route::post('/reset-password', [PasswordController::class, 'store'])->name('pass
 // استخدام middleware للتأكد من أن المستخدم مسجل الدخول
 Route::middleware('auth')->group(function () {
 
+    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     // عرض لوحة التحكم (dashboard)
 
     Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');

@@ -17,6 +17,7 @@ class ProductController extends Controller
     }
 
     // عرض نموذج إضافة منتج جديد
+    
     public function create()
     {
         $categories = Category::all(); // الحصول على جميع التصنيفات

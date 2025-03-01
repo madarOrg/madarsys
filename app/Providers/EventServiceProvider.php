@@ -4,6 +4,13 @@ namespace App\Providers;
 
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\Events\Logout;
+use App\Events\NotificationCreated;
+use App\Events\InventoryTransactionCreated;
+use App\Events\InventoryTransactionUpdated;
+use App\Listeners\SendNotificationCreatedNotification;
+use App\Listeners\CreateInventoryTransactionListener;
+use App\Listeners\UpdateInventoryTransactionListener;
+use App\Listeners\ClearUserPermissionsCache;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -16,21 +23,24 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         // أحداث تسجيل الدخول والخروج
         Login::class => [
-            \App\Listeners\ClearUserPermissionsCache::class . '@handleLogin',
+            ClearUserPermissionsCache::class . '@handleLogin',
         ],
         Logout::class => [
-            \App\Listeners\ClearUserPermissionsCache::class . '@handleLogout',
+            ClearUserPermissionsCache::class . '@handleLogout',
         ],
 
         // حدث إنشاء حركة مخزنية
-        \App\Events\InventoryTransactionCreated::class => [
-            \App\Listeners\CreateInventoryTransactionListener::class,
+        InventoryTransactionCreated::class => [
+            CreateInventoryTransactionListener::class,
         ],
-            \App\Events\InventoryTransactionUpdated::class => [
-                \App\Listeners\UpdateInventoryTransactionListener::class,
-            ],
-        
-        
+        InventoryTransactionUpdated::class => [
+            UpdateInventoryTransactionListener::class,
+        ],
+
+        // حدث إنشاء التنبيه
+        NotificationCreated::class => [
+            SendNotificationCreatedNotification::class,
+        ],
     ];
 
     /**

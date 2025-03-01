@@ -10,7 +10,10 @@ use App\Models\{
     Department,
     Warehouse,
     Product,
-    WarehouseLocation
+    WarehouseLocation,
+    UserNotification,
+    RoleWarehouse,
+    RoleUser
 };
 use App\Services\InventoryTransaction\InventoryValidationService;
 use Carbon\Carbon;
@@ -99,20 +102,64 @@ class InventoryTransactionLivewire extends Component
             // دمج البيانات المعتمدة مع العناصر
             $validatedData['transactionItems'] = $this->transactionItems;
             // استدعاء خدمة المعاملات المخزنية لحفظ البيانات
-            $transaction = $this->inventoryTransactionService->createTransaction($validatedData);
-            $this->reset(['transaction_type_id', 'transaction_date', 'effect', 'reference', 'partner_id', 'department_id', 'warehouse_id', 'secondary_warehouse_id', 'notes', 'transactionItems']);
+            $transaction  = $this->inventoryTransactionService->createTransaction($validatedData);
+
+            // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
+  // التحقق من قيمة المعاملة
+  if ($validatedData) {
+    // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
+    $this->sendWarehouseUsersNotification($validatedData['warehouse_id']);
+}
 
     // إعادة ضبط التاريخ إلى الآن
+    $this->reset(['transaction_type_id', 'transaction_date', 'effect', 'reference', 'partner_id', 'department_id', 'warehouse_id', 'secondary_warehouse_id', 'notes', 'transactionItems']);
     $this->transaction_date = Carbon::now()->format('Y-m-d\TH:i');
 
             session()->flash('message', 'تم حفظ العملية بنجاح!');
         } catch (\Exception $e) {
+            
             // session()->flash('error', 'حدث خطأ أثناء حفظ العملية: ' . $e->getMessage());
             throw new \Exception($e->getMessage());
 
         }
     }
 
+    public function sendWarehouseUsersNotification($warehouseId)
+    {
+        // جلب جميع الأدوار المرتبطة بالمستودع باستخدام علاقة RoleWarehouse
+        $roles = RoleWarehouse::where('warehouse_id', $warehouseId)->pluck('role_id');
+    
+        // التحقق من وجود أدوار مرتبطة بالمستودع
+        if ($roles->isNotEmpty()) {
+            // جلب المستخدمين المرتبطين بالأدوار بشكل أكثر كفاءة
+            $roleUsers = RoleUser::whereIn('role_id', $roles)->get();
+    
+            foreach ($roleUsers as $roleUser) {
+                // جلب المستخدم من خلال العلاقة مع جدول المستخدمين
+                $user = $roleUser->user;
+    
+                // إرسال إشعار للمستخدم المرتبط
+                if ($user) {
+                    $user->notify(new UserNotification([
+                        'message' => 'تم حفظ عملية جديدة في مستودعك',
+                        'type' => 'restocking',
+                        'priority' => 1,
+                        'due_date' => Carbon::now()->addDays(1),
+                        'is_read' => false,
+                        'product_id' => null, // يمكن تخصيصها حسب الحاجة
+                        'inventory_request_id' => null,
+                        'quantity' => null,
+                        'status' => 'new',
+                        'department_id' => $this->department_id,
+                        'warehouse_id' => $warehouseId,
+                        'created_at' => Carbon::now()->toDateTimeString(),
+                        'updated_at' => Carbon::now()->toDateTimeString(),  // إضافة updated_at
+                    ]));
+                }
+            }
+        }
+    }
+    
     public function submit()
     {
         // استدعاء دالة الحفظ
