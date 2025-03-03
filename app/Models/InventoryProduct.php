@@ -20,7 +20,7 @@ class InventoryProduct extends Model
         'branch_id',
         'warehouse_id',
         'storage_area_id',
-        'shelf_location',
+        'location_id',
         'inventory_movement_type',
         'created_user',
         'updated_user',

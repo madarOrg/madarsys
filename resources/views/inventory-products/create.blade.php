@@ -34,9 +34,12 @@
                     </div>
 
                     <!-- إدخال الموقع الدقيق للرف -->
+                    <!-- اختيار المنطقة التخزينية -->
                     <div class="mb-4">
-                        <x-file-input id="shelf_location" name="shelf_location" label="رقم الرف أو الموقع" type="text" />
-                    </div>
+                        <x-select-dropdown id="location_id" name="location_id" label="موقع المنتج" 
+                        :options="$locations" required />
+                                        </div>
+
 
                 </div>
 

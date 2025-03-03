@@ -55,4 +55,8 @@ class WarehouseLocation extends Model
     {
         return $this->current_occupancy >= $this->capacity;
     }
+    public function getFullLocationAttribute()
+    {
+        return "{$this->aisle}-{$this->rack}-{$this->shelf}-{$this->position}";
+    }
 }

@@ -20,41 +20,42 @@ class CreateInventoryProductsTable extends Migration
                 ->constrained('products')
                 ->onDelete('cascade')
                 ->comment('المعرّف الخاص بالمنتج من جدول المنتجات');
-
+    
             $table->foreignId('branch_id')
                 ->nullable()
                 ->constrained('branches')
                 ->nullOnDelete()
                 ->comment('المعرّف الخاص بالفرع الذي يوجد به المنتج');
-
+    
             $table->foreignId('warehouse_id')
                 ->constrained('warehouses')
                 ->onDelete('cascade')
                 ->comment('المستودع الذي يتم تخزين المنتج فيه');
-
+    
             $table->foreignId('storage_area_id')
                 ->constrained('warehouse_storage_areas')
                 ->onDelete('cascade')
                 ->comment('الموقع التخزيني داخل المستودع مثل المنطقة أو القسم');
-
-            $table->string('shelf_location')
+    
+            // استبدال shelf_location بـ location_id
+            $table->foreignId('location_id')
                 ->nullable()
-                ->comment('رقم الرف أو الموقع الدقيق لتخزين المنتج داخل المستودع');
-
-            $table->unsignedTinyInteger('inventory_movement_type')
-                ->comment('نوع الحركة المخزنية: 1 للإدخال أو الإخراج، 2 للتحويل المخزني');
-
-            $table->unsignedBigInteger('created_user')
+                ->constrained('warehouse_locations')
+                ->nullOnDelete()
+                ->comment('الموقع التخزيني الدقيق للمنتج داخل المستودع');
+    
+             $table->unsignedBigInteger('created_user')
                 ->nullable()
                 ->comment('رقم المستخدم الذي قام بإضافة هذا السجل');
-
+    
             $table->unsignedBigInteger('updated_user')
                 ->nullable()
                 ->comment('رقم المستخدم الذي قام بآخر تحديث لهذا السجل');
-
+    
             $table->timestamps();
         });
     }
+    
 
     /**
      * التراجع عن الترحيل.
