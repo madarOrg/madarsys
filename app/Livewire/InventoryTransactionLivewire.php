@@ -10,15 +10,23 @@ use App\Models\{
     Department,
     Warehouse,
     Product,
-    WarehouseLocation
+    WarehouseLocation,
+    UserNotification,
+    RoleWarehouse,
+    RoleUser
 };
 use App\Services\InventoryTransaction\InventoryValidationService;
 use Carbon\Carbon;
+use App\Services\UnitService;
 
 class InventoryTransactionLivewire extends Component
 {
     protected $inventoryValidationService;
+    protected $unitService;
 
+    
+        public $units = [];
+    
     public $transactionTypes, $partners, $departments, $warehouses, $products, $warehouseLocations;
     public $transaction_type_id, $transaction_date, $effect, $reference, $partner_id, $department_id, $warehouse_id, $secondary_warehouse_id, $notes;
     public $transactionItems = [];
@@ -28,10 +36,13 @@ class InventoryTransactionLivewire extends Component
     public function __construct()
     {
         $this->inventoryTransactionService = new InventoryTransactionService();
-    }
+        $this->unitService = new UnitService;
 
+    }
+   
     public function mount()
     {
+   
         $this->transactionTypes = TransactionType::all();
         $this->partners = Partner::all();
         $this->departments = Department::all();
@@ -40,9 +51,21 @@ class InventoryTransactionLivewire extends Component
         $this->warehouseLocations = WarehouseLocation::all();
         $this->transaction_date = Carbon::now()->format('Y-m-d\TH:i');
         $this->effect = 1;  // Default effect value
-        
-    }
 
+    }
+    public function updateUnits($index)
+    {
+        if (!$this->unitService) {
+            throw new \Exception("UnitService is not initialized.");
+        }
+    
+        $productId = $this->transactionItems[$index]['product_id'] ?? null;
+        
+        if ($productId) {
+            $this->transactionItems[$index]['units'] = $this->unitService->updateUnits($productId);
+        }
+    }
+    
     public function addProductRow()
     {
         // إضافة صف جديد إلى مصفوفة الـ transactionItems
@@ -99,17 +122,60 @@ class InventoryTransactionLivewire extends Component
             // دمج البيانات المعتمدة مع العناصر
             $validatedData['transactionItems'] = $this->transactionItems;
             // استدعاء خدمة المعاملات المخزنية لحفظ البيانات
-            $transaction = $this->inventoryTransactionService->createTransaction($validatedData);
-            $this->reset(['transaction_type_id', 'transaction_date', 'effect', 'reference', 'partner_id', 'department_id', 'warehouse_id', 'secondary_warehouse_id', 'notes', 'transactionItems']);
+            $transaction  = $this->inventoryTransactionService->createTransaction($validatedData);
 
-    // إعادة ضبط التاريخ إلى الآن
-    $this->transaction_date = Carbon::now()->format('Y-m-d\TH:i');
+            // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
+            // التحقق من قيمة المعاملة
+            if ($validatedData) {
+                // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
+                $this->sendWarehouseUsersNotification($validatedData['warehouse_id']);
+            }
+
+            // إعادة ضبط التاريخ إلى الآن
+            $this->reset(['transaction_type_id', 'transaction_date', 'effect', 'reference', 'partner_id', 'department_id', 'warehouse_id', 'secondary_warehouse_id', 'notes', 'transactionItems']);
+            $this->transaction_date = Carbon::now()->format('Y-m-d\TH:i');
 
             session()->flash('message', 'تم حفظ العملية بنجاح!');
         } catch (\Exception $e) {
+
             // session()->flash('error', 'حدث خطأ أثناء حفظ العملية: ' . $e->getMessage());
             throw new \Exception($e->getMessage());
+        }
+    }
 
+    public function sendWarehouseUsersNotification($warehouseId)
+    {
+        // جلب جميع الأدوار المرتبطة بالمستودع باستخدام علاقة RoleWarehouse
+        $roles = RoleWarehouse::where('warehouse_id', $warehouseId)->pluck('role_id');
+
+        // التحقق من وجود أدوار مرتبطة بالمستودع
+        if ($roles->isNotEmpty()) {
+            // جلب المستخدمين المرتبطين بالأدوار بشكل أكثر كفاءة
+            $roleUsers = RoleUser::whereIn('role_id', $roles)->get();
+
+            foreach ($roleUsers as $roleUser) {
+                // جلب المستخدم من خلال العلاقة مع جدول المستخدمين
+                $user = $roleUser->user;
+
+                // إرسال إشعار للمستخدم المرتبط
+                if ($user) {
+                    $user->notify(new UserNotification([
+                        'message' => 'تم حفظ عملية جديدة في مستودعك',
+                        'type' => 'restocking',
+                        'priority' => 1,
+                        'due_date' => Carbon::now()->addDays(1),
+                        'is_read' => false,
+                        'product_id' => null, // يمكن تخصيصها حسب الحاجة
+                        'inventory_request_id' => null,
+                        'quantity' => null,
+                        'status' => 'new',
+                        'department_id' => $this->department_id,
+                        'warehouse_id' => $warehouseId,
+                        'created_at' => Carbon::now()->toDateTimeString(),
+                        'updated_at' => Carbon::now()->toDateTimeString(),  // إضافة updated_at
+                    ]));
+                }
+            }
         }
     }
 
@@ -118,15 +184,13 @@ class InventoryTransactionLivewire extends Component
         // استدعاء دالة الحفظ
         try {
             $this->save();
-         // إرسال حدث لعرض رسالة نجاح
-      $this->dispatch('alert', type: 'success', message: 'تم حفظ العملية بنجاح!');
-        
-    } catch (\Exception $e) {
-        $this->dispatch('alert', type: 'error', message: $e->getMessage());
-        // throw new \Exception("خطأ أثناء إنشاء العملية: " . $e->getMessage());
+            // إرسال حدث لعرض رسالة نجاح
+            $this->dispatch('alert', type: 'success', message: 'تم حفظ العملية بنجاح!');
+        } catch (\Exception $e) {
+            $this->dispatch('alert', type: 'error', message: $e->getMessage());
+            // throw new \Exception("خطأ أثناء إنشاء العملية: " . $e->getMessage());
 
-    }
-    
+        }
     }
     public function updateEffect()
     {
@@ -146,83 +210,13 @@ class InventoryTransactionLivewire extends Component
         // تحديث الإجمالي في مصفوفة transactionItems
         $this->transactionItems[$index]['total'] = $total;
     }
-    public function updateUnits($index)
-{
-    // جلب معرف المنتج من transactionItems
-    $productId = $this->transactionItems[$index]['product_id'];
+   
 
-    // إذا لم يتم تحديد منتج، يتم تفريغ قائمة الوحدات وتعيين unit_id إلى null
-    if (!$productId) {
-        $this->transactionItems[$index]['units'] = [];
-        $this->transactionItems[$index]['unit_id'] = null;
-        return;
-    }
-
-    // جلب المنتج مع العلاقة للوحدة الأساسية فقط
-    $product = Product::with('unit')->find($productId);
-
-    // التأكد من وجود المنتج والوحدة الأساسية
-    if (!$product || !$product->unit) {
-        $this->transactionItems[$index]['units'] = [];
-        $this->transactionItems[$index]['unit_id'] = null;
-        return;
-    }
-
-    // بدء تجميع الوحدات، نبدأ بالوحدة الأساسية
-    $units = [];
-    $units[] = $product->unit;
-
-    // الحصول على جميع الوحدات الفرعية (الأبناء)
-    $this->getAllChildren($product->unit, $units);
-
-    // الحصول على جميع الوحدات العليا (الآباء)
-    $this->getAllParents($product->unit, $units);
-
-    // تجنب التكرار باستخدام unique على أساس الـ id
-    $units = collect($units)->unique('id')->values();
-
-    // تحويل البيانات إلى مصفوفة تحتوي على id واسم الوحدة لتستخدمها الواجهة
-    $this->transactionItems[$index]['units'] = $units->map(function ($unit) {
-        return [
-            'id'   => $unit->id,
-            'name' => $unit->name,
-        ];
-    })->toArray();
-
-    // تعيين الوحدة الافتراضية (الوحدة الأساسية) كـ unit_id
-    $this->transactionItems[$index]['unit_id'] = $product->unit->id;
-    $this->transactionItems = array_values($this->transactionItems);
-}
-
-    /**
-     * دالة للحصول على جميع الوحدات الفرعية (الأبناء) بشكل متداخل
-     */
-    private function getAllChildren($unit, &$units)
-    {
-        if (isset($unit->children) && $unit->children->count()) {
-            foreach ($unit->children as $child) {
-                $units[] = $child;
-                $this->getAllChildren($child, $units);
-            }
-        }
-    }
-
-    /**
-     * دالة للحصول على جميع الوحدات العليا (الآباء) بشكل متداخل
-     */
-    private function getAllParents($unit, &$units)
-    {
-        if ($unit->parent) {
-            $units[] = $unit->parent;
-            $this->getAllParents($unit->parent, $units);
-        }
-    }
-
-
+    
+    
 
     public function render()
     {
         return view('livewire.inventory-transaction');
-        
     }
 }

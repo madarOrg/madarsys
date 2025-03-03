@@ -30,7 +30,25 @@ return [
     */
 
     'connections' => [
-
+        
+            'default' => env('BROADCAST_CONNECTION', 'null'),
+        
+            'connections' => [
+        
+        
+                'log' => [
+                    'driver' => 'log',
+                ],
+        
+                'redis' => [
+                    'driver' => 'redis',
+                    'connection' => 'default',
+                ],
+        
+            ],
+        
+        
+        
         'sqlite' => [
             'driver' => 'sqlite',
             'url' => env('DB_URL'),

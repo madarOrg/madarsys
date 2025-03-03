@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->string('name'); // اسم المنتج
             $table->string('image')->nullable(); // إضافة عمود الصورة
             $table->text('description')->nullable(); // وصف المنتج
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade'); // التصنيف
+            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade'); // الفئه
             $table->foreignId('supplier_id')->nullable()->constrained('partners')->onDelete('set null'); // المورد (اختياري)
             $table->string('barcode')->unique()->nullable(); // الباركود
             $table->string('sku')->unique(); // كود التخزين SKU

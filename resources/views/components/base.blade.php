@@ -28,24 +28,24 @@
  
  
  {{-- Nepcha Analytics --}}
- <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
+ {{-- <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script> --}}
 {{-- Apple Touch Icon --}}
-<link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}" />
+{{-- <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('img/apple-icon.png') }}" /> --}}
 {{-- Favicon --}}
-<link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}" />
+{{-- <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}" /> --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         @vite([
             'resources/css/app.css',
-            'resources/css/nucleo-icons.css',
-            'resources/css/nucleo-svg.css',
+            // 'resources/css/nucleo-icons.css',
+            // 'resources/css/nucleo-svg.css',
             'resources/css/soft-ui-dashboard-tailwind.css',
             
             'resources/js/app.js',
-            'resources/js/inventory.js',
-            'resources/js/plugins/chartjs.min.js', //<!-- Plugin for Charts -->
-             'resources/js/plugins/perfect-scrollbar.min.js', //Plugin for Scrollbar
-            'resources/js/soft-ui-dashboard-tailwind.js',// <!-- Main Script File -->
+            // 'resources/js/inventory.js',
+            // 'resources/js/plugins/chartjs.min.js', //<!-- Plugin for Charts -->
+            //  'resources/js/plugins/perfect-scrollbar.min.js', //Plugin for Scrollbar
+            // 'resources/js/soft-ui-dashboard-tailwind.js',// <!-- Main Script File -->
 
         ])    
 
