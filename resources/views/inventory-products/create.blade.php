@@ -34,11 +34,10 @@
                     </div>
 
                     <!-- إدخال الموقع الدقيق للرف -->
-                    <!-- اختيار المنطقة التخزينية -->
                     <div class="mb-4">
                         <x-select-dropdown id="location_id" name="location_id" label="موقع المنتج" 
                         :options="$locations" required />
-                                        </div>
+                    </div>
 
 
                 </div>

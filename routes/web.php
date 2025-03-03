@@ -311,6 +311,8 @@ Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(
 
 // مجموعة Routes الخاصة بحركة المخزون
 Route::prefix('inventory-products')->name('inventory-products.')->group(function () {
+    Route::get('/', [InventoryProductController::class, 'index'])->name('index');
+
     // عرض صفحة إضافة حركة مخزنية
     Route::get('create', [InventoryProductController::class, 'create'])->name('create');
     

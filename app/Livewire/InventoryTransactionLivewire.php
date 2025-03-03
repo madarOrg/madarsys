@@ -108,7 +108,6 @@ class InventoryTransactionLivewire extends Component
         ]);
 
 
-
         return $validatedData;
     }
 
@@ -123,7 +122,7 @@ class InventoryTransactionLivewire extends Component
             $validatedData['transactionItems'] = $this->transactionItems;
             // استدعاء خدمة المعاملات المخزنية لحفظ البيانات
             $transaction  = $this->inventoryTransactionService->createTransaction($validatedData);
-
+// dd($validatedData['warehouse_id']);
             // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
             // التحقق من قيمة المعاملة
             if ($validatedData) {
@@ -144,7 +143,8 @@ class InventoryTransactionLivewire extends Component
     }
 
     public function sendWarehouseUsersNotification($warehouseId)
-    {
+    {        
+
         // جلب جميع الأدوار المرتبطة بالمستودع باستخدام علاقة RoleWarehouse
         $roles = RoleWarehouse::where('warehouse_id', $warehouseId)->pluck('role_id');
 
@@ -152,10 +152,12 @@ class InventoryTransactionLivewire extends Component
         if ($roles->isNotEmpty()) {
             // جلب المستخدمين المرتبطين بالأدوار بشكل أكثر كفاءة
             $roleUsers = RoleUser::whereIn('role_id', $roles)->get();
+            // dd($roleUsers);
 
             foreach ($roleUsers as $roleUser) {
                 // جلب المستخدم من خلال العلاقة مع جدول المستخدمين
                 $user = $roleUser->user;
+                //  dd($user);
 
                 // إرسال إشعار للمستخدم المرتبط
                 if ($user) {

@@ -76,7 +76,7 @@ class CreateInventoryTransactionListener
             ->select('inventory_movement_count', 'effect')
             ->where('id', $data['transaction_type_id'])
             ->first();
-        // dd($transactionType);
+    //  dd($transactionType);
         if ($transactionType && $transactionType->inventory_movement_count == 2) {
             // إنشاء سجل خروج من المخزن المصدر
 
@@ -144,6 +144,7 @@ class CreateInventoryTransactionListener
             }
             $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId);
             $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId);
+
             try {
                 InventoryTransactionItem::create([
                     'inventory_transaction_id' => $transaction->id,

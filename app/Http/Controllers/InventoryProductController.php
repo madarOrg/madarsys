@@ -14,6 +14,19 @@ use Illuminate\Support\Facades\Auth;
 
 class InventoryProductController extends Controller
 {
+    public function index(Request $request)
+{
+    // جلب جميع المستودعات لعرضها في القائمة المنسدلة
+    $warehouses = Warehouse::all();
+
+    // جلب المنتجات الخاصة بالمستودع المحدد فقط
+    $products = InventoryProduct::when($request->warehouse_id, function ($query) use ($request) {
+        return $query->where('warehouse_id', $request->warehouse_id);
+    })->with('product')->get();
+
+    return view('inventory-products.index', compact('warehouses', 'products'));
+}
+
     /**
      * عرض صفحة إضافة حركة مخزنية جديدة.
      *
@@ -61,7 +74,6 @@ class InventoryProductController extends Controller
             'branch_id' => 'nullable|exists:branches,id',
             'warehouse_id' => 'required|exists:warehouses,id',
             'storage_area_id' => 'required|exists:warehouse_storage_areas,id',
-            'inventory_movement_type' => 'required|in:1,2',
             'location_id' => 'nullable|string|max:255',
             'created_user' => 'nullable|exists:users,id',
             'updated_user' => 'nullable|exists:users,id',
@@ -74,7 +86,6 @@ class InventoryProductController extends Controller
             'warehouse_id' => $request->input('warehouse_id'),
             'storage_area_id' => $request->input('storage_area_id'),
             'location_id' => $request->input('location_id'),
-            'inventory_movement_type' => $request->input('inventory_movement_type'),
             'created_user' => Auth::id(), // المستخدم الذي قام بالإضافة
             'updated_user' => Auth::id(), // يمكن تحديثه لاحقًا
         ]);
