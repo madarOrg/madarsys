@@ -25,9 +25,14 @@ ProductController,
 InventoryTransactionController,
 SettingController,
 RoleWarehouseController,
-
+InventoryProductController,
 };
+use App\Services\UnitService;
 
+Route::get('/test', function (UnitService $unitService) {
+    $units = $unitService->updateUnits(52); // اختبر مع معرف منتج صالح
+    dd($units);
+});
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -304,7 +309,14 @@ Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(
 });
 
 
-
+// مجموعة Routes الخاصة بحركة المخزون
+Route::prefix('inventory-products')->name('inventory-products.')->group(function () {
+    // عرض صفحة إضافة حركة مخزنية
+    Route::get('create', [InventoryProductController::class, 'create'])->name('create');
+    
+    // تخزين حركة مخزنية جديدة
+    Route::post('/', [InventoryProductController::class, 'store'])->name('store');
+});
 
 
 

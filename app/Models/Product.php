@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use App\Traits\
 {
 HasBranch,
@@ -14,10 +15,12 @@ class Product extends Model
 {
     use HasUser,HasBranch,HasFactory;
 
-    // الحقول القابلة للتعيين
     protected $fillable = [
         'name',
+        'branch_id',
+        'image',
         'description',
+        'brand',
         'category_id',
         'supplier_id',
         'barcode',
@@ -29,34 +32,49 @@ class Product extends Model
         'max_stock_level',
         'unit_id',
         'is_active',
-        'branch_id',
-'created_user', 'updated_user'
-        
-        
+        'tax',               // الضريبة (%)
+        'discount',          // التخفيضات (%)
+        'supplier_contact',  // رقم المورد
+        'purchase_date',     // تاريخ الشراء
+        'manufacturing_date',// تاريخ التصنيع
+        'expiration_date',   // تاريخ انتهاء المنتج
+        'last_updated',      // تاريخ آخر تحديث
+        'created_user', 'updated_user'
     ];
-    public function branch()
+
+    protected static function boot()
     {
-        return $this->belongsTo(Branch::class);
+        parent::boot();
+
+        static::creating(function ($product) {
+            $product->sku = self::generateSKU($product);
+        });
     }
-    // العلاقة مع التصنيف
+
+    public static function generateSKU($product)
+    {
+        $categoryCode = strtoupper(substr($product->category->code ?? 'GEN', 0, 3)); // أول 3 أحرف من اسم الفئة
+        $brandCode = strtoupper(substr($product->brand ?? 'NO-BRAND', 0, 3)); // أول 3 أحرف من العلامة التجارية
+        $uniqueId = str_pad(self::max('id') + 1, 4, '0', STR_PAD_LEFT); // رقم فريد من 4 أرقام
+
+        return "{$categoryCode}-{$brandCode}-{$uniqueId}";
+    }
+
+    // العلاقة مع الفئة
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
-    // Product model (Product.php)
-     // app/Models/Product.php
-
-
-     public function unit()
-     {
-         return $this->belongsTo(Unit::class, 'unit_id', 'id')->with('childrenRecursive');
-     }
-     
-
 
     // العلاقة مع المورد
     public function supplier()
     {
         return $this->belongsTo(Partner::class, 'supplier_id');
+    }
+
+    // العلاقة مع الوحدة
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
 }
