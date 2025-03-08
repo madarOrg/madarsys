@@ -42,9 +42,9 @@ class WarehouseStorageArea extends Model
      /**
      * العلاقة مع مواقع التخزين التابعة لهذه المنطقة.
      */
-    public function warehouseLocations()
+   
+    public function locations()
     {
         return $this->hasMany(WarehouseLocation::class, 'storage_area_id');
     }
-
 }

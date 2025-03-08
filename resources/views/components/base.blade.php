@@ -6,6 +6,8 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
+        
+        <meta name="user-id" content="{{ auth()->id() }}">
 
         <title>{{ config('app.name') }}</title>
 
@@ -34,9 +36,26 @@
 {{-- Favicon --}}
 {{-- <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}" /> --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+{{-- <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script> --}}
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+{{-- 
+<script>
+    @if(auth()->check())
+        window.userId = {{ auth()->user()->id }};
+    @else
+        window.userId = null;
+    @endif
+</script> --}}
+
+<script>
+    window.Laravel = {!! json_encode(['userId' => auth()->id()]) !!};
+</script>
 
         @vite([
             'resources/css/app.css',
+            // 'resources/js/notifications.js',
+
             // 'resources/css/nucleo-icons.css',
             // 'resources/css/nucleo-svg.css',
             'resources/css/soft-ui-dashboard-tailwind.css',
@@ -57,6 +76,7 @@
     </head>
     <body 
     class="font-sans antialiased leading-default     bg-gray-50 dark:bg-gray-900 text-black dark:text-white" style="font-family: 'Tajawal', sans-serif;">
+    
 
     {{-- <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50  dark:bg-gray-900 text-black dark:text-white"> --}}
         {{-- <body class="antialiased bg-white dark:bg-gray-900 text-black dark:text-white"> --}}

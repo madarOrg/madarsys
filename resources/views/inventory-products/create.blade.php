@@ -1,7 +1,7 @@
 <x-layout>
     <section>
         <div>
-            <x-title :title="'إضافة منتج لى المستودع '"></x-title>
+            <x-title :title="'إضافة منتج إلى المستودع '"></x-title>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 يرجى إدخال  مكان المنتج  بدقة.
             </p>
@@ -49,3 +49,68 @@
         </div>
     </section>
 </x-layout>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const branchSelect = document.getElementById("branch_id");
+    const warehouseSelect = document.getElementById("warehouse_id");
+    const storageAreaSelect = document.getElementById("storage_area_id");
+    const locationSelect = document.getElementById("location_id");
+
+    // تحديث قائمة المستودعات عند اختيار الفرع
+    branchSelect.addEventListener("change", function () {
+        const branchId = this.value;
+        warehouseSelect.innerHTML = '<option value="">اختر مستودعًا</option>';
+        storageAreaSelect.innerHTML = '<option value="">اختر منطقة تخزينية</option>';
+        locationSelect.innerHTML = '<option value="">اختر موقعًا</option>';
+
+        if (branchId) {
+            fetch(`/get-warehouses/${branchId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Object.entries(data).forEach(([id, name]) => {
+                        let option = new Option(name, id);
+                        warehouseSelect.add(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching warehouses:', error));
+        }
+    });
+
+    // تحديث قائمة المناطق التخزينية عند اختيار المستودع
+    warehouseSelect.addEventListener("change", function () {
+        const warehouseId = this.value;
+        storageAreaSelect.innerHTML = '<option value="">اختر منطقة تخزينية</option>';
+        locationSelect.innerHTML = '<option value="">اختر موقعًا</option>';
+
+        if (warehouseId) {
+            fetch(`/get-storage-areas/${warehouseId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Object.entries(data).forEach(([id, name]) => {
+                        let option = new Option(name, id);
+                        storageAreaSelect.add(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching storage areas:', error));
+        }
+    });
+
+    // تحديث قائمة المواقع عند اختيار المنطقة التخزينية
+    storageAreaSelect.addEventListener("change", function () {
+        const storageAreaId = this.value;
+        locationSelect.innerHTML = '<option value="">اختر موقعًا</option>';
+
+        if (storageAreaId) {
+            fetch(`/get-locations/${storageAreaId}`)
+                .then(response => response.json())
+                .then(data => {
+                    Object.entries(data).forEach(([id, name]) => {
+                        let option = new Option(name, id);
+                        locationSelect.add(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching locations:', error));
+        }
+    });
+});
+</script>

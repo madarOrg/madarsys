@@ -21,6 +21,7 @@ class CreateInventoryTransactionListener
     //////////////////
     public function handle(InventoryTransactionCreated $event)
     {
+        // dd($event);
         $data = $event->data;
         DB::beginTransaction();
 
@@ -76,7 +77,7 @@ class CreateInventoryTransactionListener
             ->select('inventory_movement_count', 'effect')
             ->where('id', $data['transaction_type_id'])
             ->first();
-    //  dd($transactionType);
+    // dd($transactionType);
         if ($transactionType && $transactionType->inventory_movement_count == 2) {
             // إنشاء سجل خروج من المخزن المصدر
 
@@ -129,21 +130,24 @@ class CreateInventoryTransactionListener
             // $this->updateInventoryStock($data['secondary_warehouse_id'], $productId, $inQuantity, $pricePerUnit);
         } else if ($transactionType && $transactionType->inventory_movement_count == 1) {
             // إنشاء حركة عادية مثل بيع أو شراء
-            //  dd($transactionType);
 
             if ($transactionType && $transactionType->effect != 0) {
                 $effect = $transactionType->effect;
                 $quantityInput = $quantityInput * $effect;
                 $pricePerUnit = $pricePerUnit * $effect;
                 $priceTotal = $priceTotal * $effect;
+
+                // dd('create InventoryS',$quantityInput);
             }
             // التحقق من توفر الكمية قبل إنشاء الحركة
             if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $quantityInput)) {
+                // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:");
                 session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
                 throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
             }
             $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId);
             $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId);
+            // dd($convertedPrice);
 
             try {
                 InventoryTransactionItem::create([
@@ -192,6 +196,7 @@ class CreateInventoryTransactionListener
         if (!$inventory && $requestedQuantity < 0) {
             return false;
         }
+        // dd($requestedQuantity);
 
         // التحقق مما إذا كانت الكمية المتوفرة أكبر من أو تساوي الكمية المطلوبة
         return $inventory->quantity >= $requestedQuantity;

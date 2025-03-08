@@ -38,24 +38,32 @@ return new class extends Migration
             ['branch_id' => 1, 'type' => 'product_storage', 'message_template' => 'تم تخزين المنتج {{product_name}} في المستودع {{warehouse_name}}. الكمية المخزنة: {{quantity}}.'],
             ['branch_id' => 1, 'type' => 'supplier_delivery', 'message_template' => 'تم استلام شحنة من المورد للمنتج {{product_name}}. الكمية المستلمة: {{quantity}}. يرجى التحقق من جودة الشحنة.'],
         ]);
-        // إنشاء جدول الإشعارات
-        Schema::create('notifications', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('branch_id')->nullable()->constrained('branches')->onDelete('set null')->comment('معرف الفرع المرتبط بالقالب');
+        // // إنشاء جدول الإشعارات
+        // Schema::create('notifications', function (Blueprint $table) {
+        //     $table->id();
+        //     $table->foreignId('branch_id')->nullable()->constrained('branches')->onDelete('set null')->comment('معرف الفرع المرتبط بالقالب');
+        
+        //     $table->foreignId('template_id')->nullable()->constrained('notification_templates')->onDelete('set null')->comment('معرف القالب المستخدم');
+        //     $table->foreignId('product_id')->nullable()->index()->comment('معرف المنتج');
+        //     $table->foreignId('inventory_request_id')->nullable()->index()->comment('معرف الطلب المتعلق بالإشعار');
+        //     $table->integer('quantity')->nullable()->comment('الكمية المتأثرة بالإشعار');
+        //     $table->integer('status')->default('0')->comment('حالة التنبيه');
+        //     $table->integer('priority')->default('2')->comment('أولوية التنبيه');
+        //     $table->timestamp('due_date')->nullable()->comment('التاريخ النهائي للإشعار');
+        //     $table->foreignId('department_id')->nullable()->index()->comment('معرف القسم');
+        //     $table->foreignId('warehouse_id')->nullable()->index()->comment('معرف المستودع');
+        //     $table->foreignId('created_user')->nullable()->constrained('users')->onDelete('set null')->comment('المستخدم الذي أنشأ الإشعار');
+        //     $table->foreignId('updated_user')->nullable()->constrained('users')->onDelete('set null')->comment('المستخدم الذي قام بآخر تحديث');
+        //     $table->morphs('notifiable'); // 🔹 يضيف `notifiable_id` و `notifiable_type`
 
-            $table->foreignId('template_id')->nullable()->constrained('notification_templates')->onDelete('set null')->comment('معرف القالب المستخدم');
-            $table->foreignId('product_id')->nullable()->index()->comment('معرف المنتج');
-            $table->foreignId('inventory_request_id')->nullable()->index()->comment('معرف الطلب المتعلق بالإشعار');
-            $table->integer('quantity')->nullable()->comment('الكمية المتأثرة بالإشعار');
-            $table->integer('status')->default('0')->comment('حالة التنبيه');
-            $table->integer('priority')->default('2')->comment('أولوية التنبيه');
-            $table->timestamp('due_date')->nullable()->comment('التاريخ النهائي للإشعار');
-            $table->foreignId('department_id')->nullable()->index()->comment('معرف القسم');
-            $table->foreignId('warehouse_id')->nullable()->index()->comment('معرف المستودع');
-            $table->foreignId('created_user')->nullable()->constrained('users')->onDelete('set null')->comment('المستخدم الذي أنشأ الإشعار');
-            $table->foreignId('updated_user')->nullable()->constrained('users')->onDelete('set null')->comment('المستخدم الذي قام بآخر تحديث');
-            $table->timestamps();
-        });
+        //     // $table->string('type')->comment('نوع الإشعار');
+        //     // $table->timestamp('read_at')->nullable()->comment('وقت قراءة الإشعار');
+
+        //     $table->json('data')->nullable()->comment('البيانات المرتبطة بالإشعار');
+            
+        //     $table->timestamps();
+        // });
+        
 
         // إنشاء جدول إشعارات المستخدم
         Schema::create('user_notifications', function (Blueprint $table) {
@@ -79,7 +87,6 @@ return new class extends Migration
     public function down()
     {
         Schema::dropIfExists('user_notifications');
-        Schema::dropIfExists('notifications');
         Schema::dropIfExists('notification_templates');
     }
 };

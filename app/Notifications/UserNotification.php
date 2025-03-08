@@ -1,71 +1,59 @@
 <?php
+
 namespace App\Notifications;
 
+use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class UserNotification extends Notification
+use Illuminate\Broadcasting\PrivateChannel;
+class UserNotification extends Notification implements ShouldBroadcast
 {
-    protected $data;
+    use Queueable;
 
-    public function __construct(array $data)
+    protected $data;
+    protected $userId;
+    public $notification;
+
+    public function __construct(array $data, $userId)
     {
         $this->data = $data;
+        $this->userId = $userId; // حفظ معرف المستخدم
     }
 
     public function via($notifiable)
     {
-        return ['database']; // حفظ الإشعار في قاعدة البيانات
+        return ['database', 'broadcast']; // سيتم تخزين الإشعار في قاعدة البيانات وبثه عبر WebSockets
     }
 
     public function toArray($notifiable)
-    {dd('in');
-        dd($notifiable);
-        // تحديد القالب والإشعار
-        $template = DB::table('notification_templates')
-            ->where('type', $this->data['type'])
-            ->first();
-
-        // إنشاء إشعار جديد في جدول `notifications`
-        $notificationId = DB::table('notifications')->insertGetId([
-            'branch_id' => $this->data['branch_id'],
-            'template_id' => $template ? $template->id : null,
+    {
+        return [
+            'message' => $this->data['message'],
+            'type' => $this->data['type'],
+            'priority' => $this->data['priority'],
+            'due_date' => $this->data['due_date'],
             'product_id' => $this->data['product_id'],
             'inventory_request_id' => $this->data['inventory_request_id'],
             'quantity' => $this->data['quantity'],
-            'status' => 0,  // حالة التنبيه: غير مقروء
-            'priority' => $this->data['priority'],
-            'due_date' => $this->data['due_date'],
+            'status' => 'new',
             'department_id' => $this->data['department_id'],
             'warehouse_id' => $this->data['warehouse_id'],
-            'created_user' => $this->data['created_user'],
-            'updated_user' => $this->data['updated_user'],
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+        ];
+    }
 
-        // إدخال الإشعار في جدول `user_notifications`
-        DB::table('user_notifications')->insert([
-            'user_id' => $notifiable->id,
-            'notification_id' => $notificationId,
-            'message' => $this->data['message'],
-            'is_read' => false, // الإشعار غير مقروء
-            'created_user' => $this->data['created_user'],
-            'updated_user' => $this->data['updated_user'],
-            'created_at' => Carbon::now(),
-            'updated_at' => Carbon::now(),
-        ]);
+    public function broadcastOn()
+    {
+        return new PrivateChannel('notifications.' . $this->notification->user_id);
+    }
 
-        // إرجاع البيانات بالشكل المطلوب حتى يتمكن Laravel من حفظها
+    public function broadcastWith()
+    {
         return [
-            'notification_id' => $notificationId,
             'message' => $this->data['message'],
+            'type' => $this->data['type'],
             'priority' => $this->data['priority'],
-            'due_date' => $this->data['due_date'],
-            'status' => 0,  // غير مقروء
             'warehouse_id' => $this->data['warehouse_id'],
-            'department_id' => $this->data['department_id'],
         ];
     }
 }

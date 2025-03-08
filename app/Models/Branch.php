@@ -28,11 +28,13 @@ class Branch extends Model
     {
         return $this->hasMany(Warehouse::class);
     }
-    public function roles()
-    {
-        return $this->belongsToMany(Role::class, 'role_branch')
-                    ->withPivot('company_id')
-                    ->withTimestamps();
-    }
-  
+   
+public function roles()
+{
+    return $this->belongsToMany(Role::class, 'role_branch')
+                ->using(RoleBranch::class) // استخدام النموذج المخصص
+                ->withPivot('company_id')
+                ->withTimestamps();
+}
+
 }

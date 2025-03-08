@@ -1,5 +1,20 @@
+import './bootstrap'; // تحميل الإعدادات الأساسية
+
+// الاستماع للأحداث في Livewire
+Livewire.on('alert', (data) => {
+    Swal.fire({
+        icon: data.type,
+        title: data.message,
+        showConfirmButton: false,
+        // يمكن إضافة timer إذا كنت ترغب بإغلاق الإشعار تلقائيًا بعد مدة
+        // timer: 3000
+    });
+});
+
+
+
 document.addEventListener("DOMContentLoaded", function() {
-    // ✅ تفعيل زر تغيير الثيم (الوضع الداكن/المضيء)
+    //  تفعيل زر تغيير الثيم (الوضع الداكن/المضيء)
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
         const icon = themeToggle.querySelector('i');
@@ -21,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // ✅ القائمة المنسدلة للهاتف المحمول
+    // القائمة المنسدلة للهاتف المحمول
     const mobileMenuButton = document.querySelector("[data-collapse-toggle='mobile-menu-2']");
     const mobileMenu = document.getElementById("mobile-menu-2");
 
@@ -31,7 +46,7 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     }
 
-    // ✅ القوائم المنسدلة الأخرى
+    //  القوائم المنسدلة الأخرى
     document.querySelectorAll('.relative').forEach(item => {
         const dropdown = item.querySelector('ul');
         if (!dropdown) return;
@@ -48,3 +63,36 @@ document.addEventListener("DOMContentLoaded", function() {
         });
     });
 });
+
+ // إظهار/إخفاء الإشعارات عند الضغط على زر الإشعارات
+ document.getElementById("notificationsLink").addEventListener("click", function(event) {
+    event.preventDefault();  // منع الانتقال إلى الرابط
+    const notificationsDropdown = document.getElementById("notificationsDropdown");
+    
+    // التبديل بين إظهار وإخفاء القائمة المنسدلة
+    notificationsDropdown.classList.toggle("hidden");
+  });
+  
+  // إخفاء القائمة عند الضغط في أي مكان آخر
+  document.addEventListener("click", function(event) {
+    const notificationsDropdown = document.getElementById("notificationsDropdown");
+    const notificationsLink = document.getElementById("notificationsLink");
+    
+    // إذا تم الضغط خارج الرابط أو القائمة، قم بإخفائها
+    if (!notificationsLink.contains(event.target) && !notificationsDropdown.contains(event.target)) {
+      notificationsDropdown.classList.add("hidden");
+    }
+  });
+  
+  // توجيه القائمة المنسدلة عند النقر عليها في الهاتف المحمول
+  document.querySelectorAll('li.relative > a').forEach(item => {
+    item.addEventListener('click', function(event) {
+      const submenu = this.nextElementSibling;
+      if (submenu && submenu.classList.contains('hidden')) {
+        submenu.classList.remove('hidden');
+      } else if (submenu) {
+        submenu.classList.add('hidden');
+      }
+    });
+  });
+

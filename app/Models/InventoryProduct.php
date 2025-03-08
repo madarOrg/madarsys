@@ -58,4 +58,9 @@ class InventoryProduct extends Model
     {
         return $this->belongsTo(User::class, 'updated_user');
     }
+     public function location()
+    {
+        return $this->belongsTo(WarehouseLocation::class, 'location_id');
+    }
+
 }

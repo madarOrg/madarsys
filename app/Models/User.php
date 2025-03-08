@@ -52,6 +52,16 @@ class User extends Authenticatable
     {
         return $this->belongsTo(Branch::class);
     }
+    
+    public function branches()
+{
+    // الحصول على الأدوار المرتبطة بالمستخدم
+    return $this->belongsToMany(Branch::class, 'role_branch')
+                ->using(RoleBranch::class)
+                ->withPivot('role_id', 'company_id')
+                ->withTimestamps();
+}
+
      /**
      * العلاقة بين المستخدمين والأدوار (Many-to-Many)
      */
