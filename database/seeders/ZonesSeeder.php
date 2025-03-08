@@ -134,3 +134,4 @@ class ZonesSeeder extends Seeder
         }
     }
 }
+}
