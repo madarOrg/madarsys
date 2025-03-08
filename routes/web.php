@@ -28,7 +28,9 @@ use App\Http\Controllers\{
     RoleWarehouseController,
     InventoryProductController,
     BroadcastController,
-    InventoryReviewController
+    InvoiceController,
+        InventoryReviewController
+
 };
 use App\Services\UnitService;
 
@@ -351,5 +353,26 @@ Route::get('/', function () {
     Route::get('/notifications', [NotificationController::class, 'getUnreadNotifications']);
     Route::post('/mark-notification-as-read/{id}', [NotificationController::class, 'markAsRead']);
     Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
+
+
+Route::prefix('invoices')->name('invoices.')->group(function () {
+    // عرض قائمة الفواتير
+    Route::get('/', [InvoiceController::class, 'index'])->name('index');
+
+    // عرض صفحة إنشاء الفاتورة
+    Route::get('/create', [InvoiceController::class, 'create'])->name('create');
+
+    // تخزين الفاتورة في قاعدة البيانات
+    Route::post('/', [InvoiceController::class, 'store'])->name('store');
+
+    // عرض صفحة تعديل الفاتورة
+    Route::get('/{id}/edit', [InvoiceController::class, 'edit'])->name('edit');
+
+    // تحديث بيانات الفاتورة
+    Route::put('/{id}', [InvoiceController::class, 'update'])->name('update');
+
+    // حذف الفاتورة
+    Route::delete('/{id}', [InvoiceController::class, 'destroy'])->name('destroy');
+});
 
 });
