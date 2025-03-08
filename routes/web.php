@@ -1,5 +1,6 @@
 <?php
-
+use App\Http\Controllers\PurchaseInvoiceController;
+use App\Http\Controllers\InvoiceController;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\WarehouseReports;
 use App\Models\Product;
@@ -25,14 +26,9 @@ ProductController,
 InventoryTransactionController,
 SettingController,
 RoleWarehouseController,
-InventoryProductController,
-};
-use App\Services\UnitService;
 
-Route::get('/test', function (UnitService $unitService) {
-    $units = $unitService->updateUnits(52); // اختبر مع معرف منتج صالح
-    dd($units);
-});
+};
+
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -44,6 +40,9 @@ Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit'
 Route::get('/reset-password', [PasswordController::class, 'create'])->name('password.change');
 Route::post('/reset-password', [PasswordController::class, 'store'])->name('password.update');
 
+
+
+
  // عرض الصفحة الرئيسية
  Route::get('/', function () {
     return view('home');
@@ -51,12 +50,10 @@ Route::post('/reset-password', [PasswordController::class, 'store'])->name('pass
 // استخدام middleware للتأكد من أن المستخدم مسجل الدخول
 Route::middleware('auth')->group(function () {
 
-    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
-    Route::post('/posts', [PostController::class, 'store'])->name('posts.store');
     // عرض لوحة التحكم (dashboard)
 
     Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
-    
+
     Route::get('/warehouse-reports', WarehouseReports::class)->name('warehouse.reports');
     // مجموعة مسارات لإدارة الأدوار
     Route::prefix('roles')->name('roles.')->group(function () {
@@ -68,7 +65,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/{role}', [RoleController::class, 'update'])->name('update'); // تحديث بيانات الدور
         Route::delete('/{role}', [RoleController::class, 'destroy'])->name('destroy'); // حذف الدور
     });
-    
+
     //roleWarehouse
 
 Route::prefix('role-warehouse')->name('role-warehouse.')->group(function () {
@@ -78,31 +75,31 @@ Route::prefix('role-warehouse')->name('role-warehouse.')->group(function () {
     Route::delete('/delete/{id}', [RoleWarehouseController::class, 'destroy'])->name('destroy');
 });
 
-   
-   //role primissions 
+
+   //role primissions
     Route::prefix('role-permissions')->name('role-permissions.')->group(function () {
         // عرض قائمة الصلاحيات المرتبطة بالأدوار
         Route::get('/', [RolePermissionController::class, 'index'])->name('index');
-    
+
         // عرض نموذج إضافة صلاحيات لدور معين
         Route::get('/create', [RolePermissionController::class, 'create'])->name('create');
-    
+
         // حفظ الصلاحيات المحددة لدور معين
         Route::post('/', [RolePermissionController::class, 'store'])->name('store');
-    
+
         // عرض تفاصيل صلاحيات دور معين
         Route::get('/{role}', [RolePermissionController::class, 'show'])->name('show');
-    
+
         // عرض نموذج تعديل الصلاحيات الخاصة بدور معين
         Route::get('/{role}/edit', [RolePermissionController::class, 'edit'])->name('edit');
-    
+
         // تحديث الصلاحيات لدور معين
         Route::put('/{role}', [RolePermissionController::class, 'update'])->name('update');
-    
+
         // حذف صلاحيات دور معين
         Route::delete('/{id}', [RolePermissionController::class, 'destroy'])->name('destroy');
     });
-    
+
 // users
  Route::resource('users', UserController::class);
 
@@ -176,7 +173,7 @@ Route::get('warehouses/{warehouse}', [WarehousesController::class, 'show'])->nam
 Route::get('warehouses/{warehouse}/edit', [WarehousesController::class, 'edit'])->name('warehouses.edit'); // عرض صفحة تعديل المستودع
 Route::put('warehouses/{warehouse}', [WarehousesController::class, 'update'])->name('warehouses.update'); // تحديث بيانات المستودع
 Route::delete('warehouses/{warehouse}', [WarehousesController::class, 'destroy'])->name('warehouses.destroy'); // حذف مستودع
- 
+
 // Routes for Warehouse Storage Areas
 Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-areas.')->group(function () {
     Route::get('/', [WarehouseStorageAreaController::class, 'index'])->name('index');           // عرض مناطق التخزين
@@ -188,7 +185,7 @@ Route::prefix('warehouses/{warehouse}/storage-areas')->name('warehouse.storage-a
     Route::delete('/{storage_area}', [WarehouseStorageAreaController::class, 'destroy'])->name('destroy'); // حذف منطقة تخزين
 });
 
-    
+
 
 Route::prefix('warehouses/{warehouse}/locations')->group(function () {
     Route::get('/', [WarehouseLocationController::class, 'index'])->name('warehouses.locations.index');
@@ -253,7 +250,7 @@ Route::prefix('categories')->name('categories.')->group(function () {
     // حذف الفئة
     Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
 });
- 
+
 
 // مجموعة مسارات إدارة الشركاء
 Route::prefix('partners')->name('partners.')->group(function () {
@@ -309,15 +306,29 @@ Route::prefix('inventory/transactions')->name('inventory.transactions.')->group(
 });
 
 
-// مجموعة Routes الخاصة بحركة المخزون
-Route::prefix('inventory-products')->name('inventory-products.')->group(function () {
-    // عرض صفحة إضافة حركة مخزنية
-    Route::get('create', [InventoryProductController::class, 'create'])->name('create');
-    
-    // تخزين حركة مخزنية جديدة
-    Route::post('/', [InventoryProductController::class, 'store'])->name('store');
+//روابط الفواتير
+
+// ✅ مسارات إنشاء الفواتير
+
+Route::prefix('invoices')->name('invoices.')->group(function () {
+    Route::get('/', [InvoiceController::class, 'index'])->name('index');
+    Route::get('/create', [InvoiceController::class, 'create'])->name('create'); // إنشاء الفواتير جديد
+    Route::post('/', [InvoiceController::class, 'store'])->name('store'); // تخزين الفواتير الجديد
+    Route::get('/{invoices}', [InvoiceController::class, 'show'])->name('show'); // عرض الفواتير
+    Route::get('/{invoices}/edit', [InvoiceController::class, 'edit'])->name('edit'); // تعديل الفواتير
+    Route::put('/{invoices}', [InvoiceController::class, 'update'])->name('update'); // تحديث الفواتير
+    Route::delete('/{invoices}', [InvoiceController::class, 'destroy'])->name('destroy'); // حذف الفواتير
 });
 
 
+// ✅ مسارات فواتير المشتريات
+Route::prefix('purchase-invoices')->name('purchase_invoices.')->group(function () {
+    Route::get('/', [PurchaseInvoiceController::class, 'index'])->name('index'); // قائمة الفواتير
+    Route::get('/create', [PurchaseInvoiceController::class, 'create'])->name('create'); // شاشة إنشاء فاتورة جديدة
+    Route::post('/', [PurchaseInvoiceController::class, 'store'])->name('store'); // تخزين الفاتورة الجديدة
+    Route::get('/{purchaseInvoice}/edit', [PurchaseInvoiceController::class, 'edit'])->name('edit'); // تعديل الفاتورة
+    Route::put('/{purchaseInvoice}', [PurchaseInvoiceController::class, 'update'])->name('update'); // تحديث الفاتورة
+    Route::delete('/{purchaseInvoice}', [PurchaseInvoiceController::class, 'destroy'])->name('destroy'); // حذف الفاتورة
+});
 
 });
