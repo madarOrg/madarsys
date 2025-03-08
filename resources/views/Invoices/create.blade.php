@@ -67,7 +67,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- Items will be dynamically inserted here -->
+                
                             </tbody>
                         </table>
                     </div>

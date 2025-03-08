@@ -75,7 +75,7 @@
                                 <tr>
                                     <input type="hidden" name="items[{{ $index }}][id]" value="{{ $item->id }}">
                                     <td class="py-2 px-4">
-                                        <select name="items[{{ $index }}][product_id]" required>
+                                        <select name="items[{{ $index }}][product_id]" class="product-select w-full p-2 border rounded-lg focus:ring focus:ring-blue-500"  required>
                                             <option value="">اختر المنتج</option>
                                             @foreach($products as $product)
                                                 <option value="{{ $product->id }}" {{ $product->id == $item->product_id ? 'selected' : '' }}>{{ $product->name }}</option>
@@ -83,10 +83,10 @@
                                         </select>
                                     </td>
                                     <td class="py-2 px-4">
-                                        <input type="number" name="items[{{ $index }}][price]" value="{{ $item->price }}" required>
+                                        <input type="number" name="items[{{ $index }}][price]" class="price-input w-full py-2 px-4 border rounded" value="{{ $item->price }}" required>
                                     </td>
                                     <td class="py-2 px-4">
-                                        <input type="number" name="items[{{ $index }}][quantity]" value="{{ $item->quantity }}" required>
+                                        <input type="number" name="items[{{ $index }}][quantity]" class="quantity-input w-full py-2 px-4 border rounded" value="{{ $item->quantity }}" required>
                                     </td>
                                     <td class="py-2 px-4">
                                         <button type="button" class="remove-item text-red-600 hover:text-red-800">إزالة</button>
