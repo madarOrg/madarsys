@@ -69,6 +69,7 @@ class RoleController extends Controller
     public function show(Role $role)
     {
         try {
+            $role->load('users');
             return view('roles.show', compact('role'));
         } catch (\Exception $e) {
             // في حالة حدوث خطأ

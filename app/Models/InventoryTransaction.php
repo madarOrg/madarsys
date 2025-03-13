@@ -13,6 +13,8 @@ HasUser
 class InventoryTransaction extends Model
 {
     use HasUser,HasBranch,HasFactory;
+    
+    protected $table = 'inventory_transactions';
 
     protected $fillable = [
         'transaction_type_id',
@@ -44,6 +46,7 @@ class InventoryTransaction extends Model
     {
         return $this->hasMany(InventoryTransactionItem::class);
     }
+    
     public function transactionType()
     {
         return $this->belongsTo(TransactionType::class, 'transaction_type_id');
@@ -66,4 +69,9 @@ class InventoryTransaction extends Model
     {
         return $this->belongsTo(Warehouse::class, 'secondary_warehouse_id');
     }
+    public function inventoryItems()
+    {
+        return $this->hasMany(InventoryTransactionItem::class, 'inventory_transaction_id');
+    }
+    
 }

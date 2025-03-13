@@ -77,7 +77,7 @@ class CreateInventoryTransactionListener
             ->select('inventory_movement_count', 'effect')
             ->where('id', $data['transaction_type_id'])
             ->first();
-    // dd($transactionType);
+        // dd($transactionType);
         if ($transactionType && $transactionType->inventory_movement_count == 2) {
             // إنشاء سجل خروج من المخزن المصدر
 
@@ -139,11 +139,13 @@ class CreateInventoryTransactionListener
 
                 // dd('create InventoryS',$quantityInput);
             }
-            // التحقق من توفر الكمية قبل إنشاء الحركة
-            if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $quantityInput)) {
-                // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:");
-                session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
-                throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
+            if ($quantityInput < 0) {
+                // التحقق من توفر الكمية قبل إنشاء الحركة
+                if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $quantityInput)) {
+                    // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:");
+                    session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
+                    throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
+                }
             }
             $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId);
             $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId);
@@ -191,7 +193,7 @@ class CreateInventoryTransactionListener
         $inventory = Inventory::where('warehouse_id', $warehouseId)
             ->where('product_id', $productId)
             ->first();
-        //  dd($inventory);
+        dd($inventory);
         // إذا لم يكن هناك سجل للمخزون، فهذا يعني أنه لا توجد كميات متوفرة
         if (!$inventory && $requestedQuantity < 0) {
             return false;

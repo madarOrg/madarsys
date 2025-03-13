@@ -9,6 +9,9 @@
 
             <!-- اختيار المستودع -->
             <form method="GET" action="{{ route('inventory-products.index') }}">
+                <x-button :href="route('inventory-products.create')" type="button">
+                    <i class="fas fa-plus mr-2"></i>  إضافة منتج جديد إلى مستودع
+                </x-button>
                 <div class="mb-4">
                     <x-select-dropdown id="warehouse_id" name="warehouse_id" label="المستودع"
                         :options="$warehouses->pluck('name', 'id')" 
@@ -17,6 +20,7 @@
                         required />
                 </div>
             </form>
+           
 
             <!-- عرض المنتجات في جدول -->
             @if($products->isNotEmpty())
@@ -30,6 +34,7 @@
                                 <th class="px-6 py-3">الكمية</th>
                                 <th class="px-6 py-3">موقع المنتج</th>
                                 <th class="px-6 py-3">المنطقة التخزينية</th>
+                                <th class="px-6 py-3">الإجراء</th>
 
                             </tr>
                         </thead>
@@ -41,7 +46,24 @@
                                     <td class="px-6 py-4">{{ $product->quantity }}</td>
                                     <td class="px-6 py-4">{{ $product->location->full_location ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">{{ $product->storageArea->area_name ?? 'غير محدد' }}</td>
-
+                                    <td class="px-6 py-4">
+                                        
+                                               
+                                        <a href="{{ route('inventory-products.edit', $product->id) }}"
+                                            class="text-blue-600 hover:underline dark:text-blue-500">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </a>
+                                        <form id="delete-form-{{ $product->id }}"
+                                            action="{{ route('inventory-products.destroy', $product->id) }}" method="POST"
+                                            style="display: none;">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                        <button onclick="confirmDelete({{ $product->id }})"
+                                            class="text-red-600 hover:text-red-800">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -27,10 +27,9 @@ use App\Http\Controllers\{
     SettingController,
     RoleWarehouseController,
     InventoryProductController,
-    BroadcastController,
+    // BroadcastController,
     InvoiceController,
-        InventoryReviewController
-
+    InventoryReviewController
 };
 use App\Services\UnitService;
 
@@ -69,9 +68,9 @@ Route::get('/', function () {
 });
 // استخدام middleware للتأكد من أن المستخدم مسجل الدخول
 // Route::middleware('auth')->group(function () {
-    Route::middleware(['web', 'auth'])->group(function () {
+Route::middleware(['web', 'auth'])->group(function () {
 
-    
+
     // عرض لوحة التحكم (dashboard)
 
     Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
@@ -306,6 +305,8 @@ Route::get('/', function () {
         Route::get('/create', [InventoryTransactionController::class, 'create'])
             ->name('create');
 
+        Route::get('/', [InventoryTransactionController::class, 'index'])
+            ->name('index');
         // تخزين العملية المخزنية الجديدة
         Route::post('/', [InventoryTransactionController::class, 'store'])
             ->name('store');
@@ -341,38 +342,44 @@ Route::get('/', function () {
     Route::get('/get-warehouses/{branch_id}', [InventoryProductController::class, 'getWarehouses']);
     Route::get('/get-storage-areas/{warehouse_id}', [InventoryProductController::class, 'getStorageAreas']);
     Route::get('/get-locations/{storage_area_id}', [InventoryProductController::class, 'getLocations']);
+    Route::get('inventory-products/{inventoryProduct}/edit', [InventoryProductController::class, 'edit'])->name('inventory-products.edit');
+    Route::delete('inventory-products/{inventoryProduct}', [InventoryProductController::class, 'destroy'])->name('inventory-products.destroy');
+    Route::put('inventory-products/{inventoryProduct}', [InventoryProductController::class, 'update'])->name('inventory-products.update');
+    Route::get('/get-inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
+    Route::get('/get-products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
 
+Route::get('/inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
+Route::get('/products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
 
     // عرض الحركات المراجعة
     Route::get('/inventory-review', [InventoryReviewController::class, 'index'])->name('inventory-review.index');
-    
+
     // تحديث حالة المراجعة
     Route::post('/inventory-review/{id}/update-status', [InventoryReviewController::class, 'updateStatus'])->name('inventory-review.updateStatus');
-    
+
     //notifications routes
     Route::get('/notifications', [NotificationController::class, 'getUnreadNotifications']);
     Route::post('/mark-notification-as-read/{id}', [NotificationController::class, 'markAsRead']);
-    Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
+    // Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
 
+    //invoices routes
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        // عرض قائمة الفواتير
+        Route::get('/', [InvoiceController::class, 'index'])->name('index');
 
-Route::prefix('invoices')->name('invoices.')->group(function () {
-    // عرض قائمة الفواتير
-    Route::get('/', [InvoiceController::class, 'index'])->name('index');
+        // عرض صفحة إنشاء الفاتورة
+        Route::get('/create', [InvoiceController::class, 'create'])->name('create');
 
-    // عرض صفحة إنشاء الفاتورة
-    Route::get('/create', [InvoiceController::class, 'create'])->name('create');
+        // تخزين الفاتورة في قاعدة البيانات
+        Route::post('/', [InvoiceController::class, 'store'])->name('store');
 
-    // تخزين الفاتورة في قاعدة البيانات
-    Route::post('/', [InvoiceController::class, 'store'])->name('store');
+        // عرض صفحة تعديل الفاتورة
+        Route::get('/{id}/edit', [InvoiceController::class, 'edit'])->name('edit');
 
-    // عرض صفحة تعديل الفاتورة
-    Route::get('/{id}/edit', [InvoiceController::class, 'edit'])->name('edit');
+        // تحديث بيانات الفاتورة
+        Route::put('/{id}', [InvoiceController::class, 'update'])->name('update');
 
-    // تحديث بيانات الفاتورة
-    Route::put('/{id}', [InvoiceController::class, 'update'])->name('update');
-
-    // حذف الفاتورة
-    Route::delete('/{id}', [InvoiceController::class, 'destroy'])->name('destroy');
-});
-
+        // حذف الفاتورة
+        Route::delete('/{id}', [InvoiceController::class, 'destroy'])->name('destroy');
+    });
 });

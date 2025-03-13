@@ -12,12 +12,7 @@ use App\Models\{
     Warehouse,
     Product,
     WarehouseLocation,
-
-    RoleWarehouse,
-    RoleUser,
-    User
 };
-use App\Services\InventoryTransaction\InventoryValidationService;
 use Carbon\Carbon;
 use App\Services\UnitService;
 use App\Services\NotificationService;

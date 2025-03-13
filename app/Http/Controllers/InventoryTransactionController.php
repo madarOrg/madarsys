@@ -45,7 +45,23 @@ class InventoryTransactionController extends Controller
             ]);
         }
     }
+    public function index()
+{
+    try {
+        $transactions = $this->inventoryTransactionService->getAllTransactions();
+    // dd($transactions);
+        // التحقق مما إذا كان الطلب API أم صفحة عرض
+        if (request()->expectsJson()) {
+            return response()->json(['transactions' => $transactions], 200);
+        }
+    
+        return view('inventory.transactions.index', compact('transactions'));
+    } catch (\Exception $e) {
+        return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء جلب العمليات المخزنية: ' . $e->getMessage()]);
+    }
+}
 
+    
     // عرض النموذج لإنشاء عملية مخزنية جديدة
     public function create()
     {
