@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+
 use Livewire\Component;
 use App\Services\InventoryTransaction\InventoryTransactionService;
 use App\Models\{
@@ -11,22 +12,21 @@ use App\Models\{
     Warehouse,
     Product,
     WarehouseLocation,
-    UserNotification,
-    RoleWarehouse,
-    RoleUser
 };
-use App\Services\InventoryTransaction\InventoryValidationService;
 use Carbon\Carbon;
 use App\Services\UnitService;
+use App\Services\NotificationService;
 
 class InventoryTransactionLivewire extends Component
 {
     protected $inventoryValidationService;
     protected $unitService;
+    protected $notificationService;
 
-    
-        public $units = [];
-    
+
+
+    public $units = [];
+
     public $transactionTypes, $partners, $departments, $warehouses, $products, $warehouseLocations;
     public $transaction_type_id, $transaction_date, $effect, $reference, $partner_id, $department_id, $warehouse_id, $secondary_warehouse_id, $notes;
     public $transactionItems = [];
@@ -37,12 +37,13 @@ class InventoryTransactionLivewire extends Component
     {
         $this->inventoryTransactionService = new InventoryTransactionService();
         $this->unitService = new UnitService;
+        $this->notificationService = new NotificationService(); // استدعاء خدمة الإشعارات
 
     }
-   
+
     public function mount()
     {
-   
+
         $this->transactionTypes = TransactionType::all();
         $this->partners = Partner::all();
         $this->departments = Department::all();
@@ -58,14 +59,14 @@ class InventoryTransactionLivewire extends Component
         if (!$this->unitService) {
             throw new \Exception("UnitService is not initialized.");
         }
-    
+
         $productId = $this->transactionItems[$index]['product_id'] ?? null;
-        
+
         if ($productId) {
             $this->transactionItems[$index]['units'] = $this->unitService->updateUnits($productId);
         }
     }
-    
+
     public function addProductRow()
     {
         // إضافة صف جديد إلى مصفوفة الـ transactionItems
@@ -108,7 +109,6 @@ class InventoryTransactionLivewire extends Component
         ]);
 
 
-
         return $validatedData;
     }
 
@@ -123,13 +123,30 @@ class InventoryTransactionLivewire extends Component
             $validatedData['transactionItems'] = $this->transactionItems;
             // استدعاء خدمة المعاملات المخزنية لحفظ البيانات
             $transaction  = $this->inventoryTransactionService->createTransaction($validatedData);
-
+            // dd('in:',$validatedData['warehouse_id']);
             // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
-            // التحقق من قيمة المعاملة
-            if ($validatedData) {
-                // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
-                $this->sendWarehouseUsersNotification($validatedData['warehouse_id']);
-            }
+            // // التحقق من قيمة المعاملة
+            // if ($validatedData) {
+            //     // إرسال تنبيه للمستخدمين المرتبطين بالمستودع
+            //     $this->sendWarehouseUsersNotification($validatedData['warehouse_id']);
+            // }
+            // استرجاع اسم المستودع
+            $warehouse = Warehouse::find($validatedData['warehouse_id']);
+            $warehouseName = $warehouse ? $warehouse->name : 'المستودع غير معروف';
+            $message = "تم حفظ عملية جديدة في المستودع: {$warehouseName}";
+            // dd($message);
+            // إرسال الإشعار عبر الخدمة مع اسم المستودع
+            $this->notificationService->sendWarehouseUsersNotification(
+                $validatedData['warehouse_id'],
+                $message, // الرسالة مع اسم المستودع
+                'restocking', // type
+                1, // priority
+                null, // productId
+                null, // inventoryRequestId
+                $validatedData['department_id'] ?? null // pass department_id here
+            );
+
+
 
             // إعادة ضبط التاريخ إلى الآن
             $this->reset(['transaction_type_id', 'transaction_date', 'effect', 'reference', 'partner_id', 'department_id', 'warehouse_id', 'secondary_warehouse_id', 'notes', 'transactionItems']);
@@ -143,41 +160,7 @@ class InventoryTransactionLivewire extends Component
         }
     }
 
-    public function sendWarehouseUsersNotification($warehouseId)
-    {
-        // جلب جميع الأدوار المرتبطة بالمستودع باستخدام علاقة RoleWarehouse
-        $roles = RoleWarehouse::where('warehouse_id', $warehouseId)->pluck('role_id');
 
-        // التحقق من وجود أدوار مرتبطة بالمستودع
-        if ($roles->isNotEmpty()) {
-            // جلب المستخدمين المرتبطين بالأدوار بشكل أكثر كفاءة
-            $roleUsers = RoleUser::whereIn('role_id', $roles)->get();
-
-            foreach ($roleUsers as $roleUser) {
-                // جلب المستخدم من خلال العلاقة مع جدول المستخدمين
-                $user = $roleUser->user;
-
-                // إرسال إشعار للمستخدم المرتبط
-                if ($user) {
-                    $user->notify(new UserNotification([
-                        'message' => 'تم حفظ عملية جديدة في مستودعك',
-                        'type' => 'restocking',
-                        'priority' => 1,
-                        'due_date' => Carbon::now()->addDays(1),
-                        'is_read' => false,
-                        'product_id' => null, // يمكن تخصيصها حسب الحاجة
-                        'inventory_request_id' => null,
-                        'quantity' => null,
-                        'status' => 'new',
-                        'department_id' => $this->department_id,
-                        'warehouse_id' => $warehouseId,
-                        'created_at' => Carbon::now()->toDateTimeString(),
-                        'updated_at' => Carbon::now()->toDateTimeString(),  // إضافة updated_at
-                    ]));
-                }
-            }
-        }
-    }
 
     public function submit()
     {
@@ -210,10 +193,10 @@ class InventoryTransactionLivewire extends Component
         // تحديث الإجمالي في مصفوفة transactionItems
         $this->transactionItems[$index]['total'] = $total;
     }
-   
 
-    
-    
+
+
+
 
     public function render()
     {

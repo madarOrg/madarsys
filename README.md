@@ -106,6 +106,19 @@ php -S 127.0.0.1:8000 -t public
    ```
 
 ---
+#### **تنفيذ إشعارات وتنبيهات لحظية باستخدام WebSockets**
+1. شغل redis :
+   ```bash
+   cd "C:\Program Files\Redis"
+
+   redis-server.exe redis.windows.conf
+   ```
+2. ثم شغل laravel echo:
+   ```bash
+   cd c:/madarsys
+   laravel-echo-server start
+   ```
+
 
 ### 6. التعامل مع Git
 #### **إدارة الفروع في Git:**

@@ -14,7 +14,7 @@ class AddCapacityAndCurrentOccupancyToZonesTable extends Migration
     public function up()
     {
         Schema::table('zones', function (Blueprint $table) {
-            $table->foreignId('branch_id')->nullable()->constrained('branches')->nullOnDelete();
+            // $table->foreignId('branch_id')->nullable()->constrained('branches')->nullOnDelete();
             $table->integer('capacity')->default(0); // إضافة حقل السعة الكلية
             $table->integer('current_occupancy')->default(0); // إضافة حقل عدد الوحدات المخزنة حاليًا
         });

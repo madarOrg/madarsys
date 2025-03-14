@@ -4,14 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\
-{
-HasBranch,
-HasUser
+use App\Traits\{
+    HasBranch,
+    HasUser
 };
+
 class InventoryProduct extends Model
 {
-    use HasBranch,HasUser,HasFactory;
+    use HasBranch, HasUser, HasFactory;
 
     protected $table = 'inventory_products';
 
@@ -24,6 +24,9 @@ class InventoryProduct extends Model
         'inventory_movement_type',
         'created_user',
         'updated_user',
+        'inventory_transaction_item_id',
+        'quantity',
+        'temporary_transfer_expiry_date',
     ];
 
     /**
@@ -31,8 +34,9 @@ class InventoryProduct extends Model
      */
     public function product()
     {
-        return $this->belongsTo(Product::class);
+        return $this->belongsTo(Product::class, 'product_id');
     }
+    
 
     public function branch()
     {
@@ -58,4 +62,14 @@ class InventoryProduct extends Model
     {
         return $this->belongsTo(User::class, 'updated_user');
     }
+    public function location()
+    {
+        return $this->belongsTo(WarehouseLocation::class, 'location_id');
+    }
+   
+    public function transactionItem()
+    {
+        return $this->belongsTo(InventoryTransactionItem::class, 'inventory_transaction_item_id');
+    }
+    
 }

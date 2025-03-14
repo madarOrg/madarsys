@@ -76,7 +76,7 @@
                     <label for="total_price" class="block text-sm font-medium text-gray-700 dark:text-gray-300">المجموع الكلي</label>
                     <input type="text" id="total_price" name="total_price" value="0" readonly class="w-full p-2 border rounded-lg">
                 </div>
-
+ 
                 <div class="flex justify-start mt-4">
                     <x-button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">حفظ الفاتورة</x-button>
                 </div>

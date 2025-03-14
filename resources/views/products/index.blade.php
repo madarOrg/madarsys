@@ -7,7 +7,7 @@
                  </p> --}}
                  <form method="GET" action="{{ route('products.index') }}" class="mb-4">
                     <x-search-input id="custom-id" name="search" placeholder="ابحث عن المنتجات" :value="request()->input('search')" />
-                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md">بحث</button>
+                    <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md"></button>
                 </form>
                                 
         </div>

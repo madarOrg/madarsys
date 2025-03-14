@@ -5,7 +5,7 @@
         <!-- نموذج البحث مع تمرير معرف المستودع -->
         <form action="{{ route('warehouses.locations.index', ['warehouse' => $warehouse->id]) }}" method="GET">
 
-            <x-search-input id="custom-id" name="search" placeholder="ابحث عن مواقع المستودع" :value="request()->input('search')" />
+            {{-- <x-search-input id="custom-id" name="search" placeholder="ابحث عن مواقع المستودع" :value="request()->input('search')" /> --}}
         </form>
     </div>
 

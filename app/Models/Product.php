@@ -77,4 +77,9 @@ class Product extends Model
     {
         return $this->belongsTo(Unit::class, 'unit_id');
     }
+    public function product()
+{
+    return $this->belongsTo(Product::class, 'product_id');
+}
+
 }

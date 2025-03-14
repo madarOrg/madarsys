@@ -90,4 +90,14 @@ class RolePermissionController extends Controller
             return back()->withErrors(['error' => 'حدث خطأ أثناء حفظ صلاحية الدور: ' . $e->getMessage()]);
         }
     }
+
+    public function show($id)
+    {
+        try {
+            $role = Role::with('permissions')->findOrFail($id);
+            return view('role-permissions.show', compact('role'));
+        } catch (\Exception $e) {
+            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب بيانات الدور: ' . $e->getMessage()], 500);
+        }
+    }
 }
