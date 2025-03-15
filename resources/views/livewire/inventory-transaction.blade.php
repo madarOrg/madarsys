@@ -152,7 +152,7 @@
                 </table>
 
                 <div class="flex justify-end mt-4">
-                    <button wire:click="addProductRow" type="button" class="bg-blue-500 text-white px-4 py-2 rounded">
+                    <button wire:click="addProductRow" type="button" class="bg-blue-500  px-4 py-2 rounded">
                         إضافة منتج
                     </button>
                 </div>
@@ -160,4 +160,3 @@
         </div>
     </form>
 </div>
-{{-- ايني شاشة نفس هذه ولكن لعرض الحركات الجزء الخاص بادخال بيانات الحركة يكون على نفس التصميم بالاضافة الى ازرار للتنقل بين الحركات و الجزء الخاص بالتفاصيل يعرض تفاصيل الحركة --}}

@@ -36,6 +36,9 @@
 {{-- Favicon --}}
 {{-- <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}" /> --}}
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+
 {{-- <script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script> --}}
 <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
 <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>

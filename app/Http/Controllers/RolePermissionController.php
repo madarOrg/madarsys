@@ -33,6 +33,17 @@ class RolePermissionController extends Controller
             return response()->view('errors.500', ['error' => 'حدث خطأ أثناء عرض نموذج إضافة صلاحية الدور: ' . $e->getMessage()], 500);
         }
     }
+    public function edit($id)
+    {
+        try {
+            $role = Role::with('permissions')->findOrFail($id);
+            $permissions = Permission::all();
+            return view('role-permissions.edit', compact('role', 'permissions'));
+        } catch (\Exception $e) {
+            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب بيانات الدور للتعديل: ' . $e->getMessage()], 500);
+        }
+    }
+    
 
     public function update(Request $request)
     {

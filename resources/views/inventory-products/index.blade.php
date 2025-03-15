@@ -34,21 +34,32 @@
                                 <th class="px-6 py-3">الكمية</th>
                                 <th class="px-6 py-3">موقع المنتج</th>
                                 <th class="px-6 py-3">المنطقة التخزينية</th>
-                                <th class="px-6 py-3">الإجراء</th>
+                                <th class="px-6 py-3">تاريخ الإنتاج</th>
+                                <th class="px-6 py-3">تاريخ الانتهاء</th>
+                                <th class="px-6 py-3">رقم الدفعة</th>
+                                <th class="px-6 py-3">رقم الحركة</th>
+                                <th class="px-6 py-3">اجمالي الكمبة</th>
 
+
+                                <th class="px-6 py-3">الإجراء</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach ($products as $product)
-                                <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600"                                  >
+                                <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <td class="">{{ $loop->iteration }}</td>
                                     <td class="px-6 py-4">{{ $product->product->name }}</td>
-                                    <td class="px-6 py-4">{{ $product->quantity }}</td>
-                                    <td class="px-6 py-4">{{ $product->location->full_location ?? 'غير محدد' }}</td>
+                                    <td class="px-6 py-4">{{ $product->productQuantity ?? 'غير محدد' }}</td>
+                                    <td class="px-6 py-4">{{ $product->location->rack_code ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">{{ $product->storageArea->area_name ?? 'غير محدد' }}</td>
+                                    <td class="px-6 py-4">{{ $product->production_date ?? 'غير محدد' }}</td>
+                                    <td class="px-6 py-4">{{ $product->expiration_date ?? 'غير محدد' }}</td>
+                                    <td class="px-6 py-4">{{ $product->batch_number ?? 'غير محدد' }}</td>
+                                    <td class="px-6 py-4">{{ $product->inventory_transaction_item_id ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">
-                                        
-                                               
+                                        {{ $product->quantity ?? 'غير محدد' }} / {{ $distributedQuantities[$product->id] ?? 'غير محدد' }}
+                                    </td>
+                                    <td class="px-6 py-4">
                                         <a href="{{ route('inventory-products.edit', $product->id) }}"
                                             class="text-blue-600 hover:underline dark:text-blue-500">
                                             <i class="fa-solid fa-pen"></i>
@@ -83,4 +94,3 @@
         });
     });
 </script>
-    
