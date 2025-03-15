@@ -30,20 +30,39 @@ class ModuleActionsSeeder extends Seeder {
             ['id' => 58, 'module_id' => 4, 'name' => 'استلام الشحنات', 'action_key' => 'receive', 'route' => '/shipments/receive', 'icon' => 'fa fa-inbox text-green-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
             ['id' => 59, 'module_id' => 4, 'name' => 'إرسال الشحنات', 'action_key' => 'send', 'route' => '/shipments/send', 'icon' => 'fa fa-paper-plane text-blue-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
             ['id' => 60, 'module_id' => 4, 'name' => 'متابعة حالة الشحنات', 'action_key' => 'track', 'route' => '/shipments/track', 'icon' => 'fa fa-map-marker-alt text-red-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
-            ['id' => 61, 'module_id' => 5, 'name' => 'إنشاء فواتير المبيعات', 'action_key' => 'sales', 'route' => '/invoices', 'icon' => 'fa fa-receipt text-yellow-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
-            ['id' => 62, 'module_id' => 5, 'name' => 'إنشاء فواتير المشتريات', 'action_key' => 'purchases', 'route' => '/purchase-invoices', 'icon' => 'fa fa-shopping-cart text-green-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
-
             [
-                'id' => 63,
+                'id' => 61,
                 'module_id' => 5,
-                'name' => 'تتبع تفاصيل الفواتير',
-                'action_key' => 'track',
-                'route' => '/invoices/track',
-                'icon' => 'fa fa-search text-teal-500',
+                'name' => 'فواتير المبيعات',
+                'action_key' => 'sales',
+                'route' => '/invoices/sale',  
+                'icon' => 'fa fa-receipt text-yellow-500',
                 'created_at' => Carbon::parse('2025-01-31 16:30:35'),
                 'updated_at' => Carbon::parse('2025-02-01 16:08:19'),
                 'branch_id' => 2
             ],
+            [
+                'id' => 62,
+                'module_id' => 5,
+                'name' => 'فواتير المشتريات',
+                'action_key' => 'purchases',
+                'route' => '/invoices/purchase',  
+                'icon' => 'fa fa-shopping-cart text-green-500',
+                'created_at' => Carbon::parse('2025-01-31 16:30:35'),
+                'updated_at' => Carbon::parse('2025-02-01 16:08:19'),
+                'branch_id' => 2
+            ],
+            // [
+            //     'id' => 63,
+            //     'module_id' => 5,
+            //     'name' => 'تتبع تفاصيل الفواتير',
+            //     'action_key' => 'track',
+            //     'route' => '/invoices/track',
+            //     'icon' => 'fa fa-search text-teal-500',
+            //     'created_at' => Carbon::parse('2025-01-31 16:30:35'),
+            //     'updated_at' => Carbon::parse('2025-02-01 16:08:19'),
+            //     'branch_id' => 2
+            // ],
             [
                 'id' => 64,
                 'module_id' => 6,

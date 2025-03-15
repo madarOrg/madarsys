@@ -1,0 +1,121 @@
+<x-layout dir="rtl">
+    <section class="mb-24 p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg">
+        <div class="space-y-12 dark:bg-gray-900 mb-24">
+            <x-title :title="'فواتير المشتريات'"></x-title>
+            <div class="flex justify-start"> <!-- Align the button to the left -->
+                <x-button :href="route('invoices.create', ['type' => 'purchase'])" type="button">
+                    <i class="fas fa-plus mr-2"></i> إضافة فاتورة جديدة
+                </x-button>
+            </div>
+            <!-- Search Form with Filters -->
+            <form method="GET" action="{{ route('invoices.index', ['type' => 'purchase']) }}" class="mt-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-full">    
+                <div class="col-span-1">
+                    <x-file-input id="invoice_Code" name="invoice_code" value="{{ request('invoice_code') ?? '' }}" label="رقم الفاتورة" />                </div>
+                <!-- Filter by Branch -->
+                <div class="col-span-1">
+                    <label for="branch_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">الفرع</label>
+                    <select name="branch_id" id="branch_id" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8">
+                        <option value="">اختر الفرع</option>
+                        @foreach ($branches as $branche)
+                            <option value="{{ $branche->id }}" {{ request()->input('branch_id') == $branche->id ? 'selected' : '' }}>
+                                {{ $branche->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+    
+                <!-- Filter by Partner -->
+                <div class="col-span-1">
+                    <label for="partner_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">العميل</label>
+                    <select name="partner_id" id="partner_id" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8">
+                        <option value="">اختر العميل</option>
+                        @foreach($partners as $partner)
+                            <option value="{{ $partner->id }}" {{ request()->input('partner_id') == $partner->id ? 'selected' : '' }}>
+                                {{ $partner->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+    
+                <!-- Filter by Payment Method -->
+                <div class="col-span-1">
+                    <label for="payment_type_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">طريقة الدفع</label>
+                    <select name="payment_type_id" id="payment_type_id" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8">
+                        <option value="">اختر طريقة الدفع</option>
+                        @foreach($paymentTypes as $paymentType)
+                            <option value="{{ $paymentType->id }}" {{ request()->input('payment_type_id') == $paymentType->id ? 'selected' : '' }}>
+                                {{ $paymentType->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+    
+                <!-- Filter by Date Range -->
+                <div class="col-span-1">
+                    <label for="start_date" class="text-sm font-medium text-gray-600 dark:text-gray-400">من</label>
+                    <input type="date" name="start_date" id="start_date" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8" value="{{ request()->input('start_date') }}" />
+                </div>
+    
+                <!-- Date Range: End Date -->
+                <div class="col-span-1">
+                    <label for="end_date" class="text-sm font-medium text-gray-600 dark:text-gray-400">إلى</label>
+                    <input type="date" name="end_date" id="end_date" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8" value="{{ request()->input('end_date') }}" />
+                </div>
+    
+    
+                <x-button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 col-span-1">بحث</x-button>
+            </form>
+        </div>
+
+    <!-- Invoices Table -->
+    <div class="overflow-x-auto bg-white shadow-md rounded-lg mt-4">
+        <table class="w-full text-sm text-right text-gray-500">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                <tr>
+                    <th class="p-4">#</th>
+                    <th class="px-6 py-3">رقم الفاتورة</th>
+                    <th class="px-6 py-3">اسم العميل</th>
+                    <th class="px-6 py-3">تاريخ الفاتورة</th>
+                    <th class="px-6 py-3">المبلغ الإجمالي</th>
+                    <th class="px-6 py-3">الخصم</th>
+                    <th class="px-6 py-3">الفرع</th>
+                    <th class="px-6 py-3">طريقة الدفع</th>
+                    <th class="px-6 py-3">الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($invoices as $invoice)
+                    <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                        <td class="p-4">{{ $invoice->id }}</td>
+                        <td class="px-6 py-4">{{ $invoice->invoice_code }}</td>
+                        <td class="px-6 py-4">{{ optional($invoice->partner)->name ?? 'غير محدد' }}</td>
+                        <td class="px-6 py-4">{{ $invoice->invoice_date }}</td>
+                        <td class="px-6 py-4">{{ $invoice->total_amount }}</td>
+                        <td class="px-6 py-4">{{ $invoice->discount_amount }}</td>
+                        <td class="px-6 py-4">{{ optional($invoice->branch)->name ?? 'غير محدد' }}</td>
+                        <td class="px-6 py-4">{{ optional($invoice->paymentType)->name ?? 'غير محدد' }}</td>
+                        <td class="px-6 py-4 flex space-x-2">
+                            <x-button href="{{ route('invoices.edit', ['type' => 'purchase', 'invoice' => $invoice->id]) }}" class="text-blue-600 hover:underline dark:text-blue-500">
+                                <i class="fa-solid fa-pen"></i>
+                            </x-button>
+                            <form action="{{ route('invoices.destroy', ['type' => 'purchase', 'invoice' => $invoice->id]) }}" method="POST" class="inline-block">
+                                @csrf
+                                @method('DELETE')
+                                <x-button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('هل أنت متأكد من حذف الفاتورة؟')">
+                                    <i class="fas fa-trash-alt"></i>
+                                </x-button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+            
+        </table>
+    </div>
+    
+    <x-pagination-links :paginator="$invoices" />
+
+    </section>
+    
+    
+    </x-layout>
