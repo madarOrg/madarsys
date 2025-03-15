@@ -27,7 +27,41 @@ class InventoryProduct extends Model
         'inventory_transaction_item_id',
         'quantity',
         'temporary_transfer_expiry_date',
+        'batch_number',
+        'production_date',
+        'expiration_date'
     ];
+    protected static function boot()
+{
+    parent::boot();
+
+    static::creating(function ($product) {
+        $expirationDate = $product->expiration_date ?? null; // تعيين القيمة الافتراضية في حالة عدم وجود تاريخ صلاحية
+        $product->batch_number = $product->generateBatchNumber($expirationDate); // استدعاء الدالة عبر الكائن
+    });
+}
+function generateBatchNumber($expirationDate = null)
+{
+    $datePart = $expirationDate ? date('ymd', strtotime($expirationDate)) : '000000';
+
+    // جلب آخر دفعة تم إنشاؤها لنفس المنتج والمستودع وتاريخ الانتهاء
+    $lastBatch = self::where('warehouse_id', $this->warehouse->warehouse_id)
+        ->where('expiration_date', $expirationDate)
+        ->orderBy('id', 'desc')
+        ->value('batch_number');
+
+    // استخراج الرقم التسلسلي من آخر دفعة أو بدء من 1
+    $lastSerial = $lastBatch ? (int)substr($lastBatch, -3) : 0;
+    $newSerial = str_pad($lastSerial + 1, 6, '0', STR_PAD_LEFT);
+
+    // تكوين رقم الدفعة
+    return sprintf('%s-%s-%s-%s',
+        $this->warehouse->code,
+        $this->sku,
+        $datePart,
+        $newSerial
+    );
+}
 
     /**
      * العلاقات مع الجداول الأخرى

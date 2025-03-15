@@ -332,19 +332,27 @@ Route::middleware(['web', 'auth'])->group(function () {
     // مجموعة Routes الخاصة بحركة المخزون
     Route::prefix('inventory-products')->name('inventory-products.')->group(function () {
         Route::get('/', [InventoryProductController::class, 'index'])->name('index');
-
+    
         // عرض صفحة إضافة حركة مخزنية
         Route::get('create', [InventoryProductController::class, 'create'])->name('create');
-
+    
         // تخزين حركة مخزنية جديدة
         Route::post('/', [InventoryProductController::class, 'store'])->name('store');
+        
+        // عرض صفحة تعديل حركة مخزنية
+        Route::get('{id}/edit', [InventoryProductController::class, 'edit'])->name('edit');
+    
+        // تحديث حركة مخزنية
+        Route::put('{id}', [InventoryProductController::class, 'update'])->name('update');
+    
+        // حذف حركة مخزنية
+        Route::delete('{id}', [InventoryProductController::class, 'destroy'])->name('destroy');
     });
+    
     Route::get('/get-warehouses/{branch_id}', [InventoryProductController::class, 'getWarehouses']);
     Route::get('/get-storage-areas/{warehouse_id}', [InventoryProductController::class, 'getStorageAreas']);
     Route::get('/get-locations/{storage_area_id}', [InventoryProductController::class, 'getLocations']);
-    Route::get('inventory-products/{inventoryProduct}/edit', [InventoryProductController::class, 'edit'])->name('inventory-products.edit');
-    Route::delete('inventory-products/{inventoryProduct}', [InventoryProductController::class, 'destroy'])->name('inventory-products.destroy');
-    Route::put('inventory-products/{inventoryProduct}', [InventoryProductController::class, 'update'])->name('inventory-products.update');
+    
     Route::get('/get-inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
     Route::get('/get-products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
 

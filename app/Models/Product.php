@@ -55,7 +55,7 @@ class Product extends Model
     {
         $categoryCode = strtoupper(substr($product->category->code ?? 'GEN', 0, 3)); // أول 3 أحرف من اسم الفئة
         $brandCode = strtoupper(substr($product->brand ?? 'NO-BRAND', 0, 3)); // أول 3 أحرف من العلامة التجارية
-        $uniqueId = str_pad(self::max('id') + 1, 4, '0', STR_PAD_LEFT); // رقم فريد من 4 أرقام
+        $uniqueId = str_pad(self::max('id') + 1, 6, '0', STR_PAD_LEFT); // رقم فريد من6  أرقام
 
         return "{$categoryCode}-{$brandCode}-{$uniqueId}";
     }
