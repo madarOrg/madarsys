@@ -371,23 +371,13 @@ Route::get('/products/{transaction_id}', [InventoryProductController::class, 'ge
     // Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
 
     //invoices routes
-    Route::prefix('invoices')->name('invoices.')->group(function () {
-        // عرض قائمة الفواتير
-        Route::get('/', [InvoiceController::class, 'index'])->name('index');
+Route::prefix('invoices')->name('invoices.')->group(function () {
+    Route::get('{type}', [InvoiceController::class, 'index'])->name('index'); // List invoices by type
+    Route::get('{type}/create', [InvoiceController::class, 'create'])->name('create'); // Create form for invoice type
+    Route::post('{type}', [InvoiceController::class, 'store'])->name('store'); // Store new invoice
+    Route::get('{type}/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit'); // Edit invoice
+    Route::put('{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
+    Route::delete('{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
+});
 
-        // عرض صفحة إنشاء الفاتورة
-        Route::get('/create', [InvoiceController::class, 'create'])->name('create');
-
-        // تخزين الفاتورة في قاعدة البيانات
-        Route::post('/', [InvoiceController::class, 'store'])->name('store');
-
-        // عرض صفحة تعديل الفاتورة
-        Route::get('/{id}/edit', [InvoiceController::class, 'edit'])->name('edit');
-
-        // تحديث بيانات الفاتورة
-        Route::put('/{id}', [InvoiceController::class, 'update'])->name('update');
-
-        // حذف الفاتورة
-        Route::delete('/{id}', [InvoiceController::class, 'destroy'])->name('destroy');
-    });
 });

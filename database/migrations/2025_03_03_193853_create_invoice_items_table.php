@@ -6,9 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * إنشاء جدول عناصر الفاتورة
-     */
+
     public function up(): void
     {
         Schema::create('invoice_items', function (Blueprint $table) {
@@ -22,9 +20,7 @@ return new class extends Migration
         });
     }
 
-    /**
-     * حذف الجدول عند التراجع عن المهاجرة
-     */
+
     public function down(): void
     {
         Schema::dropIfExists('invoice_items');
