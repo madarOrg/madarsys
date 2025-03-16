@@ -1,23 +1,24 @@
 <x-layout>
     <section>
-        <div>
+        <div class="flex items-center ">
             <x-title :title="'إدارة المنتجات في المستودعات'"></x-title>
+            
+            <x-button :href="route('inventory-products.create')" type="button" class="ml-4">
+                <i class="fas fa-plus mr-2"></i> إضافة منتج جديد إلى مستودع
+            </x-button>
+        </div>
 
-            <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                يرجى اختيار المستودع لعرض المنتجات المخزنة داخله.
-            </p>
+        <p class="text-sm ">
+            يرجى اختيار المستودع لعرض المنتجات المخزنة داخله.
+        </p>
 
-            <!-- اختيار المستودع -->
-            <form method="GET" action="{{ route('inventory-products.index') }}">
-                <x-button :href="route('inventory-products.create')" type="button">
-                    <i class="fas fa-plus mr-2"></i> إضافة منتج جديد إلى مستودع
-                </x-button>
-                <div class="mb-4">
-                    <x-select-dropdown id="warehouse_id" name="warehouse_id" label="المستودع" :options="$warehouses->pluck('name', 'id')"
-                        onchange="this.form.submit()" :selected="request()->warehouse_id" required />
-                </div>
-            </form>
-
+        <!-- اختيار المستودع -->
+        <form method="GET" action="{{ route('inventory-products.index') }}">
+            <div class="mb-4">
+                <x-select-dropdown id="warehouse_id" name="warehouse_id" label="المستودع" :options="$warehouses->pluck('name', 'id')"
+                    onchange="this.form.submit()" :selected="request()->warehouse_id" required />
+            </div>
+        </form>
 
             <!-- عرض المنتجات في جدول -->
             @if ($products->isNotEmpty())
@@ -65,7 +66,7 @@
                                             'inventory_transaction_item_id' => $product->inventory_transaction_item_id,
                                             'product_id' => $product->product_id,
                                         ]) }}"
-                                            class="text-blue-600 hover:underline dark:text-white-500">
+                                            class="text-orange-400 hover:underline dark:text-white-500">
                                             <i class="fas fa-truck"></i> <!-- توزيع عبر النقل -->
                                         </a>
                                         <a href="{{ route('inventory-products.edit', $product->id) }}"
@@ -94,6 +95,7 @@
             @endif
         </div>
     </section>
+    {{-- <x-pagination-links :paginator="$products" /> --}}
 </x-layout>
 <script>
     document.addEventListener("DOMContentLoaded", function() {

@@ -9,19 +9,43 @@ use App\Models\RolePermission;
 
 class RolePermissionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $roles = Role::with('permissions')->get();
-            $permissions = Permission::all();
-
-            $rolePermissions = $roles; // تعريف المتغير ليتطابق مع الاسم في Blade
-
+            // جلب الأدوار مع الصلاحيات المرتبطة
+            $query = Role::with('permissions');
+    
+            // تطبيق فلتر البحث عن الدور إذا تم إدخاله
+            if ($request->filled('role')) {
+                $query->where('id', $request->input('role'));
+            }
+    
+            // تطبيق فلتر البحث عن الصلاحية إذا تم إدخالها
+            if ($request->filled('permission')) {
+                $query->whereHas('permissions', function ($q) use ($request) {
+                    $q->where('id', $request->input('permission'));
+                });
+            }
+    
+            // تطبيق فلتر البحث حسب الحالة (فعال/غير فعال)
+            if ($request->filled('status')) {
+                $query->whereHas('permissions', function ($q) use ($request) {
+                    $q->where('pivot.status', $request->input('status'));
+                });
+            }
+    
+            // تنفيذ الاستعلام بناءً على الفلاتر المحددة
+            $roles = Role::all(); // جلب كل الأدوار من أجل القوائم المنسدلة
+            $permissions = Permission::all(); // جلب جميع الصلاحيات من أجل القوائم المنسدلة
+            $rolePermissions = $query->get(); 
+    
             return view('role-permissions.index', compact('roles', 'permissions', 'rolePermissions'));
         } catch (\Exception $e) {
             return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب الأدوار والصلاحيات: ' . $e->getMessage()], 500);
+
         }
     }
+    
 
     public function create()
     {

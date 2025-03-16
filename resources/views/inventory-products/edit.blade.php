@@ -9,24 +9,25 @@
         <div>
             <x-title :title="'تحديث منتج في المستودع'"></x-title>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-                يرجى تحديث الكمية والتواريخ فقط.
+                يرجى تحديث الكمية والتواريخ و مواقع التخزين فقط.
             </p>
 
             <form action="{{ route('inventory-products.update', $product->id) }}" method="POST">
                 @csrf
                 @method('PUT')
 
-                <div class="mb-4">
-                    <x-file-input type="text" id="batch_number" name="batch_number" label="رقم الدفعة"
-                        value="{{ old('batch_number', $product->batch_number) }}" readonly />
-                </div>
-                <input type="hidden" name="product_id" value="{{ $product->product_id }}">
-                <input type="hidden" name="branch_id" value="{{ $product->branch_id }}">
-                <input type="hidden" name="warehouse_id" value="{{ $product->warehouse_id }}">
-                <input type="hidden" name="inventory_transaction_item_id"
-                    value="{{ $product->inventory_transaction_item_id }}">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
 
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                    <div class="mb-4">
+                        <x-file-input type="text" id="batch_number" name="batch_number" label="رقم الدفعة"
+                            value="{{ old('batch_number', $product->batch_number) }}" readonly />
+                    </div>
+                    <input type="hidden" name="product_id" value="{{ $product->product_id }}">
+                    <input type="hidden" name="branch_id" value="{{ $product->branch_id }}">
+                    <input type="hidden" name="warehouse_id" value="{{ $product->warehouse_id }}">
+                    <input type="hidden" name="inventory_transaction_item_id"
+                        value="{{ $product->inventory_transaction_item_id }}">
+
                     <!-- المستودع -->
                     <div class="mb-4">
                         <label for="warehouse_id" class="block text-sm font-medium text-gray-700">المستودع</label>
@@ -62,17 +63,19 @@
                             value="{{ old('quantity', $product->quantity) }}" required min="1" />
                     </div>
 
-                  <!-- المنطقة التخزينية -->
-<div class="mb-4">
-    <x-select-dropdown id="storage_area_id" name="storage_area_id" label="المنطقة التخزينية"
-        :options="$storageAreas->pluck('area_name', 'id')" :selected="old('storage_area_id')" required />
-</div>
+                    <!-- المنطقة التخزينية -->
+                    <div class="mb-4">
+                        <x-select-dropdown id="storage_area_id" name="storage_area_id" label="المنطقة التخزينية"
+                        :options="$storageAreas->pluck('area_name', 'id')" :selected="old('storage_area_id', $product->storage_area_id)" required />
+                    
+                    </div>
 
-<!-- موقع المنتج -->
-<div class="mb-4">
-    <x-select-dropdown id="location_id" name="location_id" label="موقع المنتج"
-        :options="$locations->pluck('rack_code', 'id')" :selected="old('location_id')" required />
-</div>
+                    <!-- موقع المنتج -->
+                    <div class="mb-4">
+                        <x-select-dropdown id="location_id" name="location_id" label="موقع المنتج"
+                        :options="$locations->pluck('rack_code', 'id')" :selected="old('location_id', $product->location_id)" required />
+                    
+                    </div>
 
 
                 </div>

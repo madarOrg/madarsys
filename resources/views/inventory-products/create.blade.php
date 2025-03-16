@@ -7,11 +7,13 @@
             </p>
             <form action="{{ route('inventory-products.store') }}" method="POST">
                 @csrf
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+
                 <!-- إضافة الحقول الثلاثة -->
                 <div class="mb-4">
                     <x-file-input type="text" id="batch_number" name="batch_number" label="رقم الدفعة" />
                 </div>
-                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- اختيار المستودع -->
                     <div class="mb-4">
                         <select id="warehouse_id" name="warehouse_id" class="tom-select w-full">
@@ -31,8 +33,9 @@
                                 data-route="{{ url('/get-inventory-transactions/${warehouseId}') }}">
                                 @foreach ($transactions as $transaction)
                                     {{-- <option value="{{ $transaction->id }}" --}}
-                                        data-product-id="{{ $transaction->product_id }}">
-                                        {{ $transaction->reference }} - {{ $transaction->product_name }} - {{ $transaction->suk }}
+                                    data-product-id="{{ $transaction->product_id }}">
+                                    {{ $transaction->reference }} - {{ $transaction->product_name }} -
+                                    {{ $transaction->suk }}
                                     </option>
                                 @endforeach
                             </select>
@@ -47,10 +50,12 @@
                     </div> --}}
 
                     <div class="mb-4">
-                        <x-file-input type="date" id="production_date" name="production_date" label="تاريخ الإنتاج" />
+                        <x-file-input type="date" id="production_date" name="production_date"
+                            label="تاريخ الإنتاج" />
                     </div>
                     <div class="mb-4">
-                        <x-file-input type="date" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء" />
+                        <x-file-input type="date" id="expiration_date" name="expiration_date"
+                            label="تاريخ الانتهاء" />
                     </div>
                     <div class="mb-4">
                         <x-file-input type="number" id="quantity" name="quantity" label="الكمية" required

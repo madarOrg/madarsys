@@ -12,31 +12,40 @@
             />
 
             <!-- حقل البحث عن الدور -->
-            <select name="role" class="px-4 py-2 border rounded">
-                <option value="">اختر الدور</option>
-                @foreach($roles as $role)
-                    <option value="{{ $role->id }}" {{ request()->input('role') == $role->id ? 'selected' : '' }}>
-                        {{ $role->name }}
-                    </option>
-                @endforeach
-            </select>
+            <div class="relative mt-1 flex items-center">
+                <select name="role" class="px-4 py-2 bg-gray-100 rounded-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200">
+                    <option value="">اختر الدور</option>
+                    @foreach($roles as $role)
+                        <option value="{{ $role->id }}" {{ request()->input('role') == $role->id ? 'selected' : '' }}>
+                            {{ $role->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
 
             <!-- حقل البحث عن الصلاحية -->
-            <select name="permission" class="px-4 py-2 border rounded">
-                <option value="">اختر الصلاحية</option>
-                @foreach($permissions as $permission)
-                    <option value="{{ $permission->id }}" {{ request()->input('permission') == $permission->id ? 'selected' : '' }}>
-                        {{ $permission->name }}
-                    </option>
-                @endforeach
-            </select>
+            <div class="relative mt-1 flex items-center">
+                <select name="permission" class="px-4 py-2 bg-gray-100 rounded-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200">
+                    <option value="">اختر الصلاحية</option>
+                    @foreach($permissions as $permission)
+                        <option value="{{ $permission->id }}" {{ request()->input('permission') == $permission->id ? 'selected' : '' }}>
+                            {{ $permission->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </div>
+            
 
             <!-- حقل البحث عن الحالة -->
-            <select name="status" class="px-4 py-2 border rounded">
-                <option value="">اختر الحالة</option>
-                <option value="1" {{ request()->input('status') == '1' ? 'selected' : '' }}>فعال</option>
-                <option value="0" {{ request()->input('status') == '0' ? 'selected' : '' }}>غير فعال</option>
-            </select>
+            <div class="relative mt-1 flex items-center">
+                <select name="status" class="px-4 py-2 bg-gray-100 rounded-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200">
+                    <option value="">اختر الحالة</option>
+                    <option value="1" {{ request()->input('status') == '1' ? 'selected' : '' }}>فعال</option>
+                    <option value="0" {{ request()->input('status') == '0' ? 'selected' : '' }}>غير فعال</option>
+                </select>
+            </div>
+            
 
             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">بحث</button>
         </form>
@@ -90,9 +99,16 @@
             @endforeach
         </tbody>
     </table>
+    {{-- <x-pagination-links :paginator="$rolePermissions" /> --}}
+
+    
 </x-layout>
 @section('scripts')
 <script>
+    document.querySelector('select[name="role"]').addEventListener('change', function () {
+    this.form.submit();
+});
+
     // السماح بإسقاط العناصر داخل القائمة
     function allowDrop(event) {
         event.preventDefault();

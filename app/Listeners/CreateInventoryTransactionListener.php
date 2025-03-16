@@ -193,7 +193,7 @@ class CreateInventoryTransactionListener
         $inventory = Inventory::where('warehouse_id', $warehouseId)
             ->where('product_id', $productId)
             ->first();
-        dd($inventory);
+        // dd($inventory);
         // إذا لم يكن هناك سجل للمخزون، فهذا يعني أنه لا توجد كميات متوفرة
         if (!$inventory && $requestedQuantity < 0) {
             return false;
@@ -204,47 +204,4 @@ class CreateInventoryTransactionListener
         return $inventory->quantity >= $requestedQuantity;
     }
 
-
-    // تحديث أو إضافة الكمية التراكمية في جدول المخزون
-    private function updateInventoryStock($warehouseId, $productId, $quantity, $pricePerUnit)
-    {
-        // جلب السجل الحالي للمخزون لهذا المنتج في هذا المستودع
-        $inventory = Inventory::where('warehouse_id', $warehouseId)
-            ->where('product_id', $productId)
-            ->first();
-        if ($inventory) {
-            // تحديث الكمية
-            $newQuantity = $inventory->quantity + $quantity;
-
-            // التأكد من عدم أن تكون الكمية سالبة (لا يمكن أن يصبح المخزون بالسالب)
-            if ($newQuantity < 0) {
-                session()->flash('error', 'خطأ: الكمية في المخزون لا يمكن أن تكون سالبة.' . $e->getMessage());
-                throw new \Exception("خطأ: الكمية في المخزون لا يمكن أن تكون سالبة.");
-            }
-
-            // تحديث السعر الإجمالي
-            $newTotalValue = ($inventory->total_value + ($quantity * $pricePerUnit));
-
-            // تحديث المخزون
-            $inventory->update([
-                'quantity' => $newQuantity,
-                'unit_price' => $newQuantity > 0 ? $newTotalValue / $newQuantity : 0, // تجنب القسمة على صفر
-                'total_value' => $newTotalValue,
-            ]);
-        } else {
-            // إذا لم يكن هناك سجل، أنشئ سجلًا جديدًا
-            if ($quantity < 0) {
-                session()->flash('error', 'خطأ: لا يمكن إخراج منتج غير موجود في المخزون.' . $e->getMessage());
-                throw new \Exception("خطأ: لا يمكن إخراج منتج غير موجود في المخزون.");
-            }
-
-            Inventory::create([
-                'warehouse_id' => $warehouseId,
-                'product_id'   => $productId,
-                'quantity'     => $quantity,
-                'unit_price'   => $pricePerUnit,
-                'total_value'  => $quantity * $pricePerUnit,
-            ]);
-        }
-    }
 }

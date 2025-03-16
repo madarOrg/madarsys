@@ -1,4 +1,7 @@
+
+
 <div>
+    
     <form id="transaction-view-form">
         <div class="p-4 rounded-lg shadow w-full overflow-x-auto">
             <x-title :title="'بحث عن عملية مخزنية'" />
@@ -18,6 +21,7 @@
                 </div>
 
                 @isset($selectedTransaction)
+                
                     <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية" type="datetime-local"
                         value="{{ optional($selectedTransaction->transaction_date)->format('Y-m-d\TH:i') }}"
                         disabled="true" />
@@ -37,13 +41,18 @@
             <!-- قسم تفاصيل الحركة -->
             <div class="col-span-1 md:col-span-3 p-4 rounded-lg shadow w-full overflow-x-auto">
                 <x-title :title="'توزيع منتجات الحركة'" />
-                <div>
-                    <!-- أزرار التنقل بين الحركات -->
-                    <button wire:click="previousProduct" class="btn btn-primary">السابق</button>
-                    <button wire:click="nextProduct" class="btn btn-primary">التالي</button>
+
+                <!-- زر قابل للتوزيع -->
+                <div class="mt-4">
+                    
+                    <button wire:click="toggleDistribution({{ $selectedTransaction->id }})"
+                        class="px-4 py-2 rounded-lg {{ $selectedTransaction->status == 0 ? 'bg-red-500' : 'bg-yellow-500' }} text-white">
+                        {{ $selectedTransaction->status == 0 ? 'معلقة' : 'قابل للتوزيع' }}
+                    </button>
                 </div>
                 
                 <div class="overflow-auto">
+
                     <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400 mt-4">
                         <thead class="text-xs text-gray-700 bg-gray-400 dark:bg-gray-700 dark:text-white">
                             <tr>
@@ -56,6 +65,8 @@
                         </thead>
                         <tbody>
                             @isset($selectedTransaction)
+                            @if($selectedTransaction->items && $selectedTransaction->items->isNotEmpty()) 
+
                                 @foreach ($selectedTransaction->items as $item)
                                     <tr id="item_{{ $item->id }}"
                                         class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white">
@@ -66,82 +77,30 @@
                                         <td class="px-6 py-3">{{ $item->total }}</td>
                                     </tr>
                                 @endforeach
+                                @else
+                                <tr>
+                                    <td colspan="5" class="px-6 py-3 text-center">لا توجد عناصر في هذه الحركة</td>
+                                </tr>
+                            @endif
                             @endisset
                         </tbody>
                     </table>
                 </div>
             </div>
 
-            <!-- قسم التوزيع على المناطق (جدول) -->
-            <div class="col-span-2 p-4 rounded-lg shadow w-full overflow-x-auto">
-                <x-title :title="'توزيع المنتجات على المناطق'" />
 
-                <div class="overflow-auto">
-                    <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400 mt-4">
-                        <thead class="text-xs text-gray-700 bg-gray-400 dark:bg-gray-700 dark:text-white">
-                            <tr>
-                                <th class="px-6 py-3">المنتج</th>
-                                <th class="px-6 py-3">المنطقة التخزينية</th>
-                                <th class="px-6 py-3">موقع التخزين</th>
-                                <th class="px-6 py-3">الكمية</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @isset($selectedTransaction)
-                                @foreach ($selectedTransaction->items as $item)
-                                    <tr id="distribution_{{ $item->id }}"
-                                        class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white">
-
-                                        <td class="px-6 py-3">{{ $item->product->name ?? '' }}</td>
-
-                                        <!-- المنطقة التخزينية -->
-                                        <td class="px-6 py-3">
-                                            <select wire:model="distribution.{{ $item->id }}.storage_area_id"
-                                                class="form-select bg-white text-black dark:bg-gray-700 dark:text-white">
-                                                <option value="">اختر المنطقة التخزينية</option>
-                                                @foreach ($selectedTransaction->warehouse->storageAreas as $area)
-                                                    <option value="{{ $area->id }}">{{ $area->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-
-                                        <!-- موقع التخزين -->
-                                        <td class="px-6 py-3">
-                                            <select wire:model="distribution.{{ $item->id }}.location_id"
-                                                class="form-select bg-white text-black dark:bg-gray-700 dark:text-white">
-                                                <option value="">اختر موقع التخزين</option>
-                                                @foreach ($selectedTransaction->warehouse->warehouseLocations as $location)
-                                                    <option value="{{ $location->id }}">{{ $location->name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-
-                                        <!-- الكمية -->
-                                        <td class="px-6 py-3">
-                                            <input type="number" wire:model="distribution.{{ $item->id }}.quantity"
-                                                class="form-input bg-white text-black dark:bg-gray-700 dark:text-white"
-                                                min="0" placeholder="الكمية">
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            @endisset
-                        </tbody>
-                    </table>
-                </div>
-            </div>
 
         </div>
     </form>
 </div>
 <script>
-    document.addEventListener('livewire:load', function () {
-    Livewire.on('focusTransactionDetails', function () {
-        // الانتقال إلى الحقل المناسب بعد التحديث
-        const firstInput = document.querySelector('#transaction_date');
-        if (firstInput) {
-            firstInput.focus();
-        }
+    document.addEventListener('livewire:load', function() {
+        Livewire.on('focusTransactionDetails', function() {
+            // الانتقال إلى الحقل المناسب بعد التحديث
+            const firstInput = document.querySelector('#transaction_date');
+            if (firstInput) {
+                firstInput.focus();
+            }
+        });
     });
-});
-
 </script>

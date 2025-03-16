@@ -1,0 +1,60 @@
+<?php
+namespace App\Services\InventoryTransaction;
+
+use App\Models\Inventory;
+use Exception;
+
+class InventoryService
+{
+    /**
+     * تحديث المخزون للمنتج في المستودع
+     *
+     * @param int $warehouseId
+     * @param int $productId
+     * @param int $quantity
+     * @param float $pricePerUnit
+     * @throws Exception
+     */
+    public function updateInventoryStock($warehouseId, $productId, $quantity, $pricePerUnit)
+    {
+        // جلب السجل الحالي للمخزون لهذا المنتج في هذا المستودع
+        $inventory = Inventory::where('warehouse_id', $warehouseId)
+            ->where('product_id', $productId)
+            ->first();
+
+        if ($inventory) {
+            // تحديث الكمية
+var_dump( $inventory->quantity);
+var_dump($quantity);
+            $newQuantity = $inventory->quantity + $quantity;
+
+            // التأكد من عدم أن تكون الكمية سالبة
+            if ($newQuantity < 0) {
+                throw new Exception("خطأ: الكمية في المخزون لا يمكن أن تكون سالبة.");
+            }
+
+            // تحديث السعر الإجمالي
+            $newTotalValue = ($inventory->total_value + ($quantity * $pricePerUnit));
+
+            // تحديث المخزون
+            $inventory->update([
+                'quantity' => $newQuantity,
+                'unit_price' => $newQuantity > 0 ? $newTotalValue / $newQuantity : 0, // تجنب القسمة على صفر
+                'total_value' => $newTotalValue,
+            ]);
+        } else {
+            // إذا لم يكن هناك سجل، أنشئ سجلًا جديدًا
+            if ($quantity < 0) {
+                throw new Exception("خطأ: لا يمكن إخراج منتج غير موجود في المخزون.");
+            }
+
+            Inventory::create([
+                'warehouse_id' => $warehouseId,
+                'product_id'   => $productId,
+                'quantity'     => $quantity,
+                'unit_price'   => $pricePerUnit,
+                'total_value'  => $quantity * $pricePerUnit,
+            ]);
+        }
+    }
+}
