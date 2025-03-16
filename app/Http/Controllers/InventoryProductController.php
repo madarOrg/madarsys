@@ -13,10 +13,18 @@ use App\Models\WarehouseLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Rules\ValidInventoryTransaction;
+use App\Services\InventoryTransaction\InventoryService;
 
 class InventoryProductController extends Controller
 {
+    protected $inventoryService;
 
+    // حقن خدمة InventoryService في الـ Controller عبر الـ constructor
+    public function __construct(InventoryService $inventoryService)
+    {
+        $this->inventoryService = $inventoryService;
+    }
+    
     public function index(Request $request)
     {
 
@@ -135,6 +143,21 @@ class InventoryProductController extends Controller
      */
     public function store(Request $request)
     {
+        // التحقق من تاريخ الإنتاج والانتهاء
+        // التحقق من تاريخ الإنتاج والانتهاء
+        if ($request->has('production_date') && $request->has('expiration_date')) {
+            $productionDate = \Carbon\Carbon::parse($request->production_date);
+            $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
+
+            if ($expirationDate->lt($productionDate)) {
+                // إرجاع رسالة خطأ والعودة لنفس الصفحة
+                return redirect()->back()->withErrors([
+                    'expiration_date' => 'تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ الإنتاج.'
+                ])->withInput();
+            }
+        }
+
+
 
         // التحقق من البيانات المدخلة
         $request->validate([
@@ -148,7 +171,7 @@ class InventoryProductController extends Controller
             'production_date' => 'nullable|date',
             'expiration_date' => 'nullable|date',
             'batch_number' => 'nullable|string',
-        'inventory_transaction_item_id' => ['required', 'exists:inventory_transaction_items,id', new ValidInventoryTransaction],
+            'inventory_transaction_item_id' => ['required', 'exists:inventory_transaction_items,id', new ValidInventoryTransaction],
         ]);
 
         // جلب الكمية الأصلية من جدول inventory_transaction_items
@@ -182,10 +205,22 @@ class InventoryProductController extends Controller
             'inventory_transaction_item_id' => $request->input('inventory_transaction_item_id'),
         ]);
 
+        // استدعاء دالة updateInventoryStock من الخدمة
+        try {
+            $this->inventoryService->updateInventoryStock(
+                $request->warehouse_id,
+                $transactionItem->product_id,
+                $request->quantity,
+                $transactionItem->unit_prices // تأكد من أن السعر موجود في $transactionItem
+            );
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
+
         // إعادة التوجيه بعد حفظ البيانات
-        return redirect()->route('inventory-products.create')->with('success', 'تم إضافة موقع المخزون بنجاح');
+        return redirect()->route('inventory-products.index')->with('success', 'تم إضافة موقع المخزون بنجاح');
     }
-    public function edit(Request $request,$id)
+    public function edit(Request $request, $id)
     {
         $oldProduct = InventoryProduct::with([
             'transactionItem.inventoryTransaction',
@@ -201,9 +236,9 @@ class InventoryProductController extends Controller
         $locations = WarehouseLocation::when($request->storage_area_id, function ($query) use ($request) {
             return $query->where('storage_area_id', $request->storage_area_id);
         })->get();
-        
-        // dd($locations->first()->rack_code);
-        
+
+        //  dump($locations->first()->rack_code);
+
         $product = $oldProduct;
         return view('inventory-products.edit', compact('product', 'storageAreas', 'locations'));
     }
@@ -218,7 +253,20 @@ class InventoryProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dd($id, $request->all());
+        // التحقق من تاريخ الإنتاج والانتهاء
+        // التحقق من تاريخ الإنتاج والانتهاء
+        if ($request->has('production_date') && $request->has('expiration_date')) {
+            $productionDate = \Carbon\Carbon::parse($request->production_date);
+            $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
+
+            if ($expirationDate->lt($productionDate)) {
+                // إرجاع رسالة خطأ والعودة لنفس الصفحة
+                return redirect()->back()->withErrors([
+                    'expiration_date' => 'تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ الإنتاج.'
+                ])->withInput();
+            }
+        }
+
 
         $request->validate([
             'product_id' => 'nullable|exists:products,id',
@@ -246,6 +294,11 @@ class InventoryProductController extends Controller
                 ->where('id', '!=', $id) // استثناء السجل الحالي
                 ->sum('quantity');
 
+            $currentQuantity = InventoryProduct::where('inventory_transaction_item_id', $request->inventory_transaction_item_id)
+            // ->where('product_id', $request->product_id)
+            ->where('warehouse_id', $request->warehouse_id)
+            ->where('id', '=', $id) //  السجل الحالي
+            ->first('quantity');
             // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية
             if (($distributedQuantity + $request->quantity) > $originalQuantity) {
                 return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
@@ -264,12 +317,29 @@ class InventoryProductController extends Controller
             'production_date' => $request->input('production_date'), // إضافة تاريخ الإنتاج
             'expiration_date' => $request->input('expiration_date'), // إضافة تاريخ انتهاء الصلاحية
         ]);
+ 
+
+ // استدعاء دالة updateInventoryStock من الخدمة
+ $currentQuantity = $currentQuantity->quantity;  // أو الخاصية المناسبة للكائن
+//  dd($request->quantity);
+ $quantityDifference = $request->quantity - $currentQuantity;
+
+try {
+    // تحديث المخزون مرة واحدة فقط بالفرق المحسوب
+    $this->inventoryService->updateInventoryStock(
+        $request->warehouse_id,
+        $transactionItem->product_id,
+        $quantityDifference,
+        $transactionItem->unit_prices
+    );
+} catch (\Exception $e) {
+    return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+}
+
 
         return redirect()->route('inventory-products.index')->with('success', 'تم تعديل موقع المنتج بنجاح.');
     }
 
-
-    //  دالة جلب المستودعات بناءً على الفرع المحدد
 
 
     //  دالة جلب المناطق التخزينية بناءً على المستودع المحدد
@@ -339,12 +409,23 @@ class InventoryProductController extends Controller
             ->where('inventory_transactions.status', 1)
             ->get();
     }
-    
+
     public function destroy($id)
     {
         $inventoryProduct = InventoryProduct::findOrFail($id);
-        $inventoryProduct->delete();
+        $transactionItem = InventoryTransactionItem::findOrFail($inventoryProduct->inventory_transaction_item_id);
 
+        $inventoryProduct->delete();
+        try {
+            $this->inventoryService->updateInventoryStock(
+                $inventoryProduct->warehouse_id,
+                $transactionItem->product_id,
+                -$inventoryProduct->quantity,  // كمية سالبة عند الحذف
+                $transactionItem->unit_prices // تأكد من أن السعر موجود في $transactionItem
+            );
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+        }
         return redirect()->route('inventory-products.index')
             ->with('success', 'تم حذف المنتج المخزني بنجاح.');
     }

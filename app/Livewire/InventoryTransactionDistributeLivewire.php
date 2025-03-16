@@ -15,17 +15,27 @@ class InventoryTransactionDistributeLivewire extends Component
     public $selectedTransactionId = null;
     public $selectedTransaction = null;
     public $search = '';
-   
+    protected $listeners = ['transactionUpdated' => '$refresh']; 
     
-    public function mount()
+    public function __construct()
     {
         $this->inventoryTransactionService = new InventoryTransactionService();
-        $this->loadTransactions();
+    }
+    // استخدام mount لتقبل المعاملات
+    public function mount($transactions)
+    {
+    // dd($transactions);
+        $this->transactions = $transactions;
 
+
+        $this->loadTransactions();
         if (!empty($this->transactions)) {
             $this->selectedTransactionId = $this->transactions[0]['id'];
+
             $this->loadTransactionDetails();
         }
+
+
     }
 
     public function loadTransactions()
@@ -35,27 +45,30 @@ class InventoryTransactionDistributeLivewire extends Component
             'department', 
             'warehouse', 
             'items'
-        ])->get();
+        ])
+        // ->where('status', 0)  // إضافة شرط الحالة
+        ->get();
     }
 
    
-    public $selectedItemId = null; // المتغير لتحديد العنصر المحدد
-    public $showDistributionModal = false; // المتغير الذي يتحكم في عرض المودال
     
     // تحميل تفاصيل الحركة وتوزيع المنتجات بناءً على الحركة المحددة
     public function loadTransactionDetails()
     {
-        if ($this->selectedTransactionId) {
-            $this->selectedTransaction = InventoryTransaction::with([
-                'items',
-                'partner',
-                'department',
-                'warehouse.storageAreas',
-                'warehouse.warehouseLocations',
-                'items.inventoryProducts'
-            ])->findOrFail($this->selectedTransactionId);
+        // dd($this->selectedTransactionId);
+
+        $this->selectedTransaction = InventoryTransaction::with([
+            'items',
+            'partner',
+            'department',
+            'warehouse.storageAreas',
+            'warehouse.warehouseLocations',
+            'items.inventoryProducts'
+        ])->findOrFail($this->selectedTransactionId);
+        
+            // dd($this->selectedTransactionId);
             
-        }
+        
     }
     
     public function loadDistributions()
@@ -126,63 +139,33 @@ class InventoryTransactionDistributeLivewire extends Component
         }
     }
     
-// إضافة وظائف التنقل
-public function previousProduct()
-{
-    // تحديد مكان الحركة الحالية في قائمة الحركات
-    $currentIndex = collect($this->transactions)
-        ->search(fn($transaction) => $transaction->id == $this->selectedTransactionId);
+
+    public function previousTransaction()
+    {
+        $currentIndex = collect($this->transactions)
+            ->search(function ($transaction) {
+                return $transaction->id == $this->selectedTransactionId;
+            });
     
-    // الانتقال إلى الحركة السابقة إذا كانت موجودة
-    if ($currentIndex > 0) {
-        $this->selectedTransactionId = $this->transactions[$currentIndex - 1]->id;
-        $this->loadDistributions(); // فقط تحديث التوزيعات
+        if ($currentIndex > 0) {
+            $this->selectedTransactionId = $this->transactions[$currentIndex - 1]->id;
+            $this->loadTransactionDetails();
+        }
     }
-}
-
-public function nextProduct()
-{
-    // تحديد مكان الحركة الحالية في قائمة الحركات
-    $currentIndex = collect($this->transactions)
-        ->search(fn($transaction) => $transaction->id == $this->selectedTransactionId);
     
-    // الانتقال إلى الحركة التالية إذا كانت موجودة
-    if ($currentIndex < count($this->transactions) - 1) {
-        $this->selectedTransactionId = $this->transactions[$currentIndex + 1]->id;
-        $this->loadDistributions(); // فقط تحديث التوزيعات
+    public function nextTransaction()
+    {
+        $currentIndex = collect($this->transactions)
+            ->search(function ($transaction) {
+                return $transaction->id == $this->selectedTransactionId;
+            });
+    
+        if ($currentIndex < count($this->transactions) - 1) {
+            $this->selectedTransactionId = $this->transactions[$currentIndex + 1]->id;
+            $this->loadTransactionDetails();
+        }
     }
-}
-
-public function previousTransaction()
-{
-    $currentIndex = collect($this->transactions)
-        ->search(function ($transaction) {
-            return $transaction->id == $this->selectedTransactionId;
-        });
-
-    if ($currentIndex > 0) {
-        $this->selectedTransactionId = $this->transactions[$currentIndex - 1]->id;
-        $this->loadTransactionDetails(); // تحديث تفاصيل الحركة
-        $this->loadDistributions(); // تحديث التوزيعات
-        $this->emit('focusTransactionDetails'); // إرسال الحدث إلى JavaScript
-    }
-}
-
-public function nextTransaction()
-{
-    $currentIndex = collect($this->transactions)
-        ->search(function ($transaction) {
-            return $transaction->id == $this->selectedTransactionId;
-        });
-
-    if ($currentIndex < count($this->transactions) - 1) {
-        $this->selectedTransactionId = $this->transactions[$currentIndex + 1]->id;
-        $this->loadTransactionDetails(); // تحديث تفاصيل الحركة
-        $this->loadDistributions(); // تحديث التوزيعات
-        $this->emit('focusTransactionDetails'); // إرسال الحدث إلى JavaScript
-    }
-}
-
+    
 
 
     public function searchTransactions()
@@ -206,10 +189,38 @@ public function nextTransaction()
         }
     }
 
-   
+ public function toggleDistribution($transactionId)
+{
+    // ابحث عن المعاملة في المصفوفة
+    $index = collect($this->transactions)->search(fn($transaction) => $transaction['id'] === $transactionId);
+    
+    if ($index !== false) {
+        // تحديث الحالة في قاعدة البيانات
+        $transaction = InventoryTransaction::findOrFail($transactionId);
+        $transaction->status = $transaction->status == 0 ? 1 : 0;
+        $transaction->save();
+    
+        // تحديث الحالة في المصفوفة مباشرة لتحديث الواجهة
+        $this->transactions[$index]['status'] = $transaction->status;
+        
+        // إشعار Livewire بتحديث الحالة
+        // $this->emit('transactionUpdated', $transactionId);
+    }
+    
+    // إعادة تحميل تفاصيل الحركة إذا كانت هي المختارة حاليًا
+    if ($this->selectedTransactionId === $transactionId) {
+        $this->selectedTransaction = $transaction;
+    }
+}
 
+    
+    
     public function render()
+    
     {
+    
+        // dd($this->selectedTransaction ? $this->selectedTransaction->items : 'No transaction selected');
+
         return view('livewire.inventory-transaction-distribute', [
             'transactions' => $this->transactions,
             'selectedTransaction' => $this->selectedTransaction,
