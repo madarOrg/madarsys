@@ -23,18 +23,21 @@
                 <input type="hidden" name="product_id" value="{{ $product->product_id }}">
                 <input type="hidden" name="branch_id" value="{{ $product->branch_id }}">
                 <input type="hidden" name="warehouse_id" value="{{ $product->warehouse_id }}">
-                <input type="hidden" name="inventory_transaction_item_id" value="{{ $product->inventory_transaction_item_id }}">
+                <input type="hidden" name="inventory_transaction_item_id"
+                    value="{{ $product->inventory_transaction_item_id }}">
 
                 <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <!-- المستودع -->
                     <div class="mb-4">
                         <label for="warehouse_id" class="block text-sm font-medium text-gray-700">المستودع</label>
-                        <input type="text" id="warehouse_id" value="{{ $product->warehouse->name }}" class="form-control" readonly />
+                        <input type="text" id="warehouse_id" value="{{ $product->warehouse->name }}"
+                            class="form-control" readonly />
                     </div>
 
                     <!-- الحركة المخزنية -->
                     <div class="mb-4">
-                        <label for="inventory_transaction_item_id" class="block text-sm font-medium text-gray-700">الحركة المخزنية</label>
+                        <label for="inventory_transaction_item_id"
+                            class="block text-sm font-medium text-gray-700">الحركة المخزنية</label>
                         <input type="text" id="inventory_transaction_item_id"
                             value="{{ $product->transactionItem->inventoryTransaction->reference }}"
                             class="form-control" readonly />
@@ -59,19 +62,19 @@
                             value="{{ old('quantity', $product->quantity) }}" required min="1" />
                     </div>
 
-                    <!-- المنطقة التخزينية -->
-                    <div class="mb-4">
-                        <x-select-dropdown id="storage_area_id" name="storage_area_id" label="المنطقة التخزينية"
-                            :options="[$product->storageArea->id => $product->storageArea->area_name]"
-                            :selected="old('storage_area_id', $product->storage_area_id)" required />
-                    </div>
+                  <!-- المنطقة التخزينية -->
+<div class="mb-4">
+    <x-select-dropdown id="storage_area_id" name="storage_area_id" label="المنطقة التخزينية"
+        :options="$storageAreas->pluck('area_name', 'id')" :selected="old('storage_area_id')" required />
+</div>
 
-                    <!-- موقع المنتج -->
-                    <div class="mb-4">
-                        <x-select-dropdown id="location_id" name="location_id" label="موقع المنتج"
-                            :options="[$product->location->id => $product->location->rack_code]"
-                            :selected="old('location_id', $product->location_id)" required />
-                    </div>
+<!-- موقع المنتج -->
+<div class="mb-4">
+    <x-select-dropdown id="location_id" name="location_id" label="موقع المنتج"
+        :options="$locations->pluck('rack_code', 'id')" :selected="old('location_id')" required />
+</div>
+
+
                 </div>
 
                 <div class="sm:col-span-6 flex justify-end mt-6">

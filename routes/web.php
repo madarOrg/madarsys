@@ -335,6 +335,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     
         // عرض صفحة إضافة حركة مخزنية
         Route::get('create', [InventoryProductController::class, 'create'])->name('create');
+        Route::get('new', [InventoryProductController::class, 'new'])->name('new');
+
     
         // تخزين حركة مخزنية جديدة
         Route::post('/', [InventoryProductController::class, 'store'])->name('store');
