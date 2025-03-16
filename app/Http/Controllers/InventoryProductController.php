@@ -12,8 +12,7 @@ use App\Models\WarehouseStorageArea;
 use App\Models\WarehouseLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
-use League\CommonMark\Extension\CommonMark\Renderer\Block\ThematicBreakRenderer;
+use App\Rules\ValidInventoryTransaction;
 
 class InventoryProductController extends Controller
 {
@@ -136,6 +135,7 @@ class InventoryProductController extends Controller
      */
     public function store(Request $request)
     {
+
         // التحقق من البيانات المدخلة
         $request->validate([
             'branch_id' => 'nullable|exists:branches,id',
@@ -148,7 +148,7 @@ class InventoryProductController extends Controller
             'production_date' => 'nullable|date',
             'expiration_date' => 'nullable|date',
             'batch_number' => 'nullable|string',
-            'inventory_transaction_item_id' => 'nullable|exists:inventory_transaction_items,id', // تحقق من الحقل الجديد
+        'inventory_transaction_item_id' => ['required', 'exists:inventory_transaction_items,id', new ValidInventoryTransaction],
         ]);
 
         // جلب الكمية الأصلية من جدول inventory_transaction_items
@@ -298,6 +298,8 @@ class InventoryProductController extends Controller
         $transactions = InventoryTransactionItem::join('inventory_transactions as t', 'inventory_transaction_items.inventory_transaction_id', '=', 't.id')
             ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id') // ربط جدول المنتجات
             ->where('inventory_transaction_items.target_warehouse_id', $warehouse_id)
+            ->where('t.status', 1) // ان تكون الحركة قابلة للتوزيع
+
             ->select('inventory_transaction_items.id', 't.reference', 'p.name as product_name') // اختيار الأعمدة المطلوبة
             ->get();
 
@@ -329,7 +331,15 @@ class InventoryProductController extends Controller
             ->where('warehouse_id', $warehouseId)
             ->sum('quantity');
     }
-
+    public function getTransactionItemsWithStatus($transactionId)
+    {
+        return InventoryTransactionItem::select('inventory_transaction_items.product_id', 'inventory_transaction_items.quantity')
+            ->join('inventory_transactions', 'inventory_transaction_items.transaction_id', '=', 'inventory_transactions.id')
+            ->where('inventory_transactions.id', $transactionId)
+            ->where('inventory_transactions.status', 1)
+            ->get();
+    }
+    
     public function destroy($id)
     {
         $inventoryProduct = InventoryProduct::findOrFail($id);
