@@ -9,7 +9,7 @@
             </x-button>
         </form>
         <!-- جدول عرض الطلبات -->
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg mt-4">
+        <div class="overflow-x-auto bg-white shadow-md rounded-lg mt-4 w-full">
             <table class="w-full text-sm text-right text-gray-500">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                     <tr>
