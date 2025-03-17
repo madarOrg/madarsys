@@ -26,12 +26,14 @@ ProductController,
 InventoryTransactionController,
 SettingController,
 RoleWarehouseController,
-
+ShipmentController,
+OrderController
 };
 
 Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.submit');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+// Route::resource('shipments', ShipmentController::class);
 
 
 Route::get('/signup', [SignupController::class, 'create'])->name('signup');
@@ -330,5 +332,55 @@ Route::prefix('purchase-invoices')->name('purchase_invoices.')->group(function (
     Route::put('/{purchaseInvoice}', [PurchaseInvoiceController::class, 'update'])->name('update'); // تحديث الفاتورة
     Route::delete('/{purchaseInvoice}', [PurchaseInvoiceController::class, 'destroy'])->name('destroy'); // حذف الفاتورة
 });
+Route::get('/shipments', [ShipmentController::class, 'index']);
 
+Route::prefix('shipments')->group(function () {
+    // عرض جميع الشحنات
+    // Route::get('/', [ShipmentController::class, 'index'])->name('shipments.index');
+    Route::get('/', [ShipmentController::class, 'index'])->name('shipments.receive');
+    Route::get('/receive', [ShipmentController::class, 'index'])->name('shipments.index');
+
+    
+    // عرض تفاصيل شحنة معينة
+    Route::get('/show/{id}', [ShipmentController::class, 'show'])->name('shipments.show');
+    
+    // عرض نموذج إضافة شحنة جديدة
+    Route::get('/create', [ShipmentController::class, 'create'])->name('shipments.create');
+    
+    // حفظ الشحنة الجديدة
+    Route::post('/store', [ShipmentController::class, 'store'])->name('shipments.store');
+    
+    // عرض نموذج تعديل شحنة
+    Route::get('/edit/{id}', [ShipmentController::class, 'edit'])->name('shipments.edit');
+    
+    // تحديث الشحنة
+    Route::put('/update/{id}', [ShipmentController::class, 'update'])->name('shipments.update');
+    
+    // حذف الشحنة
+    Route::delete('/destroy/{id}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
 });
+
+
+// عرض جميع الطلبات
+Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+
+// عرض صفحة إضافة طلب جديد
+Route::get('/orders/create', [OrderController::class, 'create'])->name('orders.create');
+
+// حفظ طلب جديد
+Route::post('/orders', [OrderController::class, 'store'])->name('orders.store');
+
+// عرض صفحة تعديل حالة الطلب
+Route::get('/orders/{order}/edit', [OrderController::class, 'edit'])->name('orders.edit');
+
+// تحديث حالة الطلب
+Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
+});
+
+
+
+
+
+
+
+

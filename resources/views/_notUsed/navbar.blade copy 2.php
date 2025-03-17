@@ -63,7 +63,7 @@ $permissions = $role ? $role->permissions->pluck('permission_key')->toArray() : 
   <div class="max-w-screen-xl flex flex-wrap justify-between items-center mx-auto">
     <div class="hidden justify-between items-center w-full lg:flex lg:w-auto lg:order-1" id="mobile-menu-2">
       <ul class="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-4 lg:mt-0">
-        @foreach ($NavbarLinks as $menu)
+        @foreach ($NavbarLinkss as $menu)
           @php
             // التحقق من صلاحيات الوصول لهذا الرابط
             $hasPermission = in_array($menu['permission'], $permissions);

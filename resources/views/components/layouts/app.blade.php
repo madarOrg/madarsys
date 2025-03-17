@@ -1,3 +1,4 @@
 <x-layout>
-    {{ $slot }}
+   
+     {{ $slot }}
 </x-layout>
