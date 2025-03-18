@@ -27,7 +27,8 @@ class ModuleActionsSeeder extends Seeder {
             ['id' => 55, 'module_id' => 3, 'name' => 'حركات مخزنية', 'action_key' => 'update-quantities', 'route' => '/inventory/transactions/create', 'icon' => 'fa fa-edit text-blue-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
             ['id' => 56, 'module_id' => 3, 'name' => 'توزيع المخزون', 'action_key' => 'distribute', 'route' => '/inventory/distribute', 'icon' => 'fa fa-arrows-alt text-purple-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
             ['id' => 57, 'module_id' => 3, 'name' => 'مراقبة حالة المخزون', 'action_key' => 'monitor', 'route' => '/inventory/monitor', 'icon' => 'fa fa-eye text-teal-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
-            ['id' => 58, 'module_id' => 4, 'name' => 'استلام الشحنات', 'action_key' => 'receive', 'route' => '/shipments/receive', 'icon' => 'fa fa-inbox text-green-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
+            ['id' => 58, 'module_id' => 4, 'name' => 'استلام الشحنات', 'action_key' => 'receive', 'route' => '/shipments', 'icon' => 'fa fa-inbox text-green-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
+            
             ['id' => 59, 'module_id' => 4, 'name' => 'إرسال الشحنات', 'action_key' => 'send', 'route' => '/shipments/send', 'icon' => 'fa fa-paper-plane text-blue-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
             ['id' => 60, 'module_id' => 4, 'name' => 'متابعة حالة الشحنات', 'action_key' => 'track', 'route' => '/shipments/track', 'icon' => 'fa fa-map-marker-alt text-red-500', 'created_at' => Carbon::parse('2025-01-31 16:30:35'), 'updated_at' => Carbon::parse('2025-02-01 16:08:19'), 'branch_id' => 2],
             [
@@ -130,15 +131,15 @@ class ModuleActionsSeeder extends Seeder {
                 'branch_id' => 2
             ],
             [
-                'id' => 70,
-                'module_id' => 8,
-                'name' => 'متابعة حالة التعامل مع الموردين',
-                'action_key' => 'track',
-                'route' => '/suppliers/track',
-                'icon' => 'fa fa-clipboard-check text-teal-500',
-                'created_at' => Carbon::parse('2025-01-31 16:30:35'),
-                'updated_at' => Carbon::parse('2025-02-01 16:08:19'),
-                'branch_id' => 2
+                // 'id' => 70,
+                // 'module_id' => 8,
+                // 'name' => 'متابعة حالة التعامل مع الموردين',
+                // 'action_key' => 'track',
+                // 'route' => '/suppliers/track',
+                // 'icon' => 'fa fa-clipboard-check text-teal-500',
+                // 'created_at' => Carbon::parse('2025-01-31 16:30:35'),
+                // 'updated_at' => Carbon::parse('2025-02-01 16:08:19'),
+                // 'branch_id' => 2
             ],
             [
                 'id' => 71,

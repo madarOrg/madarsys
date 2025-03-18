@@ -43,6 +43,7 @@ class ModuleActionsSeeder extends Seeder {
             [
                 'text' => 'إدارة الشحنات',
                 'children' => [
+                    ['href' => '/shipments', 'icon' => 'fa fa-inbox text-green-500', 'text' => 'استلام الشحنات'],
                     ['href' => '/shipments/receive', 'icon' => 'fa fa-inbox text-green-500', 'text' => 'استلام الشحنات'],
                     ['href' => '/shipments/send', 'icon' => 'fa fa-paper-plane text-blue-500', 'text' => 'إرسال الشحنات'],
                     ['href' => '/shipments/track', 'icon' => 'fa fa-map-marker-alt text-red-500', 'text' => 'متابعة حالة الشحنات'],

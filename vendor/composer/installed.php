@@ -1,9 +1,15 @@
 <?php return array(
     'root' => array(
         'name' => 'laravel/laravel',
+<<<<<<< HEAD
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'ac900ada9ac3023daf34e6b2e2390ad51983cdea',
+        'reference' => '5b609e57c9a5d0641a94df9f06c668a010d53e21',
+=======
+        'pretty_version' => 'dev-develop',
+        'version' => 'dev-develop',
+        'reference' => '89ba5ca84c2ab7715372aea55e3324d1b70fbf8e',
+>>>>>>> 4d3c77dcdedc8c0acba88674195a4b419d41b70d
         'type' => 'project',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -158,9 +164,9 @@
             'dev_requirement' => true,
         ),
         'filp/whoops' => array(
-            'pretty_version' => '2.17.0',
-            'version' => '2.17.0.0',
-            'reference' => '075bc0c26631110584175de6523ab3f1652eb28e',
+            'pretty_version' => '2.18.0',
+            'version' => '2.18.0.0',
+            'reference' => 'a7de6c3c6c3c022f5cfc337f8ede6a14460cf77e',
             'type' => 'library',
             'install_path' => __DIR__ . '/../filp/whoops',
             'aliases' => array(),
@@ -449,9 +455,15 @@
             'dev_requirement' => false,
         ),
         'laravel/laravel' => array(
+<<<<<<< HEAD
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'ac900ada9ac3023daf34e6b2e2390ad51983cdea',
+            'reference' => '5b609e57c9a5d0641a94df9f06c668a010d53e21',
+=======
+            'pretty_version' => 'dev-develop',
+            'version' => 'dev-develop',
+            'reference' => '89ba5ca84c2ab7715372aea55e3324d1b70fbf8e',
+>>>>>>> 4d3c77dcdedc8c0acba88674195a4b419d41b70d
             'type' => 'project',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
@@ -981,9 +993,9 @@
             ),
         ),
         'psy/psysh' => array(
-            'pretty_version' => 'v0.12.7',
-            'version' => '0.12.7.0',
-            'reference' => 'd73fa3c74918ef4522bb8a3bf9cab39161c4b57c',
+            'pretty_version' => 'v0.12.8',
+            'version' => '0.12.8.0',
+            'reference' => '85057ceedee50c49d4f6ecaff73ee96adb3b3625',
             'type' => 'library',
             'install_path' => __DIR__ . '/../psy/psysh',
             'aliases' => array(),

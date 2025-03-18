@@ -24,20 +24,18 @@
                     </select>
                 </div>
     
-                <!-- Filter by Partner -->
-                <div class="col-span-1">
-                    <label for="partner_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">العميل</label>
-                    <select name="partner_id" id="partner_id" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8">
-                        <option value="">اختر العميل</option>
-                        @foreach($partners as $partner)
-                            <option value="{{ $partner->id }}" {{ request()->input('partner_id') == $partner->id ? 'selected' : '' }}>
-                                {{ $partner->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-    
-                <!-- Filter by Payment Method -->
+                    <div>
+                        <label for="warehouse_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">المستودع</label>
+                        <select name="warehouse_id" id="warehouse_id" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8">
+                            <option value="">اختر المستودع</option>
+                            @foreach($Warehouses as $warehouse)
+                                <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                    {{ $warehouse->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
                 <div class="col-span-1">
                     <label for="payment_type_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">طريقة الدفع</label>
                     <select name="payment_type_id" id="payment_type_id" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8">
@@ -49,20 +47,29 @@
                         @endforeach
                     </select>
                 </div>
-    
-                <!-- Filter by Date Range -->
+
                 <div class="col-span-1">
                     <label for="start_date" class="text-sm font-medium text-gray-600 dark:text-gray-400">من</label>
-                    <input type="date" name="start_date" id="start_date" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8" value="{{ request()->input('start_date') }}" />
+                    <input type="date" name="start_date" id="start_date" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8" value="{{ request()->input('start_date') ?? now()->toDateString() }}" />
                 </div>
-    
-                <!-- Date Range: End Date -->
+                
                 <div class="col-span-1">
                     <label for="end_date" class="text-sm font-medium text-gray-600 dark:text-gray-400">إلى</label>
-                    <input type="date" name="end_date" id="end_date" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8" value="{{ request()->input('end_date') }}" />
+                    <input type="date" name="end_date" id="end_date" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8" value="{{ request()->input('end_date') ?? now()->toDateString() }}" />
                 </div>
+                
     
-    
+                <div class="col-span-1">
+                    <label for="partner_id" class="text-sm font-medium text-gray-600 dark:text-gray-400">العميل</label>
+                    <select name="partner_id" id="partner_id" class="w-full bg-gray-100 rounded border py-1 px-3 leading-8">
+                        <option value="">اختر العميل</option>
+                        @foreach($partners as $partner)
+                            <option value="{{ $partner->id }}" {{ request()->input('partner_id') == $partner->id ? 'selected' : '' }}>
+                                {{ $partner->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
                 <x-button type="submit" class="text-white bg-blue-600 hover:bg-blue-700 col-span-1">بحث</x-button>
             </form>
         </div>
@@ -80,6 +87,7 @@
                     <th class="px-6 py-3">الخصم</th>
                     <th class="px-6 py-3">الفرع</th>
                     <th class="px-6 py-3">طريقة الدفع</th>
+                    <th class="px-6 py-3">المستودع</th>
                     <th class="px-6 py-3">الإجراءات</th>
                 </tr>
             </thead>
@@ -94,6 +102,7 @@
                         <td class="px-6 py-4">{{ $invoice->discount_amount }}</td>
                         <td class="px-6 py-4">{{ optional($invoice->branch)->name ?? 'غير محدد' }}</td>
                         <td class="px-6 py-4">{{ optional($invoice->paymentType)->name ?? 'غير محدد' }}</td>
+                        <td class="px-6 py-4">{{ optional($invoice->warehouse)->name ?? 'غير محدد' }}</td>
                         <td class="px-6 py-4 flex space-x-2">
                             <x-button href="{{ route('invoices.edit', ['type' => 'sale', 'invoice' => $invoice->id]) }}" class="text-blue-600 hover:underline dark:text-blue-500">
                                 <i class="fa-solid fa-pen"></i>
@@ -112,10 +121,6 @@
             
         </table>
     </div>
-    
     <x-pagination-links :paginator="$invoices" />
-
     </section>
-    
-    
     </x-layout>

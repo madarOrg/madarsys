@@ -19,3 +19,26 @@ return new class extends Migration {
         });
     }
 };
+return new class extends Migration
+{
+    public function up()
+    {
+        // إضافة جدول الحركات المخزنية (inventory_transactions)
+        Schema::create('inventory_transactions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('order_id')->constrained('orders')->onDelete('cascade'); // ربط الحركة بالطلب
+            $table->foreignId('product_id')->constrained('products'); // ربط المنتج بالحركة
+            $table->decimal('quantity', 10, 2); // الكمية المتأثرة
+            $table->decimal('price', 15, 2); // سعر المنتج عند الحركه
+            $table->enum('transaction_type', ['in', 'out'])->comment('in = إضافة إلى المخزون, out = خصم من المخزون');
+            $table->timestamps();
+        });
+    }
+
+    public function down()
+    {
+        // حذف جدول الحركات المخزنية
+        Schema::dropIfExists('inventory_transactions');
+    }
+};
+
