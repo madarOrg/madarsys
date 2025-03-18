@@ -15,9 +15,9 @@ class CreateInventoryUpdateErrorsTable extends Migration
     {
         Schema::create('inventory_update_errors', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('inventory_transaction_item_id')->constrained()->onDelete('cascade');
-            $table->foreignId('product_id')->constrained()->onDelete('cascade');
-            $table->foreignId('warehouse_id')->constrained()->onDelete('cascade');
+            $table->foreignId('inventory_transaction_item_id');
+            $table->foreignId('product_id');
+            $table->foreignId('warehouse_id');
             $table->integer('quantity');
             $table->string('error_message');
             $table->timestamps();
