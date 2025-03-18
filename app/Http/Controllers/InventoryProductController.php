@@ -24,52 +24,195 @@ class InventoryProductController extends Controller
     {
         $this->inventoryService = $inventoryService;
     }
-    
-    public function index(Request $request)
-    {
+    // دالة البحث: مسؤولة عن تنفيذ الاستعلام وجلب البيانات
+    public function search(Request $request){
+        $warehouses = Warehouse::ForUserWarehouse()->get();
 
-        // جلب جميع المستودعات لعرضها في القائمة المنسدلة
-        $warehouses = Warehouse::all();
+        $query = InventoryProduct::query()
+            ->select([
+                'inventory_products.id',
+                'inventory_products.distribution_type',
+                'inventory_products.warehouse_id',
+                'inventory_products.product_id',
+                'inventory_products.storage_area_id',
+                'inventory_products.location_id',
+                'inventory_products.production_date',
+                'inventory_products.expiration_date',
+                'inventory_products.batch_number',
+                'inventory_products.quantity as productQuantity',
+                'products.name as product_name',
+                'warehouse_storage_areas.area_name',
+                'warehouse_locations.rack_code',
+                'inventory_transaction_items.quantity',
+                'inventory_products.inventory_transaction_item_id'
+            ])
+            ->leftJoin('products', 'inventory_products.product_id', '=', 'products.id')
+            ->leftJoin('warehouse_storage_areas', 'inventory_products.storage_area_id', '=', 'warehouse_storage_areas.id')
+            ->leftJoin('warehouse_locations', 'inventory_products.location_id', '=', 'warehouse_locations.id')
+            ->leftJoin('inventory_transaction_items', 'inventory_products.inventory_transaction_item_id', '=', 'inventory_transaction_items.id');
+       
+       
+            // البحث حسب المستودع
 
+        // dd($query);
+        // البحث حسب النوع (إدخال أو إخراج)
+if ($request->filled('distribution_type')) {
+    $query->where('inventory_products.distribution_type', $request->distribution_type);
+}
 
-        if ($request->has('warehouse_id')) {
-            $products = InventoryProduct::query()
-                ->select([
-                    'inventory_products.id',
-                    'inventory_products.warehouse_id',
-                    'inventory_products.product_id',
-                    'inventory_products.storage_area_id',
-                    'inventory_products.location_id',
-                    'inventory_products.production_date',
-                    'inventory_products.expiration_date',
-                    'inventory_products.batch_number',
-                    'inventory_products.quantity as productQuantity',
-                    'products.name as product_name',
-                    'warehouse_storage_areas.area_name',
-                    'warehouse_locations.rack_code',
-                    'inventory_transaction_items.quantity',
-                    'inventory_products.inventory_transaction_item_id'
-                ])
-                ->leftJoin('products', 'inventory_products.product_id', '=', 'products.id')
-                ->leftJoin('warehouse_storage_areas', 'inventory_products.storage_area_id', '=', 'warehouse_storage_areas.id')
-                ->leftJoin('warehouse_locations', 'inventory_products.location_id', '=', 'warehouse_locations.id')
-                ->leftJoin('inventory_transaction_items', 'inventory_products.inventory_transaction_item_id', '=', 'inventory_transaction_items.id')
-                ->where('inventory_products.warehouse_id', $request->warehouse_id)
-                ->get();
-        } else {
-            // في حال عدم وجود warehouse_id يتم إرجاع مجموعة فارغة
-            $products = collect([]);
+        if ($request->filled('warehouse_id')) {
+            $query->where('inventory_products.warehouse_id', $request->warehouse_id);
         }
+
+        // البحث حسب تاريخ الإنتاج
+        if ($request->filled('production_date_from') || $request->filled('production_date_to')) {
+            $from = $request->filled('production_date_from')
+                ? \Carbon\Carbon::parse($request->production_date_from)->startOfDay()
+                : \Carbon\Carbon::minValue();
+
+            $to = $request->filled('production_date_to')
+                ? \Carbon\Carbon::parse($request->production_date_to)->endOfDay()
+                : \Carbon\Carbon::maxValue();
+
+            $query->whereBetween('inventory_products.production_date', [$from, $to]);
+        }
+
+        // البحث حسب تاريخ الانتهاء
+        if ($request->filled('expiration_date_from') || $request->filled('expiration_date_to')) {
+            $from = $request->filled('expiration_date_from')
+                ? \Carbon\Carbon::parse($request->expiration_date_from)->startOfDay()
+                : \Carbon\Carbon::minValue();
+
+            $to = $request->filled('expiration_date_to')
+                ? \Carbon\Carbon::parse($request->expiration_date_to)->endOfDay()
+                : \Carbon\Carbon::maxValue();
+
+            $query->whereBetween('inventory_products.expiration_date', [$from, $to]);
+        }
+
+        // البحث حسب المنطقة
+        if ($request->filled('storage_area_id')) {
+            $query->where('inventory_products.storage_area_id', $request->storage_area_id);
+        }
+
+        // البحث حسب الرف
+        if ($request->filled('location_id')) {
+            $query->where('inventory_products.location_id', $request->location_id);
+        }
+
+        // البحث حسب تاريخ الإدخال
+        if ($request->filled('created_at_from') || $request->filled('created_at_to')) {
+            $from = $request->filled('created_at_from')
+                ? \Carbon\Carbon::parse($request->created_at_from)->startOfDay()
+                : \Carbon\Carbon::minValue();
+
+            $to = $request->filled('created_at_to')
+                ? \Carbon\Carbon::parse($request->created_at_to)->endOfDay()
+                : \Carbon\Carbon::maxValue();
+
+            $query->whereBetween('inventory_products.created_at', [$from, $to]);
+        }
+
+        // البحث حسب رقم الحركة
+        if ($request->filled('inventory_transaction_item_id')) {
+            $query->where('inventory_products.inventory_transaction_item_id', $request->inventory_transaction_item_id);
+        }
+
+        // البحث حسب اسم المنتج
+        // البحث حسب المنتج (الاسم، الباركود، الكود، المعرف)
+        if ($request->filled('product_name')) {
+            $query->where(function ($q) use ($request) {
+                $searchTerm = '%' . $request->product_name . '%';
+                $q->where('products.name', 'like', $searchTerm)
+                    ->orWhere('products.barcode', 'like', $searchTerm)
+                    ->orWhere('products.sku', 'like', $searchTerm)
+                    ->orWhere('products.id', $request->product_name);
+            });
+        }
+
+
+        // البحث حسب رقم الدفعة
+        if ($request->filled('batch_number')) {
+            $query->where('inventory_products.batch_number', 'like', '%' . $request->batch_number . '%');
+        }
+
+
+        // تنفيذ الاستعلام مع الباجيناشن
+        $products = $query->paginate(10)->withQueryString();
         $distributedQuantities = [];
         foreach ($products as $product) {
             $distributedQuantities[$product->id] = $this->getDistributedQuantity($product->inventory_transaction_item_id, $product->warehouse_id);
-        }
-        // dd($distributedQuantities);
-        return view('inventory-products.index', compact('warehouses', 'products', 'distributedQuantities'));
+        };
+        // جلب المستودعات والمواقع فقط لعرضها في الفلاتر
+        $storageAreas = WarehouseStorageArea::when($request->warehouse_id, function ($query) use ($request) {
+            return $query->where('warehouse_id', $request->warehouse_id);
+        })->get();
+
+        $locations = WarehouseLocation::when($request->storage_area_id, function ($query) use ($request) {
+            return $query->where('storage_area_id', $request->storage_area_id);
+        })->get()->mapWithKeys(function ($location) {
+            return [$location->id => $location->rack_code];
+        });
+
+        // dd($warehouses);
+
+        // عرض النتائج مع الفلاتر
+        return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities'));
     }
 
+    public function index(Request $request)
+    {
+        // جلب جميع المستودعات
+        // $warehouses = Warehouse::toSql();  // للحصول على الاستعلام الفعلي
+        // dd($warehouses); 
+               $warehouses = Warehouse::ForUserWarehouse()->get();
 
-    /**
+        // بناء الاستعلام لجلب المنتجات مع العلاقات اللازمة
+        $products = InventoryProduct::query()
+            ->select([
+                'inventory_products.id',
+                 'inventory_products.distribution_type',
+                'inventory_products.warehouse_id',
+                'inventory_products.product_id',
+                'inventory_products.storage_area_id',
+                'inventory_products.location_id',
+                'inventory_products.production_date',
+                'inventory_products.expiration_date',
+                'inventory_products.batch_number',
+                'inventory_products.quantity as productQuantity',
+                'products.name as product_name',
+                'warehouse_storage_areas.area_name',
+                'warehouse_locations.rack_code',
+                'inventory_transaction_items.quantity',
+                'inventory_products.inventory_transaction_item_id'
+
+            ])
+            ->leftJoin('products', 'inventory_products.product_id', '=', 'products.id')
+            ->leftJoin('warehouse_storage_areas', 'inventory_products.storage_area_id', '=', 'warehouse_storage_areas.id')
+            ->leftJoin('warehouse_locations', 'inventory_products.location_id', '=', 'warehouse_locations.id')
+            ->leftJoin('inventory_transaction_items', 'inventory_products.inventory_transaction_item_id', '=', 'inventory_transaction_items.id')
+            ->paginate(10);  // جلب البيانات
+           
+
+        // متغير لتجميع الكميات الموزعة
+        $distributedQuantities = collect();
+    
+        // جلب مناطق التخزين بناءً على المستودع المحدد (إذا تم تحديده)
+        $storageAreas = WarehouseStorageArea::when($request->warehouse_id, function ($query) use ($request) {
+            return $query->where('warehouse_id', $request->warehouse_id);
+        })->get();
+    
+        // جلب المواقع بناءً على منطقة التخزين المحددة (إذا تم تحديدها)
+        $locations = WarehouseLocation::when($request->storage_area_id, function ($query) use ($request) {
+            return $query->where('storage_area_id', $request->storage_area_id);
+        })->get()->mapWithKeys(function ($location) {
+            return [$location->id => $location->rack_code];
+        });
+    
+        // إرجاع البيانات إلى العرض
+        return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities'));
+    }
+        /**
      * عرض صفحة إضافة حركة مخزنية جديدة.
      *
      * @return \Illuminate\View\View
@@ -78,7 +221,7 @@ class InventoryProductController extends Controller
     public function create(Request $request)
     {
 
-        $transactions = InventoryTransaction::with('items')->get();
+        $transactions = collect();
         $products = InventoryTransaction::with('items.product')
             ->get()
             ->flatMap(function ($transaction) {
@@ -87,12 +230,16 @@ class InventoryProductController extends Controller
                 });
             })
             ->unique('id'); // تجنب التكرار
-
+        
+        $distributionType = $request->input('distribution_type', 1); // Default to '1' (توزيع)
+            
         $branches = Branch::all();
         $userBranch = Auth::user()->branch_id; // فرع المستخدم الحالي
 
         // استخدام الـ Scope لجلب المستودعات الخاصة بفرع المستخدم الحالي
-        $warehouses = Warehouse::forUserBranch()->get();
+        // $warehouses = Warehouse::all();
+        // $warehouses = Warehouse::forUserBranch()->get();
+        $warehouses = Warehouse::ForUserWarehouse()->get();
 
         // dump($warehouses);
         $storageAreas = WarehouseStorageArea::when($request->warehouse_id, function ($query) use ($request) {
@@ -105,7 +252,40 @@ class InventoryProductController extends Controller
             return [$location->id => $location->rack_code];
         });
 
-        return view('inventory-products.create', compact('transactions', 'products', 'branches', 'warehouses', 'storageAreas', 'locations'));
+        return view('inventory-products.create', compact('transactions', 'products', 'branches', 'warehouses', 'storageAreas', 'locations','distributionType'));
+    }
+    public function createOut(Request $request)
+    {
+        // $transactions = InventoryTransaction::with('items')->get();
+        $transactions = InventoryTransactionItem::join('inventory_transactions as t', 'inventory_transaction_items.inventory_transaction_id', '=', 't.id')
+        ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id')
+        ->where('inventory_transaction_items.target_warehouse_id',  $request->warehouse_id)
+        ->where('inventory_transaction_items.quantity', '<', 0)  // فقط الحركات الخارجة
+        ->where('t.status', 1)
+        ->select('inventory_transaction_items.id', 't.reference', 'p.name as product_name', 'p.id as product_id', 'p.sku')
+        ->get();
+
+        // جلب المنتج باستخدام inventory_transaction_item_id
+        $transactionItem = InventoryTransactionItem::with([
+            'inventoryTransaction',
+            'inventoryProducts.warehouse:id,name',
+            'inventoryProducts.product:id,name'
+        ])->findOrFail($request->inventory_transaction_item_id);
+
+        $product = $transactionItem->inventoryProducts->first();
+        $storageAreas = WarehouseStorageArea::when($request->warehouse_id, function ($query) use ($request) {
+            return $query->where('warehouse_id', $request->warehouse_id);
+        })->get();
+        // dump($storageAreas);
+
+        $locations = WarehouseLocation::when($request->storage_area_id, function ($query) use ($request) {
+            return $query->where('storage_area_id', $request->storage_area_id);
+        })->get()->mapWithKeys(function ($location) {
+            return [$location->id => $location->rack_code];
+        });
+        // dump($locations);
+
+        return view('inventory-products.createOut', compact('transactions','transactionItem', 'product', 'storageAreas', 'locations'));
     }
 
     public function new(Request $request)
@@ -141,24 +321,24 @@ class InventoryProductController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request){
+
         // التحقق من تاريخ الإنتاج والانتهاء
-        // التحقق من تاريخ الإنتاج والانتهاء
-        if ($request->has('production_date') && $request->has('expiration_date')) {
-            $productionDate = \Carbon\Carbon::parse($request->production_date);
-            $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
+        // if ($request->has('production_date') && $request->has('expiration_date')) {
+        //     $productionDate = \Carbon\Carbon::parse($request->production_date);
+        //     $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
 
-            if ($expirationDate->lt($productionDate)) {
-                // إرجاع رسالة خطأ والعودة لنفس الصفحة
-                return redirect()->back()->withErrors([
-                    'expiration_date' => 'تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ الإنتاج.'
-                ])->withInput();
-            }
-        }
-
+        //     if ($expirationDate->lt($productionDate)) {
+        //         // إرجاع رسالة خطأ والعودة لنفس الصفحة
+        //         return redirect()->back()->withErrors([
+        //             'expiration_date' => 'تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ الإنتاج.'
+        //         ])->withInput();
+        //     }
+        // }
 
 
+        $distributionType = $request->input('distribution_type', 1); // Default to '1' (توزيع)
+        // dd($request->all());
         // التحقق من البيانات المدخلة
         $request->validate([
             'branch_id' => 'nullable|exists:branches,id',
@@ -169,27 +349,42 @@ class InventoryProductController extends Controller
             'updated_user' => 'nullable|exists:users,id',
             'quantity' => 'required|numeric|min:1', // التأكد من إدخال الكمية
             'production_date' => 'nullable|date',
-            'expiration_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date|after_or_equal:production_date', // التحقق من صحة تاريخ انتهاء الصلاحية (إن كان موجودًا)
             'batch_number' => 'nullable|string',
             'inventory_transaction_item_id' => ['required', 'exists:inventory_transaction_items,id', new ValidInventoryTransaction],
+            'distribution_type' => 'required|in:1,-1', // التأكد من القيم المقبولة
         ]);
 
         // جلب الكمية الأصلية من جدول inventory_transaction_items
         $transactionItem = InventoryTransactionItem::findOrFail($request->inventory_transaction_item_id);
         $originalQuantity = $transactionItem->quantity;
-        //  dump($originalQuantity );
+        //   dump($request->inventory_transaction_item_id );
         // حساب الكمية التي تم توزيعها لهذا المنتج في نفس المستودع ونفس الحركة المخزنية
         $distributedQuantity = InventoryProduct::where('inventory_transaction_item_id', $request->inventory_transaction_item_id)
             // ->where('product_id', $transactionItem->product_id) // استخدم المنتج من الحركة المخزنية
             ->where('warehouse_id', $request->warehouse_id)
             ->sum('quantity');
         //  dump($distributedQuantity);
-        // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية
-        if (($distributedQuantity + $request->quantity) > $originalQuantity) {
-            return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
-        }
+     
+// التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
+if ($request->distribution_type == 1) {
+    $quantityInvertory=$request->quantity;
 
-        // إنشاء حركة مخزنية جديدة باستخدام المنتج المستخرج من العملية المخزنية
+    // في حالة التوزيع (إدخال)
+    if (($distributedQuantity + $request->quantity) > $originalQuantity) {
+        return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
+    }
+} elseif ($request->distribution_type == -1) {
+    $quantityInvertory=-$request->quantity;
+
+    // dd(($distributedQuantity + $request->quantity) , $originalQuantity);
+    // في حالة الإخراج (تخفيض الكمية)
+    if (-($distributedQuantity + $request->quantity) < $originalQuantity) {
+        return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات المسحوبة أكثر من الكمية المطلوبة للإخراج.']);
+    }
+}
+// dd($distributionType);
+// إنشاء حركة مخزنية جديدة باستخدام المنتج المستخرج من العملية المخزنية
         InventoryProduct::create([
             'product_id' => $transactionItem->product_id, // استخراج المنتج من الحركة المخزنية
             'branch_id' => $request->input('branch_id'),
@@ -203,22 +398,36 @@ class InventoryProductController extends Controller
             'expiration_date' => $request->input('expiration_date'),
             'batch_number' => $request->input('batch_number'),
             'inventory_transaction_item_id' => $request->input('inventory_transaction_item_id'),
-        ]);
+            'distribution_type' =>  $distributionType
 
+        ]);
         // استدعاء دالة updateInventoryStock من الخدمة
         try {
             $this->inventoryService->updateInventoryStock(
                 $request->warehouse_id,
                 $transactionItem->product_id,
-                $request->quantity,
-                $transactionItem->unit_prices // تأكد من أن السعر موجود في $transactionItem
+                $quantityInvertory,
+                $transactionItem->unit_prices
             );
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
+            \DB::table('inventory_update_errors')->insert([
+                'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
+                'product_id' => $transactionItem->product_id,
+                'warehouse_id' => $request->warehouse_id,
+                'quantity' => $quantityOut,
+                'error_message' => $e->getMessage(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        
+            return redirect()->back()->withErrors([
+                'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
+            ])->withInput();
         }
+        
 
         // إعادة التوجيه بعد حفظ البيانات
-        return redirect()->route('inventory-products.index')->with('success', 'تم إضافة موقع المخزون بنجاح');
+        return redirect()->route('inventory-products.search')->with('success', 'تم إضافة موقع المخزون بنجاح');
     }
     public function edit(Request $request, $id)
     {
@@ -253,19 +462,19 @@ class InventoryProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // التحقق من تاريخ الإنتاج والانتهاء
-        // التحقق من تاريخ الإنتاج والانتهاء
-        if ($request->has('production_date') && $request->has('expiration_date')) {
-            $productionDate = \Carbon\Carbon::parse($request->production_date);
-            $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
+        // // التحقق من تاريخ الإنتاج والانتهاء
+        // // التحقق من تاريخ الإنتاج والانتهاء
+        // if ($request->has('production_date') && $request->has('expiration_date')) {
+        //     $productionDate = \Carbon\Carbon::parse($request->production_date);
+        //     $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
 
-            if ($expirationDate->lt($productionDate)) {
-                // إرجاع رسالة خطأ والعودة لنفس الصفحة
-                return redirect()->back()->withErrors([
-                    'expiration_date' => 'تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ الإنتاج.'
-                ])->withInput();
-            }
-        }
+        //     if ($expirationDate->lt($productionDate)) {
+        //         // إرجاع رسالة خطأ والعودة لنفس الصفحة
+        //         return redirect()->back()->withErrors([
+        //             'expiration_date' => 'تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ الإنتاج.'
+        //         ])->withInput();
+        //     }
+        // }
 
 
         $request->validate([
@@ -295,15 +504,23 @@ class InventoryProductController extends Controller
                 ->sum('quantity');
 
             $currentQuantity = InventoryProduct::where('inventory_transaction_item_id', $request->inventory_transaction_item_id)
-            // ->where('product_id', $request->product_id)
-            ->where('warehouse_id', $request->warehouse_id)
-            ->where('id', '=', $id) //  السجل الحالي
-            ->first('quantity');
-            // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية
-            if (($distributedQuantity + $request->quantity) > $originalQuantity) {
-                return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
-            }
+                ->where('warehouse_id', $request->warehouse_id)
+                ->where('id', '=', $id) //  السجل الحالي
+                ->first('quantity');
+         }
+            // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
+    if ($request->distribution_type == 1) {
+        // في حالة التوزيع (إدخال)
+        if (($distributedQuantity + $request->quantity) > $originalQuantity) {
+            return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
         }
+    } elseif ($request->distribution_type == -1) {
+        // في حالة الإخراج (تخفيض الكمية)
+        if ($distributedQuantity < $request->quantity) {
+            return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة أقل من الكمية المطلوبة للإخراج.']);
+        }
+    }
+        
 
         // تحديث السجل
         $inventoryProduct->update([
@@ -317,30 +534,71 @@ class InventoryProductController extends Controller
             'production_date' => $request->input('production_date'), // إضافة تاريخ الإنتاج
             'expiration_date' => $request->input('expiration_date'), // إضافة تاريخ انتهاء الصلاحية
         ]);
- 
-
- // استدعاء دالة updateInventoryStock من الخدمة
- $currentQuantity = $currentQuantity->quantity;  // أو الخاصية المناسبة للكائن
-//  dd($request->quantity);
- $quantityDifference = $request->quantity - $currentQuantity;
-
-try {
-    // تحديث المخزون مرة واحدة فقط بالفرق المحسوب
-    $this->inventoryService->updateInventoryStock(
-        $request->warehouse_id,
-        $transactionItem->product_id,
-        $quantityDifference,
-        $transactionItem->unit_prices
-    );
-} catch (\Exception $e) {
-    return redirect()->back()->withErrors(['error' => $e->getMessage()]);
-}
 
 
-        return redirect()->route('inventory-products.index')->with('success', 'تم تعديل موقع المنتج بنجاح.');
+        // استدعاء دالة updateInventoryStock من الخدمة
+        $currentQuantity = $currentQuantity->quantity;  // أو الخاصية المناسبة للكائن
+        //  dd($request->quantity);
+        $quantityDifference = $request->quantity - $currentQuantity;
+
+     // استدعاء دالة updateInventoryStock من الخدمة
+     try {
+        $this->inventoryService->updateInventoryStock(
+            $request->warehouse_id,
+            $transactionItem->product_id,
+            $request->quantity,
+            $transactionItem->unit_prices
+        );
+    } catch (\Exception $e) {
+        \DB::table('inventory_update_errors')->insert([
+            'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
+            'product_id' => $transactionItem->product_id,
+            'warehouse_id' => $request->warehouse_id,
+            'quantity' => $request->quantity,
+            'error_message' => $e->getMessage(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    
+        return redirect()->back()->withErrors([
+            'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
+        ])->withInput();
     }
 
+        return redirect()->route('inventory-products.search')->with('success', 'تم تعديل موقع المنتج بنجاح.');
+    }
 
+    public function destroy($id)
+    {
+        $inventoryProduct = InventoryProduct::findOrFail($id);
+        $transactionItem = InventoryTransactionItem::findOrFail($inventoryProduct->inventory_transaction_item_id);
+
+        $inventoryProduct->delete();
+  
+     // استدعاء دالة updateInventoryStock من الخدمة
+     try {
+        $this->inventoryService->updateInventoryStock(
+            $inventoryProduct->warehouse_id,
+            $transactionItem->product_id,
+            -$inventoryProduct->quantity,
+            $transactionItem->unit_prices
+        );
+    } catch (\Exception $e) {
+        \DB::table('inventory_update_errors')->insert([
+            'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
+            'product_id' => $transactionItem->product_id,
+            'warehouse_id' => $inventoryProduct->warehouse_id,
+            'quantity' => $inventoryProduct->quantity,
+            'error_message' => $e->getMessage(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    
+        return redirect()->back()->withErrors([
+            'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
+        ])->withInput();
+    }
+    }
 
     //  دالة جلب المناطق التخزينية بناءً على المستودع المحدد
     public function getStorageAreas($warehouse_id)
@@ -357,7 +615,9 @@ try {
     }
     public function getWarehouses($branch_id)
     {
-        $warehouses = Warehouse::forUserBranch()->get();
+        $warehouses = Warehouse::ForUserWarehouse()->get();
+
+        // $warehouses = Warehouse::forUserBranch()->get();
         // dump($warehouses);
         // $warehouses = Warehouse::where('branch_id', $branch_id)->pluck('name', 'id');
         return response()->json($warehouses);
@@ -365,10 +625,12 @@ try {
 
     public function getInventoryTransactions($warehouse_id)
     {
+        // dd($warehouse_id);
         $transactions = InventoryTransactionItem::join('inventory_transactions as t', 'inventory_transaction_items.inventory_transaction_id', '=', 't.id')
             ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id') // ربط جدول المنتجات
             ->where('inventory_transaction_items.target_warehouse_id', $warehouse_id)
             ->where('t.status', 1) // ان تكون الحركة قابلة للتوزيع
+            ->where('inventory_transaction_items.quantity', '>', 0) // الشرط الصحيح
 
             ->select('inventory_transaction_items.id', 't.reference', 'p.name as product_name') // اختيار الأعمدة المطلوبة
             ->get();
@@ -376,6 +638,19 @@ try {
         return response()->json($transactions);
     }
 
+    public function getInventoryTransactionsOut($warehouse_id)
+    {
+        // dump($warehouse_id);
+        $transactions = InventoryTransactionItem::join('inventory_transactions as t', 'inventory_transaction_items.inventory_transaction_id', '=', 't.id')
+            ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id') // ربط جدول المنتجات
+            ->where('inventory_transaction_items.target_warehouse_id', $warehouse_id)
+            ->where('t.status', 1) // ان تكون الحركة قابلة للتوزيع
+            ->where('inventory_transaction_items.quantity', '<', 0) // الشرط الصحيح
+            ->select('inventory_transaction_items.id', 't.reference', 'p.name as product_name') // اختيار الأعمدة المطلوبة
+            ->get();
+
+        return response()->json($transactions);
+    }
 
 
     public function getProducts($id)
@@ -408,25 +683,5 @@ try {
             ->where('inventory_transactions.id', $transactionId)
             ->where('inventory_transactions.status', 1)
             ->get();
-    }
-
-    public function destroy($id)
-    {
-        $inventoryProduct = InventoryProduct::findOrFail($id);
-        $transactionItem = InventoryTransactionItem::findOrFail($inventoryProduct->inventory_transaction_item_id);
-
-        $inventoryProduct->delete();
-        try {
-            $this->inventoryService->updateInventoryStock(
-                $inventoryProduct->warehouse_id,
-                $transactionItem->product_id,
-                -$inventoryProduct->quantity,  // كمية سالبة عند الحذف
-                $transactionItem->unit_prices // تأكد من أن السعر موجود في $transactionItem
-            );
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
-        }
-        return redirect()->route('inventory-products.index')
-            ->with('success', 'تم حذف المنتج المخزني بنجاح.');
     }
 }

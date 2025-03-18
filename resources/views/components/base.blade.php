@@ -24,7 +24,8 @@
  <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
  <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
  
- 
+ <script src="https://cdn.jsdelivr.net/npm/tom-select@2.5.0/dist/js/tom-select.min.js"></script>
+
  {{-- Popper.js --}}
  <script src="https://unpkg.com/@popperjs/core@2"></script>
  
