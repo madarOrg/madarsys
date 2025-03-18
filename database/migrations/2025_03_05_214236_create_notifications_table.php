@@ -32,3 +32,6 @@ return new class extends Migration
         Schema::dropIfExists('notifications');
     }
 };
+Schema::table('notifications', function (Blueprint $table) {
+    $table->string('notifiable_type');
+});

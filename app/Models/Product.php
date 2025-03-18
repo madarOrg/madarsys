@@ -23,9 +23,7 @@ class Product extends Model
         return $this->hasMany(OrderDetail::class);
     }
 
-<<<<<<< HEAD
     // علاقة مع الفئة (Category) 
-=======
     public static function generateSKU($product)
     {
         $categoryCode = strtoupper(substr($product->category->code ?? 'GEN', 0, 3)); // أول 3 أحرف من اسم الفئة
@@ -36,7 +34,6 @@ class Product extends Model
     }
 
     // العلاقة مع الفئة
->>>>>>> cd8ff8182ca3a7723128542e0abbd735444d7e74
     public function category()
     {
         return $this->belongsTo(Category::class);
