@@ -76,3 +76,12 @@
         </div>
     @endif
 </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll("#triggerElement").forEach(button => {
+            button.addEventListener("click", function () {
+                this.parentElement.remove(); // حذف العنصر عند النقر على زر الإغلاق
+            });
+        });
+    });
+</script>

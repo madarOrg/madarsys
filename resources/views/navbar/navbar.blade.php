@@ -8,11 +8,17 @@
         </div>
         <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">مدار</span>
       </a>
-    <li class="flex items-center px-4">
-      <a href="{{ route('settings.index') }}" class="p-0 transition-all text-sm ease-nav-brand text-slate-500 dark:text-white">
-        <i class="cursor-pointer fa fa-cog" aria-hidden="true"></i>
-      </a>
-    </li>
+      <li class="flex items-center px-4">
+        <a href="{{ route('settings.index') }}" class="p-0 transition-all text-sm ease-nav-brand text-slate-500 dark:text-white">
+          <i class="cursor-pointer fa fa-cog" aria-hidden="true"></i>
+        </a>
+        <a href="#" id="notificationsLink" class="relative">
+          <i class="fas fa-bell"></i>
+          <span id="unreadCount" class="absolute top-0 right-0 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+            0
+          </span>
+        </a>
+      </li>
     
   </div>
 
@@ -35,7 +41,6 @@
           </a>
         @endauth
       </li>
-    
       <div class="flex items-center pr-6">
         <button id="theme-toggle" type="button" class="text-gray-900 dark:text-white">
           <i class="fas fa-moon"></i>
@@ -51,6 +56,20 @@
     </ul>
   </div>
   </div>
+   <!-- عرض الإشعارات -->
+<div id="notificationsDropdown" class="hidden absolute right-0 mt-2 w-80 dark:bg-gray-700 border rounded shadow-lg z-10">
+  <div id="notificationsList" class="max-h-60 overflow-y-auto p-4">
+      <!-- الإشعارات ستظهر هنا -->
+      @foreach(auth()->user()->unreadNotifications as $notification)
+          <div class="alert alert-info mb-2" id="notification-{{ $notification->id }}">
+              {{ $notification->data['message'] }}
+              <button onclick="markAsRead('{{ $notification->id }}')" class="mt-1 text-sm">
+                  تحديد كمقروء
+              </button>
+          </div>
+      @endforeach
+  </div>
+</div>
 
   <!-- القائمة المنسدلة -->
   <div class="max-w-screen-xl flex flex-wrap justify-between items-center mx-auto">
@@ -77,18 +96,6 @@
       </ul>
     </div>
   </div>
+  
 </header>
 
-<script>
-// توجيه القائمة المنسدلة عند النقر عليها في الهاتف المحمول
-document.querySelectorAll('li.relative > a').forEach(item => {
-  item.addEventListener('click', function(event) {
-    const submenu = this.nextElementSibling;
-    if (submenu && submenu.classList.contains('hidden')) {
-      submenu.classList.remove('hidden');
-    } else if (submenu) {
-      submenu.classList.add('hidden');
-    }
-  });
-});
-</script>

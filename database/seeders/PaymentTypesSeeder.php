@@ -9,11 +9,13 @@ class PaymentTypesSeeder extends Seeder
 {
     public function run()
     {
-        $payment_types = [
+        $payment_types = [ 
             ['name' => 'نقدي', 'created_user' => 1, 'updated_user' => 1],
-            ['name' => 'تحويل بنكي', 'created_user' => 1, 'updated_user' => 1],
+            ['name' => 'أجل', 'created_user' => 1, 'updated_user' => 1], 
             ['name' => 'بطاقة ائتمانية', 'created_user' => 1, 'updated_user' => 1],
+            ['name' => 'شيك', 'created_user' => 1, 'updated_user' => 1], 
         ];
+        
 
         foreach ($payment_types as $type) {
             PaymentType::create($type);

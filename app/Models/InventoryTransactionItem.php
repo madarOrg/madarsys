@@ -52,4 +52,18 @@ class InventoryTransactionItem extends Model
     {
         return $this->belongsTo(Warehouse::class, 'target_warehouse_id');
     }
+   
+ 
+      // العلاقة مع InventoryTransactionItem (علاقة عكسية)
+      public function inventoryItems()
+      {
+          return $this->hasMany(InventoryTransactionItem::class, 'inventory_transaction_id');
+      }
+      // العلاقة مع InventoryProduct (إضافة علاقة مع InventoryProduct)
+     
+      public function inventoryProducts()
+{
+    return $this->hasMany(InventoryProduct::class, 'inventory_transaction_item_id', 'id');
+}
+
 }

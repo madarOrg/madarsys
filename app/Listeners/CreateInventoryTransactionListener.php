@@ -21,6 +21,7 @@ class CreateInventoryTransactionListener
     //////////////////
     public function handle(InventoryTransactionCreated $event)
     {
+        // dd($event);
         $data = $event->data;
         DB::beginTransaction();
 
@@ -129,21 +130,27 @@ class CreateInventoryTransactionListener
             // $this->updateInventoryStock($data['secondary_warehouse_id'], $productId, $inQuantity, $pricePerUnit);
         } else if ($transactionType && $transactionType->inventory_movement_count == 1) {
             // إنشاء حركة عادية مثل بيع أو شراء
-            //  dd($transactionType);
 
             if ($transactionType && $transactionType->effect != 0) {
                 $effect = $transactionType->effect;
                 $quantityInput = $quantityInput * $effect;
                 $pricePerUnit = $pricePerUnit * $effect;
                 $priceTotal = $priceTotal * $effect;
+
+                // dd('create InventoryS',$quantityInput);
             }
-            // التحقق من توفر الكمية قبل إنشاء الحركة
-            if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $quantityInput)) {
-                session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
-                throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
+            if ($quantityInput < 0) {
+                // التحقق من توفر الكمية قبل إنشاء الحركة
+                if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $quantityInput)) {
+                    // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:");
+                    session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
+                    throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
+                }
             }
             $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId);
             $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId);
+            // dd($convertedPrice);
+
             try {
                 InventoryTransactionItem::create([
                     'inventory_transaction_id' => $transaction->id,
@@ -186,57 +193,15 @@ class CreateInventoryTransactionListener
         $inventory = Inventory::where('warehouse_id', $warehouseId)
             ->where('product_id', $productId)
             ->first();
-        //  dd($inventory);
+        // dd($inventory);
         // إذا لم يكن هناك سجل للمخزون، فهذا يعني أنه لا توجد كميات متوفرة
         if (!$inventory && $requestedQuantity < 0) {
             return false;
         }
+        // dd($requestedQuantity);
 
         // التحقق مما إذا كانت الكمية المتوفرة أكبر من أو تساوي الكمية المطلوبة
         return $inventory->quantity >= $requestedQuantity;
     }
 
-
-    // تحديث أو إضافة الكمية التراكمية في جدول المخزون
-    private function updateInventoryStock($warehouseId, $productId, $quantity, $pricePerUnit)
-    {
-        // جلب السجل الحالي للمخزون لهذا المنتج في هذا المستودع
-        $inventory = Inventory::where('warehouse_id', $warehouseId)
-            ->where('product_id', $productId)
-            ->first();
-        if ($inventory) {
-            // تحديث الكمية
-            $newQuantity = $inventory->quantity + $quantity;
-
-            // التأكد من عدم أن تكون الكمية سالبة (لا يمكن أن يصبح المخزون بالسالب)
-            if ($newQuantity < 0) {
-                session()->flash('error', 'خطأ: الكمية في المخزون لا يمكن أن تكون سالبة.' . $e->getMessage());
-                throw new \Exception("خطأ: الكمية في المخزون لا يمكن أن تكون سالبة.");
-            }
-
-            // تحديث السعر الإجمالي
-            $newTotalValue = ($inventory->total_value + ($quantity * $pricePerUnit));
-
-            // تحديث المخزون
-            $inventory->update([
-                'quantity' => $newQuantity,
-                'unit_price' => $newQuantity > 0 ? $newTotalValue / $newQuantity : 0, // تجنب القسمة على صفر
-                'total_value' => $newTotalValue,
-            ]);
-        } else {
-            // إذا لم يكن هناك سجل، أنشئ سجلًا جديدًا
-            if ($quantity < 0) {
-                session()->flash('error', 'خطأ: لا يمكن إخراج منتج غير موجود في المخزون.' . $e->getMessage());
-                throw new \Exception("خطأ: لا يمكن إخراج منتج غير موجود في المخزون.");
-            }
-
-            Inventory::create([
-                'warehouse_id' => $warehouseId,
-                'product_id'   => $productId,
-                'quantity'     => $quantity,
-                'unit_price'   => $pricePerUnit,
-                'total_value'  => $quantity * $pricePerUnit,
-            ]);
-        }
-    }
 }

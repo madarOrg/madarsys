@@ -27,6 +27,7 @@
                     <th class="px-4 py-3">عدد المستخدمين</th>
                     <th class="px-4 py-3">آخر تحديث</th>
                     <th class="px-4 py-3">الحالة</th>
+                    <th class="px-4 py-3">ملاحظات</th>
                     <th class="px-4 py-3">الإجراء</th>
                 </tr>
             </thead>
@@ -41,6 +42,7 @@
                             {{ $role->status ? 'فعال' : 'غير فعال' }}
                         </span>
                     </td>
+                    <td class="px-4 py-3"> {{ $role->description}}</td>
                     <td class="px-4 py-3 flex space-x-2">
                         <a href="{{ route('roles.edit', $role->id) }}" class="text-blue-600 hover:underline dark:text-blue-400">
                             <i class="fa-solid fa-pen"></i>

@@ -42,6 +42,7 @@
                 <!-- الشريك -->
                 <label for="partner_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">الشريك</label>
                 <select wire:model="partner_id" id="partner_id" name="partner_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                    <option value="" selected>اختر الشريك(مورد/عميل/مورد)</option>
                     @foreach ($partners as $partner)
                         <option value="{{ $partner->id }}">{{ $partner->name }}</option>
                     @endforeach
@@ -50,7 +51,7 @@
                 <!-- القسم -->
                 <label for="department_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">القسم</label>
                 <select wire:model="department_id" id="department_id" name="department_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                    <option value=""></option>
+                    <option value="">اختر القسم</option>
                     @foreach ($departments as $department)
                         <option value="{{ $department->id }}">{{ $department->name }}</option>
                     @endforeach
@@ -59,7 +60,7 @@
                 <!-- المستودع -->
                 <label for="warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع</label>
                 <select wire:model="warehouse_id" id="warehouse_id" name="warehouse_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                    <option value="" disabled selected>اختر مستودعًا</option>
+                    <option value="" selected>اختر مستودعًا</option>
                     @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                     @endforeach
@@ -151,7 +152,7 @@
                 </table>
 
                 <div class="flex justify-end mt-4">
-                    <button wire:click="addProductRow" type="button" class="bg-blue-500 text-white px-4 py-2 rounded">
+                    <button wire:click="addProductRow" type="button" class="bg-blue-500  px-4 py-2 rounded">
                         إضافة منتج
                     </button>
                 </div>

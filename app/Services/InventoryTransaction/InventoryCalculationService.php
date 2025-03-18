@@ -34,6 +34,7 @@ public function reduceStock($productId, $quantity)
      */
     public function calculateConvertedQuantity($quantity, $unitId)
     {
+
         $unit = Unit::find($unitId);
         if ($unit && $unit->conversion_factor) {
             return $quantity * $unit->conversion_factor;

@@ -33,5 +33,4 @@ class RolePermission extends Model
         return $this->belongsTo(Permission::class);
     }
 
-    
 }

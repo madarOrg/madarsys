@@ -10,6 +10,7 @@
         "barryvdh/laravel-dompdf": "^3.1",
         "dompdf/dompdf": "^3.1",
         "laravel/framework": "^11.31",
+        "laravel/telescope": "^5.5",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
         "maatwebsite/excel": "^3.1",
@@ -74,4 +75,9 @@
     },
     "minimum-stability": "stable",
     "prefer-stable": true
+    
 }
+ 
+  
+
+

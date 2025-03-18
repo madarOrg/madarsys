@@ -9,6 +9,9 @@ use App\Traits\HasBranch, HasUser;
 class InventoryTransaction extends Model
 {
     use HasFactory, HasUser, HasBranch;
+    use HasUser,HasBranch,HasFactory;
+    
+    protected $table = 'inventory_transactions';
 
     // الحقول القابلة للتعيين
     protected $fillable = [
@@ -51,6 +54,7 @@ class InventoryTransaction extends Model
     }
 
     // علاقة مع نوع المعاملة (TransactionType)
+    
     public function transactionType()
     {
         return $this->belongsTo(TransactionType::class, 'transaction_type_id');
@@ -85,5 +89,10 @@ class InventoryTransaction extends Model
     {
         return $this->hasMany(InventoryTransactionItem::class);
     }
+    public function inventoryItems()
+    {
+        return $this->hasMany(InventoryTransactionItem::class, 'inventory_transaction_id');
+    }
+    
 }
 

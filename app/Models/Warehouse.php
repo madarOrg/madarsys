@@ -36,7 +36,25 @@ class Warehouse extends Model
         'is_active',
         'created_user', 'updated_user'
     ];
-
+    public function scopeForUserBranch($query)
+    {
+        if (auth()->check()) {
+            $roleIds = auth()->user()->roles()->pluck('id');
+            $defaultBranch = \App\Models\Branch::whereIn('id', function($q) use ($roleIds) {
+                $q->select('branch_id')
+                  ->from('role_branch')
+                  ->whereIn('role_id', $roleIds);
+            })->first();
+    //  dump($defaultBranch);
+            if ($defaultBranch) {
+                return $query->where('branch_id', $defaultBranch->id);
+            }
+        }
+        // dump($query->get());
+        return $query;
+    }
+    
+    
     // علاقة المستودع مع الفرع
     public function branch()
     {
