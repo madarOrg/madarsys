@@ -8,6 +8,8 @@ use App\Traits\
 {
 HasUser
 };
+// use App\Models\Scopes\UserAccessScope;
+
 
 class Company extends Model
 {
@@ -35,6 +37,10 @@ class Company extends Model
         'settings',
         'created_user', 'updated_user'
     ];
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new UserAccessScope);
+    // }
 
     /**
      * الحقول التي يتم تحويلها تلقائيًا إلى أنواع أخرى.

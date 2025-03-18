@@ -8,6 +8,8 @@ use App\Traits\
 {
 HasUser
 };
+use App\Models\Scopes\UserAccessScope;
+
 class Warehouse extends Model
 {
     use HasUser,HasFactory;
@@ -36,6 +38,35 @@ class Warehouse extends Model
         'is_active',
         'created_user', 'updated_user'
     ];
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new UserAccessScope);
+    // }
+
+    public function scopeForUserWarehouse($query)
+    {
+        if (auth()->check()) {
+            $user = auth()->user();
+            
+            // جلب المستودعات المتاحة بناءً على الأدوار المرتبطة بالمستخدم
+            $accessibleWarehouses = $user->roles() // الأدوار المرتبطة بالمستخدم
+                ->with('warehouses') // تحميل المستودعات المرتبطة بكل دور
+                ->get()
+                ->flatMap(function ($role) {
+                    return $role->warehouses; // جلب المستودعات المرتبطة بكل دور
+                })
+                ->unique('id'); // التأكد من أن المستودعات فريدة
+    
+            // إذا كانت هناك مستودعات، إضافة شرط التصفية
+            if ($accessibleWarehouses->isNotEmpty()) {
+                return $query->whereIn('id', $accessibleWarehouses->pluck('id')); // تصفية المستودعات المرتبطة بالمستخدم
+            }
+        }
+    
+        // إذا لم يكن هناك مستودعات متاحة للمستخدم، العودة بالاستعلام بدون تعديل
+        return $query;
+    }
+    
     public function scopeForUserBranch($query)
     {
         if (auth()->check()) {
