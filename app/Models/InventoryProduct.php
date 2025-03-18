@@ -29,39 +29,57 @@ class InventoryProduct extends Model
         'temporary_transfer_expiry_date',
         'batch_number',
         'production_date',
-        'expiration_date'
+        'expiration_date',
+        'distribution_type'
     ];
+
+    
+
+    /**
+     * دالة boot لإنشاء رقم الدفعة عند إنشاء المنتج
+     */
     protected static function boot()
-{
-    parent::boot();
+    {
+        parent::boot();
 
-    static::creating(function ($product) {
-        $expirationDate = $product->expiration_date ?? null; // تعيين القيمة الافتراضية في حالة عدم وجود تاريخ صلاحية
-        $product->batch_number = $product->generateBatchNumber($expirationDate); // استدعاء الدالة عبر الكائن
-    });
-}
-function generateBatchNumber($expirationDate = null)
-{
-    $datePart = $expirationDate ? date('ymd', strtotime($expirationDate)) : '000000';
+        static::creating(function ($product) {
+            if ($product->distribution_type === '1') {
+                    $expirationDate = $product->expiration_date ?? null;
+                    $product->batch_number = $product->generateBatchNumber($expirationDate);
+            }
+        });
+    }
 
-    // جلب آخر دفعة تم إنشاؤها لنفس المنتج والمستودع وتاريخ الانتهاء
-    $lastBatch = self::where('warehouse_id', $this->warehouse->warehouse_id)
-        ->where('expiration_date', $expirationDate)
-        ->orderBy('id', 'desc')
-        ->value('batch_number');
+    /**
+     * توليد رقم الدفعة
+     */
+    public function generateBatchNumber($expirationDate = null)
+    {
+        $datePart = $expirationDate ? date('ymd', strtotime($expirationDate)) : '000000';
 
-    // استخراج الرقم التسلسلي من آخر دفعة أو بدء من 1
-    $lastSerial = $lastBatch ? (int)substr($lastBatch, -3) : 0;
-    $newSerial = str_pad($lastSerial + 1, 6, '0', STR_PAD_LEFT);
+        // التأكد من وجود علاقة warehouse
+        if (!$this->warehouse) {
+            throw new \Exception('Warehouse relationship is not loaded');
+        }
 
-    // تكوين رقم الدفعة
-    return sprintf('%s-%s-%s-%s',
-        $this->warehouse->code,
-        $this->sku,
-        $datePart,
-        $newSerial
-    );
-}
+        // جلب آخر دفعة تم إنشاؤها لنفس المنتج والمستودع وتاريخ الانتهاء
+        $lastBatch = self::where('warehouse_id', $this->warehouse_id)
+            ->where('expiration_date', $expirationDate)
+            ->orderBy('id', 'desc')
+            ->value('batch_number');
+
+        // استخراج الرقم التسلسلي من آخر دفعة أو بدء من 1
+        $lastSerial = $lastBatch ? (int)substr($lastBatch, -3) : 0;
+        $newSerial = str_pad($lastSerial + 1, 6, '0', STR_PAD_LEFT);
+
+        // تكوين رقم الدفعة
+        return sprintf('%s-%s-%s-%s',
+            $this->warehouse->code ?? '000',
+            $this->product->sku ?? '000',
+            $datePart,
+            $newSerial
+        );
+    }
 
     /**
      * العلاقات مع الجداول الأخرى
@@ -71,7 +89,6 @@ function generateBatchNumber($expirationDate = null)
         return $this->belongsTo(Product::class, 'product_id');
     }
     
-
     public function branch()
     {
         return $this->belongsTo(Branch::class);
@@ -96,14 +113,14 @@ function generateBatchNumber($expirationDate = null)
     {
         return $this->belongsTo(User::class, 'updated_user');
     }
+
     public function location()
     {
         return $this->belongsTo(WarehouseLocation::class, 'location_id');
     }
-   
+
     public function transactionItem()
     {
         return $this->belongsTo(InventoryTransactionItem::class, 'inventory_transaction_item_id');
     }
-    
 }

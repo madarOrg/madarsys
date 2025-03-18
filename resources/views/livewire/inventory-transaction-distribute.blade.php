@@ -1,7 +1,8 @@
 
 
 <div>
-    
+    {{-- @livewire('transaction-search') --}}
+ 
     <form id="transaction-view-form">
         <div class="p-4 rounded-lg shadow w-full overflow-x-auto">
             <x-title :title="'بحث عن عملية مخزنية'" />
@@ -21,7 +22,8 @@
                 </div>
 
                 @isset($selectedTransaction)
-                
+                <x-file-input id="transaction_type_id" name="transaction_type_id" label="نوع الحركة " type="text"
+                value="{{ $selectedTransaction->transactionType->name }}" disabled="true" />
                     <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية" type="datetime-local"
                         value="{{ optional($selectedTransaction->transaction_date)->format('Y-m-d\TH:i') }}"
                         disabled="true" />
@@ -31,8 +33,12 @@
                         value="{{ $selectedTransaction->partner->name ?? '' }}" disabled="true" />
                     <x-file-input id="department_name" name="department_name" label="القسم" type="text"
                         value="{{ $selectedTransaction->department->name ?? '' }}" disabled="true" />
-                    <x-file-input id="warehouse_name" name="warehouse_name" label="المستودع" type="text"
-                        value="{{ $selectedTransaction->warehouse->name ?? '' }}" disabled="true" />
+                        <x-file-input id="warehouse_name" name="warehouse_name" label="من المستودع" type="text"
+                        value="{{ $selectedTransaction->warehouse->name ?? 'لم يتم تحديد المستودع' }}" disabled="true" />
+                    
+                    <x-file-input id="to_warehouse_name" name="to_warehouse_name" label="الى المستودع" type="text"
+                        value="{{ $selectedTransaction->secondaryWarehouse->name ?? 'لم يتم تحديد المستودع الوجه' }}" disabled="true" />
+                    
                     <x-file-input id="notes" name="notes" label="ملاحظات" type="textarea"
                         value="{{ $selectedTransaction->notes }}" disabled="true" />
                 @endisset

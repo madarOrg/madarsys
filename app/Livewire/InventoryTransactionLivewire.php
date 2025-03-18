@@ -54,6 +54,17 @@ class InventoryTransactionLivewire extends Component
         $this->effect = 1;  // Default effect value
 
     }
+   
+//     public function updatedTransactionTypeId($value)
+// {
+//     // إذا كان نوع العملية هو 5، نرسل الحدث إلى JavaScript
+//     if ($value == 5) {
+//         $this->dispatchBrowserEvent('showSecondaryWarehouse', ['show' => true]);
+//     } else {
+//         $this->dispatchBrowserEvent('showSecondaryWarehouse', ['show' => false]);
+//     }
+// }
+
     public function updateUnits($index)
     {
         if (!$this->unitService) {

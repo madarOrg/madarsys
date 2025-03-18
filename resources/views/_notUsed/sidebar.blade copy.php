@@ -24,7 +24,7 @@ $sidebarLinks = [
         'icon' => 'truck',
         'text' => 'إدارة الشحنات',
         'children' => [
-            ['href' => '/shipments/receive', 'icon' => 'inbox', 'text' => 'استلام الشحنات'],
+            ['href' => '/shipments', 'icon' => 'inbox', 'text' => 'استلام الشحنات'],
             ['href' => '/shipments/send', 'icon' => 'paper-plane', 'text' => 'إرسال الشحنات'],
             ['href' => '/shipments/track', 'icon' => 'map-marker-alt', 'text' => 'متابعة حالة الشحنات'],
         ],
@@ -45,8 +45,6 @@ $sidebarLinks = [
         'text' => 'إدارة طلبات الموردين',
         'children' => [
             ['href' => '/supplier-orders/create', 'icon' => 'plus-square', 'text' => 'إنشاء طلبات الشراء'],
-            ['href' => '/supplier-orders/track', 'icon' => 'tasks', 'text' => 'متابعة حالة الطلبات'],
-            ['href' => '/supplier-orders/validate', 'icon' => 'check-circle', 'text' => 'التأكد من الكميات المطلوبة'],
         ],
     ],
     [
@@ -64,8 +62,6 @@ $sidebarLinks = [
         'text' => 'إدارة الموردين',
         'children' => [
             ['href' => '/suppliers/add', 'icon' => 'user-plus', 'text' => 'إضافة وتحديث بيانات الموردين'],
-            ['href' => '/suppliers/track', 'icon' => 'clipboard-check', 'text' => 'متابعة حالة التعامل مع الموردين'],
-            ['href' => '/suppliers/details', 'icon' => 'info-circle', 'text' => 'إدارة تفاصيل الموردين'],
         ],
     ],
     [

@@ -64,7 +64,7 @@
                                 <th class="px-6 py-3">الكمية</th>
                                 <th class="px-6 py-3">سعر الوحدة</th>
                                 <th class="px-6 py-3">الإجمالي</th>
-                                <th class="px-6 py-3">موقع التخزين</th>
+                                {{-- <th class="px-6 py-3">موقع التخزين</th> --}}
                             </tr>
                         </thead>
                         <tbody>
@@ -76,7 +76,7 @@
                                         <td class="px-6 py-3">{{ $item->quantity }}</td>
                                         <td class="px-6 py-3">{{ $item->unit_prices }}</td>
                                         <td class="px-6 py-3">{{ $item->total }}</td>
-                                        <td class="px-6 py-3">{{ $item->warehouse_location->name ?? '' }}</td>
+                                        {{-- <td class="px-6 py-3">{{ $item->warehouse_location->name ?? '' }}</td> --}}
                                     </tr>
                                 @endforeach
                             @endisset

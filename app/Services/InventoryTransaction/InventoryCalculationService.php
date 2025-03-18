@@ -10,23 +10,23 @@ class InventoryCalculationService
 
 {
     public function addStock($productId, $quantity)
-{
-    $product = Product::find($productId);
-    $product->stock += $quantity;
-    $product->save();
-}
-public function reduceStock($productId, $quantity)
-{
-    $product = Product::find($productId);
-
-    if ($product->stock >= $quantity) {
-        $product->stock -= $quantity;
+    {
+        $product = Product::find($productId);
+        $product->stock += $quantity;
         $product->save();
-        return "تمت العملية بنجاح!";
-    } else {
-        return "عذرًا، الكمية غير متوفرة!";
     }
-}
+    public function reduceStock($productId, $quantity)
+    {
+        $product = Product::find($productId);
+
+        if ($product->stock >= $quantity) {
+            $product->stock -= $quantity;
+            $product->save();
+            return "تمت العملية بنجاح!";
+        } else {
+            return "عذرًا، الكمية غير متوفرة!";
+        }
+    }
 
 
     /**
@@ -41,7 +41,7 @@ public function reduceStock($productId, $quantity)
         }
         return $quantity;
     }
-    
+
     /**
      * حساب السعر  بناءً على معامل التحويل للوحدة
      */
@@ -55,7 +55,7 @@ public function reduceStock($productId, $quantity)
         // إذا لم توجد وحدة أو معامل تحويل، يرجع السعر كما هو
         return $pricePerUnit;
     }
-    
+
     /**
      * حساب الكمية مع التأثير (إدخال أو إخراج)
      */

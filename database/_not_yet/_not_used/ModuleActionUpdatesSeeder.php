@@ -51,7 +51,9 @@ class ModuleActionUpdatesSeeder extends Seeder
             [
                 'text' => 'إدارة الشحنات',
                 'children' => [
+                    ['href' => '/shipments', 'icon' => 'fa fa-inbox text-green-500', 'text' => 'استلام الشحنات'],
                     ['href' => '/shipments/receive', 'icon' => 'fa fa-inbox text-green-500', 'text' => 'استلام الشحنات'],
+
                     ['href' => '/shipments/send', 'icon' => 'fa fa-paper-plane text-blue-500', 'text' => 'إرسال الشحنات'],
                     ['href' => '/shipments/track', 'icon' => 'fa fa-map-marker-alt text-red-500', 'text' => 'متابعة حالة الشحنات'],
                 ],
@@ -83,8 +85,8 @@ class ModuleActionUpdatesSeeder extends Seeder
                 'text' => 'إدارة الموردين',
                 'children' => [
                     ['href' => '/suppliers/add', 'icon' => 'fa fa-user-plus text-green-500', 'text' => 'إضافة وتحديث بيانات الموردين'],
-                    ['href' => '/suppliers/track', 'icon' => 'fa fa-clipboard-check text-teal-500', 'text' => 'متابعة حالة التعامل مع الموردين'],
-                    ['href' => '/suppliers/details', 'icon' => 'fa fa-info-circle text-blue-500', 'text' => 'إدارة تفاصيل الموردين'],
+                    // ['href' => '/suppliers/track', 'icon' => 'fa fa-clipboard-check text-teal-500', 'text' => 'متابعة حالة التعامل مع الموردين'],
+                    // ['href' => '/suppliers/details', 'icon' => 'fa fa-info-circle text-blue-500', 'text' => 'إدارة تفاصيل الموردين'],
                 ],
             ],
             [

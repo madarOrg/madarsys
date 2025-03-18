@@ -1,3 +1,7 @@
+
+{{-- @livewireStyles
+@livewireScripts --}}
+
 <div>
     <form id="transaction-form" wire:submit.prevent="submit">
         @csrf
@@ -58,25 +62,34 @@
                 </select>
 
                 <!-- المستودع -->
-                <label for="warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع</label>
+                <label for="warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">من المستودع</label>
                 <select wire:model="warehouse_id" id="warehouse_id" name="warehouse_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                    <option value="" selected>اختر مستودعًا</option>
+                    <option value="" selected>من المستودع</option>
                     @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                     @endforeach
                 </select>
 
-                <!-- المستودع الثانوي (يظهر عند الحاجة) -->
+                {{-- <!-- المستودع الثانوي (يظهر عند الحاجة) -->
                 <div id="secondary_warehouse_container" style="display: none;">
                     <label for="secondary_warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع الثانوي</label>
                     <select wire:model="secondary_warehouse_id" id="secondary_warehouse_id" name="secondary_warehouse_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                        <option value="">اختر مستودعًا</option>
+                        <option value="">من مستودعًا</option>
                         @foreach ($warehouses as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
-                </div>
-
+                </div> --}}
+     <!-- المستودع الثانوي -->
+     <div id="secondary_warehouse_container">
+        <label for="secondary_warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400"> الى المستودع</label>
+        <select wire:model="secondary_warehouse_id" id="secondary_warehouse_id" name="secondary_warehouse_id" class="form-select w-full mt-1">
+            <option value="">الى المستودع</option>
+            @foreach ($warehouses as $warehouse)
+                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+            @endforeach
+        </select>
+    </div>
                 <!-- الملاحظات -->
                 <x-file-input wire:model="notes" id="notes" name="notes" label="ملاحظات" type="textarea" />
 
@@ -98,7 +111,7 @@
                             <th class="px-6 py-3">الكمية</th>
                             <th class="px-6 py-3">سعر الوحدة</th>
                             <th class="px-6 py-3">الإجمالي</th>
-                            <th class="px-6 py-3">موقع التخزين</th>
+                            {{-- <th class="px-6 py-3">موقع التخزين</th> --}}
                             <th class="px-6 py-3">الإجراءات</th>
                         </tr>
                     </thead>
@@ -133,14 +146,14 @@
                                 <td class="px-6 py-2">
                                     <input wire:model="transactionItems.{{ $index }}.total" class="form-input w-full" type="number" step="0.01" readonly />
                                 </td>
-                                <td class="px-6 py-2">
+                                {{-- <td class="px-6 py-2">
                                     <select wire:model="transactionItems.{{ $index }}.warehouse_location_id" class="form-select w-full mt-1">
                                         <option value="" disabled selected>اختر موقع التخزين</option>
                                         @foreach($warehouseLocations as $location)
                                             <option value="{{ $location->id }}">{{ $location->name }}</option>
                                         @endforeach
                                     </select>
-                                </td>
+                                </td> --}}
                                 <td class="px-6 py-2">
                                     <button wire:click="removeProductRow({{ $index }})" type="button" class="text-red-500 hover:text-red-700">
                                         <i class="fas fa-trash-alt"></i>
@@ -160,3 +173,44 @@
         </div>
     </form>
 </div>
+{{-- <script>
+   document.addEventListener("DOMContentLoaded", function () {
+    // تحديد العناصر المطلوبة
+    const transactionTypeSelect = document.getElementById("transaction_type_id");
+    const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container");
+
+    // تعريف الدالة المسؤولة عن إظهار أو إخفاء المستودع الثانوي
+    function toggleSecondaryWarehouse() {
+        const selectedValue = transactionTypeSelect.value;
+        
+        // إظهار المستودع الثانوي فقط إذا كانت القيمة 5
+        if (selectedValue === "5") {
+            secondaryWarehouseContainer.style.display = "block";
+        } else {
+            secondaryWarehouseContainer.style.display = "none";
+        }
+    }
+
+    // ربط الحدث بالتغيير واستدعاء الدالة عند التحميل
+    transactionTypeSelect.addEventListener("change", function() {
+        toggleSecondaryWarehouse();
+    });
+
+    // التأكد من ظهور المستودع الثانوي بناءً على القيمة الافتراضية
+    toggleSecondaryWarehouse(); // للتحقق من القيمة الافتراضية عند تحميل الصفحة
+});
+
+
+
+</script> --}}
+
+<script>
+    document.addEventListener('livewire:load', function () {
+        // استماع لحدث showSecondaryWarehouse من Livewire
+        Livewire.on('showSecondaryWarehouse', function (eventData) {
+            const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container");
+            // إظهار أو إخفاء المستودع الثانوي بناءً على الحدث
+            secondaryWarehouseContainer.style.display = eventData.show ? "block" : "none";
+        });
+    });
+</script>

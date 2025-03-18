@@ -21,6 +21,9 @@ class InventoryTransactionDistributeLivewire extends Component
     {
         $this->inventoryTransactionService = new InventoryTransactionService();
     }
+
+
+
     // استخدام mount لتقبل المعاملات
     public function mount($transactions)
     {
@@ -79,25 +82,46 @@ class InventoryTransactionDistributeLivewire extends Component
         // تحديث التوزيعات بناءً على تفاصيل الحركة
         $this->selectedTransaction = InventoryTransaction::with([
             'items',
+            'items.inventoryTransaction',
             'partner',
             'department',
             'warehouse.storageAreas',
             'warehouse.warehouseLocations',
-            'items.inventoryProducts'
+            'items.inventoryProducts',
+            'transactionType'
         ])->findOrFail($this->selectedTransactionId);
 
+        $this->selectedTransaction = InventoryTransaction::with([
+            'items',
+            'items.inventoryTransaction', // استيراد الحقول من جدول الحركة
+            'partner',
+            'department',
+            'warehouse.storageAreas',
+            'warehouse.warehouseLocations',
+            'items.inventoryProducts',
+            'transactionType'
+        ])->findOrFail($this->selectedTransactionId);
+        
         foreach ($this->selectedTransaction->items as $item) {
             $distributions = $item->inventoryProducts;
-        
+            
+            // استخراج secondary_warehouse_id و warehouse_id من العلاقة 'items.inventoryTransaction'
+            $secondaryWarehouseName = $item->inventoryTransaction->secondaryWarehouse->name ?? 'اسم غير متاح';
+            $warehouseName = $item->inventoryTransaction->warehouse->name ?? 'اسم غير متاح';
+            
+            // إضافة هذه القيم إلى التوزيعات
             foreach ($distributions as $distribution) {
                 $this->distribution[$item->id][] = [
                     'product_id' => $item->product_id ?? null,
                     'storage_area_id' => $distribution->storage_area_id ?? null,
                     'location_id' => $distribution->location_id ?? null,
                     'quantity' => $distribution->quantity ?? null,
+                    'secondary_warehouse_id' => $secondaryWarehouseName, // إضافة secondary_warehouse_id
+                    'warehouse_id' => $warehouseName, // إضافة warehouse_id
                 ];
             }
         }
+        
     }
 }
 

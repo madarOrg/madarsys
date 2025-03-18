@@ -31,17 +31,19 @@ updateEffectValue();
 
 
 ////////////////////////////////////////////////////////////////////////
-   //   تعديل ظهور المستودع الثانوي عند التخحويل المخزني
-   document.addEventListener("DOMContentLoaded", function () { //تحديد العناصر المطلوبة
+   //   تعديل ظهور المستودع الثانوي عند التحويل المخزني
+document.addEventListener("DOMContentLoaded", function () {
+    // تحديد العناصر المطلوبة
     const transactionTypeSelect = document.getElementById("transaction_type_id");
-    const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container"); 
-// تعريف الدالة المسؤولة عن إظهار أو إخفاء المستودع الثانوي
+    const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container");
+
+    // تعريف الدالة المسؤولة عن إظهار أو إخفاء المستودع الثانوي
     function toggleSecondaryWarehouse() {
-        const selectedTransaction = transactionTypeSelect.options[transactionTypeSelect.selectedIndex];
-        const isStockTransfer = selectedTransaction.text.includes("تحويل مخزني"); 
-        secondaryWarehouseContainer.style.display = isStockTransfer ? "block" : "none";
+        const selectedValue = transactionTypeSelect.value;
+        secondaryWarehouseContainer.style.display = selectedValue === "5" ? "block" : "none";
     }
 
+    // ربط الحدث بالتغيير واستدعاء الدالة عند التحميل
     transactionTypeSelect.addEventListener("change", toggleSecondaryWarehouse);
-    toggleSecondaryWarehouse(); //  استدعاء الدالة عند تحميل الصفحة للتحقق من الاختيار الافتراضي لضبط حالة العرض بناءً على القيمة الافتراضية في القائمة
+    toggleSecondaryWarehouse(); // للتحقق من القيمة الافتراضية عند تحميل الصفحة
 });

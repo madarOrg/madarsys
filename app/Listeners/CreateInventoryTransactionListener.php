@@ -175,7 +175,6 @@ class CreateInventoryTransactionListener
                 throw new \Exception("خطأ أثناء إنشاء  تفاصيل الحركة المخزنية: " . $e->getMessage());
             }
             //لا نؤثر على كميات المخزون لان جالة الحركة معلقة
-            // $this->updateInventoryStock($data['warehouse_id'], $productId, $convertedQuantity, $pricePerUnit);
         }
     }
     /**
