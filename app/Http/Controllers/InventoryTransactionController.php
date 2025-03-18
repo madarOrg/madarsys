@@ -70,7 +70,9 @@ class InventoryTransactionController extends Controller
             $transactionTypes = TransactionType::all();
             $partners = Partner::all();
             $departments = Department::all();
-            $warehouses = Warehouse::all();
+            // $warehouses = Warehouse::all();
+            $warehouses = Warehouse::ForUserWarehouse()->get();
+
             $products = Product::with('unit')->get(); // جلب المنتجات مع الوحدات
             $units = Unit::all(); // جلب جميع الوحدات
             $warehouseLocations = WarehouseLocation::all();
@@ -125,7 +127,9 @@ class InventoryTransactionController extends Controller
             $transactionTypes = TransactionType::all();
             $partners = Partner::all();
             $departments = Department::all();
-            $warehouses = Warehouse::all();
+            // $warehouses = Warehouse::all();
+            $warehouses = Warehouse::ForUserWarehouse()->get();
+
             $products = Product::all();
             $warehouseLocations = WarehouseLocation::all();
 

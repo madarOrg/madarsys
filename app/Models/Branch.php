@@ -8,6 +8,8 @@ use App\Traits\
 {
 HasUser
 };
+// use App\Models\Scopes\UserAccessScope;
+
 
 class Branch extends Model
 {
@@ -16,6 +18,10 @@ class Branch extends Model
     protected $fillable = [
         'name', 'address', 'contact_info', 'company_id','created_user', 'updated_user'
     ];
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope(new UserAccessScope);
+    // }
 
     // علاقة الفرع مع الشركة
     public function company()

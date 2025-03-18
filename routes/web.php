@@ -339,6 +339,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         // عرض صفحة إضافة حركة مخزنية
         Route::get('create', [InventoryProductController::class, 'create'])->name('create');
         Route::get('new', [InventoryProductController::class, 'new'])->name('new');
+        Route::get('createOut', [InventoryProductController::class, 'createOut'])->name('createOut');
 
     
         // تخزين حركة مخزنية جديدة
@@ -352,6 +353,9 @@ Route::middleware(['web', 'auth'])->group(function () {
     
         // حذف حركة مخزنية
         Route::delete('{id}', [InventoryProductController::class, 'destroy'])->name('destroy');
+        // بحث
+        Route::get('search', [InventoryProductController::class, 'search'])->name('search');
+
     });
     
     Route::get('/get-warehouses/{branch_id}', [InventoryProductController::class, 'getWarehouses']);
@@ -359,6 +363,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/get-locations/{storage_area_id}', [InventoryProductController::class, 'getLocations']);
     
     Route::get('/get-inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
+    Route::get('/get-inventory-transactions-out/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactionsOut']);
+
     Route::get('/get-products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
 
 Route::get('/inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);

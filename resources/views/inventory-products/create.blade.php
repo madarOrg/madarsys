@@ -7,13 +7,14 @@
             </p>
             <form action="{{ route('inventory-products.store') }}" method="POST">
                 @csrf
-                
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
 
-                <!-- إضافة الحقول الثلاثة -->
-                <div class="mb-4">
-                    <x-file-input type="text" id="batch_number" name="batch_number" label="رقم الدفعة" />
-                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+                    <input type="hidden" name="distribution_type" value="1">
+
+                    <!-- إضافة الحقول الثلاثة -->
+                    <div class="mb-4">
+                        <x-file-input type="text" id="batch_number" name="batch_number" label="رقم الدفعة" />
+                    </div>
                     <!-- اختيار المستودع -->
                     <div class="mb-4">
                         <select id="warehouse_id" name="warehouse_id" class="tom-select w-full">

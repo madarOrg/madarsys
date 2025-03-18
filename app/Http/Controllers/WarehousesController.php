@@ -17,7 +17,8 @@ class WarehousesController extends Controller
      */
     public function index(Request $request)
 {
-    $query = Warehouse::withCount(['zones', 'storageAreas', 'warehouseLocations']);
+    $query = Warehouse::ForUserWarehouse() // استرجاع المستودعات الخاصة بالمستخدم
+    ->withCount(['zones', 'storageAreas', 'warehouseLocations']);
     // تطبيق البحث
     if ($request->filled('search')) {
         $query->where('name', 'like', '%' . $request->search . '%')
