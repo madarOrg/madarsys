@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
+class ComposerStaticInitdc34c350302a576b5317d3943c3dff2d
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -643,7 +643,6 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Events\\InventoryTransactionCreated' => __DIR__ . '/../..' . '/app/Events/InventoryTransactionCreated.php',
         'App\\Events\\InventoryTransactionUpdated' => __DIR__ . '/../..' . '/app/Events/InventoryTransactionUpdated.php',
         'App\\Events\\NotificationCreated' => __DIR__ . '/../..' . '/app/Events/NotificationCreated.php',
-        'App\\Events\\PostCreate' => __DIR__ . '/../..' . '/app/Events/PostCreate.php',
         'App\\Events\\StockMovementCreated' => __DIR__ . '/../..' . '/app/Events/StockMovementCreated.php',
         'App\\Exports\\WarehouseReportExport' => __DIR__ . '/../..' . '/app/Exports/WarehouseReportExport.php',
         'App\\Http\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/AuthController.php',
@@ -724,7 +723,9 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\TelescopeServiceProvider' => __DIR__ . '/../..' . '/app/Providers/TelescopeServiceProvider.php',
+        'App\\Rules\\ValidInventoryTransaction' => __DIR__ . '/../..' . '/app/Rules/ValidInventoryTransaction.php',
         'App\\Services\\InventoryTransaction\\InventoryCalculationService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryCalculationService.php',
+        'App\\Services\\InventoryTransaction\\InventoryService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryService.php',
         'App\\Services\\InventoryTransaction\\InventoryTransactionService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryTransactionService.php',
         'App\\Services\\InventoryTransaction\\InventoryValidationService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryValidationService.php',
         'App\\Services\\NavbarService' => __DIR__ . '/../..' . '/app/Services/NavbarService.php',
@@ -9140,10 +9141,10 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$classMap;
 
         }, null, ClassLoader::class);
     }
