@@ -388,7 +388,8 @@ Route::prefix('invoices')->name('invoices.')->group(function () {
     Route::put('{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
     Route::delete('{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
 });
-Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
 Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
+Route::post('/reports/get-fields', [ReportController::class, 'getFields'])->name('reports.get-fields');
 
 });
