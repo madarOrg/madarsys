@@ -29,7 +29,8 @@ use App\Http\Controllers\{
     InventoryProductController,
     // BroadcastController,
     InvoiceController,
-    InventoryReviewController
+    InventoryReviewController,
+    ReportController
 };
 use App\Services\UnitService;
 
@@ -387,5 +388,7 @@ Route::prefix('invoices')->name('invoices.')->group(function () {
     Route::put('{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
     Route::delete('{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
 });
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
 
 });
