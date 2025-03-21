@@ -3,57 +3,83 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Product; // مثال على الموديلات التي قد تحتاجها
+use App\Models\Warehouse;
+use App\Models\InventoryTransaction;
 
 class ReportController extends Controller
 {
-   
-
-    // عرض الصفحة الرئيسية لإنشاء التقارير
-    public function index()
+    public function create()
     {
-        // يمكنك تمرير النماذج والحقول المتاحة من هنا
+        // النماذج المتاحة للاختيار
         $models = [
             'Product' => 'المنتجات',
             'Warehouse' => 'المخازن',
             'InventoryTransaction' => 'الحركات المخزنية',
         ];
-        
-    
-        $fieldNames = [
-            'id' => 'المعرف',
-            'name' => 'الاسم',
-            'quantity' => 'الكمية',
-            'price' => 'السعر',
-            'created_at' => 'تاريخ الإنشاء',
-            'updated_at' => 'آخر تحديث'
-        ];
-        
-        return view('reports.index', compact('models', 'fieldNames'));
+
+        return view('reports.create', compact('models'));
     }
 
-    // إنشاء التقرير بناءً على مدخلات المستخدم
+    // جلب الحقول والشروط للموديل المختار
+    public function getFields(Request $request)
+    {
+        $modelName = $request->input('model');
+        $modelClass = "App\\Models\\$modelName";
+
+        if (!class_exists($modelClass)) {
+            return response()->json(['error' => 'الموديل غير موجود'], 404);
+        }
+
+        // جلب الحقول من الجدول
+        $table = (new $modelClass)->getTable();
+        $columns = \Schema::getColumnListing($table);
+
+        // ترجمة الحقول باستخدام المصفوفات الخاصة بكل موديل
+        $translatedColumns = [];
+        foreach ($columns as $column) {
+            $translatedColumns[$column] = __("fields.$column", [], 'ar') ?? $column;
+        }
+
+        // فرضا إذا كان هناك شروط مرتبطة بالموديل
+        $conditions = [
+            'status' => 'الحالة',
+            'created_at' => 'تاريخ الإنشاء'
+        ];
+
+        return response()->json([
+            'fields' => $translatedColumns,
+            'conditions' => $conditions
+        ]);
+    }
+
     public function generate(Request $request)
     {
-        $models = ['Product', 'Warehouse', 'InventoryTransaction'];
         $modelName = $request->input('model');
-
-        // التأكد من أن الموديل موجود في القائمة لتجنب أي استدعاءات خاطئة
-        if (!in_array($modelName, $models)) {
-            return back()->with('error', 'الموديل المحدد غير صالح');
-        }
-
-        $model = "App\\Models\\$modelName";
         $fields = $request->input('fields', []);
         $conditions = $request->input('conditions', []);
-
-        // تنفيذ الاستعلام
-        $query = $model::query();
-        foreach ($conditions as $condition) {
-            $query->where($condition['field'], $condition['operator'], $condition['value']);
+    
+        $modelClass = "App\\Models\\$modelName";
+        if (!class_exists($modelClass)) {
+            return back()->with('error', 'الموديل غير موجود');
         }
-
+    
+        $query = $modelClass::query();
+    
+        // تأكد من أن الشروط هي مصفوفات تحتوي على الحقول، العوامل والقيم
+        if (!empty($conditions)) {
+            foreach ($conditions as $condition) {
+                // تأكد من أن الشرط عبارة عن مصفوفة تحتوي على 'field' و 'operator' و 'value'
+                if (is_array($condition) && isset($condition['field'], $condition['operator'], $condition['value'])) {
+                    $query->where($condition['field'], $condition['operator'], $condition['value']);
+                }
+            }
+        }
+    
+        // استعلام مع الحقول المحددة
         $results = $query->get($fields);
-
+    
         return view('reports.result', compact('results', 'fields'));
     }
+    
 }

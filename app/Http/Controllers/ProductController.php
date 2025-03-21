@@ -156,50 +156,56 @@ class ProductController extends Controller
         // إعادة التوجيه مع رسالة نجاح
         return redirect()->route('products.index')->with('success', 'تم حذف المنتج بنجاح');
     }
-    ///get units of products
     public function getUnits($productId)
     {
         // تحميل المنتج مع جميع مستويات الوحدات المتداخلة
         $product = Product::with(['unit.childrenRecursive', 'unit.parentRecursive'])->find($productId);
-
+    
         // التحقق من وجود المنتج والوحدة
         if (!$product || !$product->unit) {
             return response()->json(['units' => []]);
         }
-
-        $units = [];
-
+    
+        // جمع الوحدات باستخدام Collection لتجنب التكرار
+        $units = collect();
+    
         // إضافة الوحدة الأساسية الخاصة بالمنتج
-        $units[] = $product->unit;
-
+        $units->push($product->unit);
+    
         // استرجاع جميع الأبناء المتداخلين
         $this->getAllChildren($product->unit, $units);
-
+    
         // استرجاع جميع الآباء المتداخلين
         $this->getAllParents($product->unit, $units);
-
-        return response()->json(['units' => $units]);
+    
+        // إزالة التكرار باستخدام unique() وتحويل النتيجة لمصفوفة
+        $uniqueUnits = $units->unique('id')->values()->all();
+    
+        return response()->json(['units' => $uniqueUnits]);
     }
-
+    
     /**
-     * جلب جميع الوحدات الأبناء بشكل متداخل
+     * جلب جميع الوحدات الأبناء بشكل متداخل مع تجنب التكرار
      */
     private function getAllChildren($unit, &$units)
     {
         foreach ($unit->children as $child) {
-            $units[] = $child;
-            $this->getAllChildren($child, $units);
+            if (!$units->contains('id', $child->id)) {
+                $units->push($child);
+                $this->getAllChildren($child, $units);
+            }
         }
     }
-
+    
     /**
-     * جلب جميع الوحدات الآباء بشكل متداخل
+     * جلب جميع الوحدات الآباء بشكل متداخل مع تجنب التكرار
      */
     private function getAllParents($unit, &$units)
     {
-        if ($unit->parent) {
-            $units[] = $unit->parent;
+        if ($unit->parent && !$units->contains('id', $unit->parent->id)) {
+            $units->push($unit->parent);
             $this->getAllParents($unit->parent, $units);
         }
     }
+    
 }

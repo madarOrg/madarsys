@@ -21,54 +21,100 @@ class CreateInventoryTransactionListener
     //////////////////
     public function handle(InventoryTransactionCreated $event)
     {
-        // dd($event);
         $data = $event->data;
+        // dd(gettype($data));
+        // dd($event);
+
         DB::beginTransaction();
+        // dd('b',$data['transaction_type_id']);
 
         try {
             // إنشاء السجل الرئيسي للحركة المخزنية
-            try {
-                $transaction = InventoryTransaction::create([
-                    'transaction_type_id'  => $data['transaction_type_id'] ?? null,
-                    'effect'               => $data['effect'] ?? null,
-                    'transaction_date'     => $data['transaction_date'] ?? null,
-                    'reference'            => $data['reference'] ?? null,
-                    'partner_id'           => $data['partner_id'] ?? null,
-                    'department_id'        => $data['department_id'] ?? null,
-                    'warehouse_id'         => $data['warehouse_id'] ?? null,
-                    'secondary_warehouse_id' => $data['secondary_warehouse_id'] ?? null,
-                    'notes'                => $data['notes'] ?? null,
-                    'inventory_request_id' => $data['inventory_request_id'] ?? null,
-                ]);
-            } catch (\Exception $e) {
-                // dump("خطأ أثناء إنشاء الحركة المخزنية:", $e->getMessage());
-                // session()->flash('error', 'خطأ أثناء إنشاء  الحركة المخزنية:' . $e->getMessage());
-                throw new \Exception("خطأ أثناء إنشاء  المخزنية: " . $e->getMessage());
+            $transaction = InventoryTransaction::create([
+                'transaction_type_id'     => $data['transaction_type_id'] ?? null,
+                'effect'                  => $data['effect'] ?? null,
+                'transaction_date'        => date('Y-m-d H:i:s', strtotime($data['transaction_date'])),
+                'reference'               => $data['reference'] ?? null,
+                'partner_id'              => $data['partner_id'] ?? null,
+                'department_id'           => $data['department_id'] ?? null,
+                'warehouse_id'            => $data['warehouse_id'] ?? null,
+                'secondary_warehouse_id'  => $data['secondary_warehouse_id'] ?? null,
+                'notes'                   => $data['notes'] ?? null,
+                'inventory_request_id'    => $data['inventory_request_id'] ?? null,
+                'status'                  => $data['status'] ?? 0,
+            ]);
+        
+            // تحقق من المصفوفات المرتبطة
+            $products = $data['products'];
+            $units = $data['units'];
+            $quantities = $data['quantities'];
+            $unitPrices = $data['unit_prices'];
+            $totals = $data['totals'];
+            $locations = $data['warehouse_locations'];
+            // dd($transaction, $data);
+
+            foreach ($products as $index => $product) {
+                // الحصول على القيم الخاصة بكل منتج
+                $quantity = $quantities[$index] ?? 0;
+                $unitId = $units[$index] ?? null;
+                $pricePerUnit = $unitPrices[$index] ?? 0;
+                $priceTotal = $totals[$index] ?? 0;
+                $location = $locations[$index] ?? null;
+                // استدعاء دالة معالجة الحركة المخزنية
+                $this->createInventoryMovement($transaction, $data, $product, $quantity, $unitId, $pricePerUnit, $priceTotal, $location, $index);
             }
-            //   dd($data['transactionItems']); // تحقق إذا كانت مصفوفة `transactionItems` غير فارغة.
-
-            foreach ($data['transactionItems'] as $index => $item) {
-                //   dd($item['unit_id'], $item['unit_price'], $item['total']);
-
-                $quantity = $item['quantity'];
-                $unitId = $item['unit_id'][$index] ?? null;
-                $productUnit = Product::find($item['product_id'])->unit_id;
-                $pricePerUnit = $item['unit_price'] ?: ($item['total'] / ($quantity ?: 1));
-                $priceTotal = $item['total'] ?: ($quantity * $pricePerUnit);
-
-                // dd($quantity, $unitId, $productUnit, $pricePerUnit, $priceTotal);
-
-                // استدعاء الدالة لمعالجة العملية
-                $this->createInventoryMovement($transaction, $data, $item['product_id'], $quantity, $unitId, $pricePerUnit, $priceTotal, $productUnit, $index);
-            }
-
+        // dd($products);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
-            // session()->flash('error', 'خطأ أثناء إنشاء الحركة المخزنية:' . $e->getMessage());
-
+            // التعامل مع الأخطاء
             throw new \Exception($e->getMessage());
         }
+        
+        // try {
+        //     // إنشاء السجل الرئيسي للحركة المخزنية
+        //     try {
+        //         $transaction = InventoryTransaction::create([
+        //             'transaction_type_id'  => $data['transaction_type_id'] ?? null,
+        //             'effect'               => $data['effect'] ?? null,
+        //             'transaction_date'     => $data['transaction_date'] ?? null,
+        //             'reference'            => $data['reference'] ?? null,
+        //             'partner_id'           => $data['partner_id'] ?? null,
+        //             'department_id'        => $data['department_id'] ?? null,
+        //             'warehouse_id'         => $data['warehouse_id'] ?? null,
+        //             'secondary_warehouse_id' => $data['secondary_warehouse_id'] ?? null,
+        //             'notes'                => $data['notes'] ?? null,
+        //             'inventory_request_id' => $data['inventory_request_id'] ?? null,
+        //         ]);
+        //     } catch (\Exception $e) {
+        //         // dump("خطأ أثناء إنشاء الحركة المخزنية:", $e->getMessage());
+        //         // session()->flash('error', 'خطأ أثناء إنشاء  الحركة المخزنية:' . $e->getMessage());
+        //         throw new \Exception("خطأ أثناء إنشاء  المخزنية: " . $e->getMessage());
+        //     }
+        //     //   dd($data['transactionItems']); // تحقق إذا كانت مصفوفة `transactionItems` غير فارغة.
+
+        //     foreach ($data['transactionItems'] as $index => $item) {
+        //         //   dd($item['unit_id'], $item['unit_price'], $item['total']);
+
+        //         $quantity = $item['quantity'];
+        //         $unitId = $item['unit_id'][$index] ?? null;
+        //         $productUnit = Product::find($item['product_id'])->unit_id;
+        //         $pricePerUnit = $item['unit_price'] ?: ($item['total'] / ($quantity ?: 1));
+        //         $priceTotal = $item['total'] ?: ($quantity * $pricePerUnit);
+
+        //         // dd($quantity, $unitId, $productUnit, $pricePerUnit, $priceTotal);
+
+        //         // استدعاء الدالة لمعالجة العملية
+        //         $this->createInventoryMovement($transaction, $data, $item['product_id'], $quantity, $unitId, $pricePerUnit, $priceTotal, $productUnit, $index);
+        //     }
+
+        //     DB::commit();
+        // } catch (\Exception $e) {
+        //     DB::rollBack();
+        //     // session()->flash('error', 'خطأ أثناء إنشاء الحركة المخزنية:' . $e->getMessage());
+
+        //     throw new \Exception($e->getMessage());
+        // }
     }
     /////////////////create Inventory Movement
     private function createInventoryMovement($transaction, $data, $productId, $quantityInput, $unitId, $pricePerUnit, $priceTotal, $productUnit, $index)
@@ -167,7 +213,7 @@ class CreateInventoryTransactionListener
 
 
                 ]);
-
+// dd($data['warehouse_locations'][$index] );
                 // تحديث الكميات في جدول المخزون
             } catch (\Exception $e) {
                 // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:", $e->getMessage());

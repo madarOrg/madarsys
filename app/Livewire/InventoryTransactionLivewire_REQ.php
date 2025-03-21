@@ -25,6 +25,9 @@ class InventoryTransactionLivewire extends Component
     public $transactionItems = [];
 
     protected $inventoryTransactionService;
+// المتغيرات الخاصة بالبحث عن المنتجات
+public $query = '';
+public $searchResults = [];
 
     public function __construct()
     {
@@ -44,6 +47,15 @@ class InventoryTransactionLivewire extends Component
         // $this->inventoryTransactionService = new InventoryTransactionService();
 
     }
+// دالة البحث عن المنتجات
+public function updatedQuery()
+{
+    $this->searchResults = Product::where('name', 'like', "%{$this->query}%")
+                                  ->orWhere('sku', 'like', "%{$this->query}%")
+                                  ->orWhere('barcode', 'like', "%{$this->query}%")
+                                  ->limit(10)
+                                  ->get();
+}
 
     public function addProductRow()
     {
@@ -213,7 +225,9 @@ class InventoryTransactionLivewire extends Component
 
     public function render()
     {
-        return view('livewire.inventory-transaction');
-        
+        // return view('livewire.inventory-transaction');
+        return view('livewire.inventory-transaction', [
+            'searchResults' => $this->searchResults,
+        ]);        
     }
 }

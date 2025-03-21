@@ -63,7 +63,7 @@ class InventoryTransactionController extends Controller
 
     
     // عرض النموذج لإنشاء عملية مخزنية جديدة
-    public function create()
+    public function create(Request $request)
     {
         try {
             // جلب البيانات اللازمة للعرض
@@ -76,6 +76,7 @@ class InventoryTransactionController extends Controller
             $products = Product::with('unit')->get(); // جلب المنتجات مع الوحدات
             $units = Unit::all(); // جلب جميع الوحدات
             $warehouseLocations = WarehouseLocation::all();
+            session()->flash('products', $request->products);
 
             return view('inventory.transactions.create', compact('transactionTypes', 'partners', 'departments', 'warehouses', 'products', 'warehouseLocations'));
         } catch (\Exception $e) {

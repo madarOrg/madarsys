@@ -22,7 +22,7 @@
         </tbody>
     </table>
     
-    <a href="{{ route('reports.index') }}" class="btn btn-secondary mt-3">إنشاء تقرير جديد</a>
+    <a href="{{ route('reports.create') }}" class="btn btn-secondary mt-3">إنشاء تقرير جديد</a>
 </div>
 
 </x-layout>

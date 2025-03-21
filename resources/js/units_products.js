@@ -68,11 +68,19 @@
 //         }
 //     }
 // })
-
-console.log("Livewire is ready, JS is running...");
+document.addEventListener('change', function (event) {
+    if (event.target.classList.contains('product-select')) {
+        const productId = event.target.value;
+        const row = event.target.closest('.product-row');
+        if (!row) return;
+        populateUnits(row, productId);
+    }
+});
 
 // دالة لتعبئة قائمة الوحدات بناءً على معرف المنتج
 function populateUnits(row, productId) {
+    console.log("Livewire is ready, JS is running...");
+
     const unitsSelect = row.querySelector('.units-select');
     if (!unitsSelect) return;
     
