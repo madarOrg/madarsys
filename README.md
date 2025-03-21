@@ -124,7 +124,7 @@ php -S 127.0.0.1:8000 -t public
 #### **إدارة الفروع في Git:**
 1. إنشاء فرع جديد:
    ```bash
-   git checkout -b feature-branch develop
+   git checkout -b feature-branch deply
    ```
 2. إضافة التعديلات إلى Git:
    ```bash

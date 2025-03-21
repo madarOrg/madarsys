@@ -23,9 +23,11 @@ class InventoryTransactionLivewire extends Component
     protected $unitService;
     protected $notificationService;
 
+    public $search = '';
 
 
     public $units = [];
+
 
     public $transactionTypes, $partners, $departments, $warehouses, $products, $warehouseLocations;
     public $transaction_type_id, $transaction_date, $effect, $reference, $partner_id, $department_id, $warehouse_id, $secondary_warehouse_id, $notes;
@@ -54,16 +56,21 @@ class InventoryTransactionLivewire extends Component
         $this->effect = 1;  // Default effect value
 
     }
-   
-//     public function updatedTransactionTypeId($value)
-// {
-//     // إذا كان نوع العملية هو 5، نرسل الحدث إلى JavaScript
-//     if ($value == 5) {
-//         $this->dispatchBrowserEvent('showSecondaryWarehouse', ['show' => true]);
-//     } else {
-//         $this->dispatchBrowserEvent('showSecondaryWarehouse', ['show' => false]);
-//     }
-// }
+    public function updatedTransactionTypeId($value)
+    {
+        // تنفيذ العمليات المطلوبة عندما يتغير نوع العملية
+        $this->emit('showSecondaryWarehouse', ['show' => $value == 5]);
+    }
+
+    //     public function updatedTransactionTypeId($value)
+    // {
+    //     // إذا كان نوع العملية هو 5، نرسل الحدث إلى JavaScript
+    //     if ($value == 5) {
+    //         $this->dispatchBrowserEvent('showSecondaryWarehouse', ['show' => true]);
+    //     } else {
+    //         $this->dispatchBrowserEvent('showSecondaryWarehouse', ['show' => false]);
+    //     }
+    // }
 
     public function updateUnits($index)
     {
@@ -85,10 +92,13 @@ class InventoryTransactionLivewire extends Component
             'product_id' => '',
             'quantity' => 1,
             'unit_price' => 0,
-            'warehouse_location_id' => '',
             'units' => [],
-            'unit_id' => null
+            'unit_id' => null,
+            'total' => 0,
+
         ];
+        $this->dispatch('reinitializeTomSelect');
+
     }
 
     public function removeProductRow($index)

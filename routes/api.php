@@ -4,15 +4,28 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 use App\Models\InventoryTransactionItem;
 use Illuminate\Http\Request;
-
 Route::get('/search/products', function (Request $request) {
+    // الحصول على الاستعلام من الطلب
     $query = $request->get('query');
-    
-    $products = Product::where('name', 'like', "%$query%")
-                       ->limit(20)
-                       ->get(['id', 'name']);
+
+    // التحقق من وجود الاستعلام
+    if (!$query) {
+        return response()->json([]);
+    }
+
+    // البحث في قاعدة البيانات باستخدام الاسم أو الباركود أو SKU
+    $products = Product::where(function($queryBuilder) use ($query) {
+        $queryBuilder->where('name', 'like', "%$query%")
+                     ->orWhere('barcode', 'like', "%$query%")
+                     ->orWhere('sku', 'like', "%$query%");
+    })
+    ->limit(20)
+    ->get(['id', 'name']);
+
+    // إرجاع النتيجة بتنسيق JSON
     return response()->json($products);
 });
+
 
 Route::get('/search/items', function (Request $request) {
     $query = $request->get('query');

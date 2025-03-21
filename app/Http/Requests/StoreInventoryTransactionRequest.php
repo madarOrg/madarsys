@@ -29,22 +29,22 @@ class StoreInventoryTransactionRequest extends FormRequest
         $transactionType = TransactionType::find($transactionTypeId);
         $secondaryWarehouseId = $this->input('secondary_warehouse_id'); 
         $warehouseId = $this->input('warehouse_id'); 
-    
         return [
             'transaction_type_id' => 'required|exists:transaction_types,id',
-            'transaction_date' => ['required', 'date', function ($attribute, $value, $fail) use ($warehouseId, $secondaryWarehouseId, $inventoryValidationService) {
-                $errorMessage = $inventoryValidationService->validateTransactionDate($value, $warehouseId);
-                if ($errorMessage) {
-                    $fail($errorMessage);
-                }
+            'transaction_date' => 'required|date|date_format:Y-m-d\TH:i',
+            // ['required', 'date', function ($attribute, $value, $fail) use ($warehouseId, $secondaryWarehouseId, $inventoryValidationService) {
+            //     $errorMessage = $inventoryValidationService->validateTransactionDate($value, $warehouseId);
+            //     if ($errorMessage) {
+            //         $fail($errorMessage);
+            //     }
     
-                if ($secondaryWarehouseId) {
-                    $errorMessageSecondary = $inventoryValidationService->validateTransactionDate($value, $secondaryWarehouseId);
-                    if ($errorMessageSecondary) {
-                        $fail($errorMessageSecondary);
-                    }
-                }
-            }],
+            //     if ($secondaryWarehouseId) {
+            //         $errorMessageSecondary = $inventoryValidationService->validateTransactionDate($value, $secondaryWarehouseId);
+            //         if ($errorMessageSecondary) {
+            //             $fail($errorMessageSecondary);
+            //         }
+            //     }
+            // }],
             'reference' => 'required|string|max:255',
             'partner_id' => 'required|exists:partners,id',
             'department_id' => 'nullable|exists:departments,id',
@@ -67,6 +67,7 @@ class StoreInventoryTransactionRequest extends FormRequest
                 }
             ],
             'notes' => 'nullable|string',
+            'inventory_request_id'=>'nullable',
             'products' => 'required|array',
             'products.*' => 'exists:products,id',
             'quantities' => 'required|array',
@@ -74,6 +75,7 @@ class StoreInventoryTransactionRequest extends FormRequest
             'warehouse_locations' => 'nullable|array',
             'warehouse_locations.*' => 'nullable|exists:warehouse_locations,id',
         ];
+
     }
     
 

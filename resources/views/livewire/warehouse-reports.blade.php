@@ -3,7 +3,9 @@
         <!-- رأس الصفحة -->
         <div class="overflow-hidden shadow-sm sm:rounded-lg p-6 mb-6 border border-gray-950">
             <x-title :title="' تقارير المستودعات'"></x-title>
-            
+            @livewireStyles
+            @livewireScripts
+             
             <!-- نموذج التصفية -->
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 ">
                 <div>

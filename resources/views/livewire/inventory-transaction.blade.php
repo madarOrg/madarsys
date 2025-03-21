@@ -1,4 +1,3 @@
-
 {{-- @livewireStyles
 @livewireScripts --}}
 
@@ -21,7 +20,8 @@
                         <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">{{ $transactionType->name }}</option>
                     @endforeach
                 </select> --}}
-                <select wire:model.defer="transaction_type_id" id="transaction_type_id" class="form-select w-full mt-1" wire:change="updateEffect">
+                <select wire:model.defer="transaction_type_id" id="transaction_type_id" class="form-select w-full mt-1"
+                    wire:change="updateEffect">
                     <option value="">اختر نوع العملية</option>
                     @foreach ($transactionTypes as $transactionType)
                         <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">
@@ -29,32 +29,39 @@
                         </option>
                     @endforeach
                 </select>
-                
+
                 <!-- تاريخ العملية -->
-                <x-file-input wire:model="transaction_date" id="transaction_date" name="transaction_date" label="تاريخ العملية" type="datetime-local" required="true" value="{{ now()->format('Y-m-d\TH:i') }}" />
+                <x-file-input wire:model="transaction_date" id="transaction_date" name="transaction_date"
+                    label="تاريخ العملية" type="datetime-local" required="true"
+                    value="{{ now()->format('Y-m-d\TH:i') }}" />
 
                 <!-- التأثير (تحديث تلقائي عند اختيار نوع العملية) -->
-                <label for="effect" class="block text-sm font-medium text-gray-600 dark:text-gray-400 mt-2">التأثير</label>
-                <select wire:model="effect" id="effect" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                <label for="effect"
+                    class="block text-sm font-medium text-gray-600 dark:text-gray-400 mt-2">التأثير</label>
+                <select wire:model="effect" id="effect"
+                    class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                     <option value="1">+</option>
                     <option value="-1">-</option>
                 </select>
 
                 <!-- الرقم المرجعي -->
-                <x-file-input wire:model="reference" id="reference" name="reference" label="الرقم المرجعي (اختياري)" type="text" />
+                <x-file-input wire:model="reference" id="reference" name="reference" label="الرقم المرجعي (اختياري)"
+                    type="text" />
 
                 <!-- الشريك -->
-                <label for="partner_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">الشريك</label>
-                <select wire:model="partner_id" id="partner_id" name="partner_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                    <option value="" selected>اختر الشريك(مورد/عميل/مورد)</option>
-                    @foreach ($partners as $partner)
-                        <option value="{{ $partner->id }}">{{ $partner->name }}</option>
-                    @endforeach
-                </select>
-
+                <select wire:model="partner_id" wire:key="partner-select" id="partner_id" name="partner_id"
+                class="form-select tom-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                <option value="" selected>اختر الشريك(مورد/عميل/مورد)</option>
+                @foreach ($partners as $partner)
+                    <option value="{{ $partner->id }}">{{ $partner->name }}</option>
+                @endforeach
+            </select>
+                            
                 <!-- القسم -->
-                <label for="department_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">القسم</label>
-                <select wire:model="department_id" id="department_id" name="department_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                <label for="department_id"
+                    class="block text-sm font-medium text-gray-600 dark:text-gray-400">القسم</label>
+                <select wire:model="department_id" id="department_id" name="department_id"
+                    class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                     <option value="">اختر القسم</option>
                     @foreach ($departments as $department)
                         <option value="{{ $department->id }}">{{ $department->name }}</option>
@@ -62,34 +69,29 @@
                 </select>
 
                 <!-- المستودع -->
-                <label for="warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">من المستودع</label>
-                <select wire:model="warehouse_id" id="warehouse_id" name="warehouse_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                <label for="warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">من
+                    المستودع</label>
+                <select wire:model="warehouse_id" id="warehouse_id" name="warehouse_id"
+                    class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                     <option value="" selected>من المستودع</option>
                     @foreach ($warehouses as $warehouse)
                         <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                     @endforeach
                 </select>
 
-                {{-- <!-- المستودع الثانوي (يظهر عند الحاجة) -->
-                <div id="secondary_warehouse_container" style="display: none;">
-                    <label for="secondary_warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع الثانوي</label>
-                    <select wire:model="secondary_warehouse_id" id="secondary_warehouse_id" name="secondary_warehouse_id" class="form-select w-full mt-1 bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                        <option value="">من مستودعًا</option>
+
+                <!-- المستودع الثانوي -->
+                <div id="secondary_warehouse_container">
+                    <label for="secondary_warehouse_id"
+                        class="block text-sm font-medium text-gray-600 dark:text-gray-400">الى المستودع</label>
+                    <select wire:model="secondary_warehouse_id" id="secondary_warehouse_id"
+                        name="secondary_warehouse_id" class="form-select w-full mt-1">
+                        <option value="">الى المستودع</option>
                         @foreach ($warehouses as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                         @endforeach
                     </select>
-                </div> --}}
-     <!-- المستودع الثانوي -->
-     <div id="secondary_warehouse_container">
-        <label for="secondary_warehouse_id" class="block text-sm font-medium text-gray-600 dark:text-gray-400"> الى المستودع</label>
-        <select wire:model="secondary_warehouse_id" id="secondary_warehouse_id" name="secondary_warehouse_id" class="form-select w-full mt-1">
-            <option value="">الى المستودع</option>
-            @foreach ($warehouses as $warehouse)
-                <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-            @endforeach
-        </select>
-    </div>
+                </div>
                 <!-- الملاحظات -->
                 <x-file-input wire:model="notes" id="notes" name="notes" label="ملاحظات" type="textarea" />
 
@@ -116,46 +118,55 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach($transactionItems as $index => $item)
-                            <tr class="product-row border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+                        @foreach ($transactionItems as $index => $item)
+                            <tr
+                                class="product-row border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
                                 <td>
-                                    {{-- <select wire:model="transactionItems.{{ $index }}.product_id" class="form-select product-select"> --}}
-                                        <select wire:model="transactionItems.{{ $index }}.product_id" wire:change="updateUnits({{ $index }})" class="form-select">
+                                    <select wire:model="transactionItems.{{ $index }}.product_id"
+                                        wire:change="updateUnits({{ $index }})"
+                                        class="form-select product-select">
                                         <option value="">اختر المنتج</option>
-                                        @foreach($products as $product)
+                                        @foreach ($products as $product)
                                             <option value="{{ $product->id }}">{{ $product->name }}</option>
                                         @endforeach
-                                    </select>
+                                    </select> 
                                 </td>
                                 <td>
                                     {{-- <select class="form-select units-select"> --}}
 
-                                    <select wire:model="transactionItems.{{ $index }}.unit_id" class="form-select units-select">
+                                    <select wire:model="transactionItems.{{ $index }}.unit_id"
+                                        class="form-select units-select">
                                         <option value="">اختر وحدة</option>
-                                        @foreach($item['units'] as $unit)
+                                        @foreach ($item['units'] as $unit)
                                             <option value="{{ $unit['id'] }}">{{ $unit['name'] }}</option>
                                         @endforeach
                                     </select>
                                 </td>
                                 <td class="px-6 py-2">
-                                    <input wire:model="transactionItems.{{ $index }}.quantity" class="form-input w-full" type="number" step="1" wire:input="calculateTotal({{ $index }})" />
+                                    <input wire:model="transactionItems.{{ $index }}.quantity"
+                                        class="form-input w-full" type="number" step="1"
+                                        wire:input="calculateTotal({{ $index }})" />
                                 </td>
                                 <td class="px-6 py-2">
-                                    <input wire:model="transactionItems.{{ $index }}.unit_price" class="form-input w-full" type="number" step="0.01" wire:input="calculateTotal({{ $index }})" />
+                                    <input wire:model="transactionItems.{{ $index }}.unit_price"
+                                        class="form-input w-full" type="number" step="0.01"
+                                        wire:input="calculateTotal({{ $index }})" />
                                 </td>
                                 <td class="px-6 py-2">
-                                    <input wire:model="transactionItems.{{ $index }}.total" class="form-input w-full" type="number" step="0.01" readonly />
+                                    <input wire:model="transactionItems.{{ $index }}.total"
+                                        class="form-input w-full" type="number" step="0.01" readonly />
                                 </td>
                                 {{-- <td class="px-6 py-2">
                                     <select wire:model="transactionItems.{{ $index }}.warehouse_location_id" class="form-select w-full mt-1">
                                         <option value="" disabled selected>اختر موقع التخزين</option>
-                                        @foreach($warehouseLocations as $location)
+                                        @foreach ($warehouseLocations as $location)
                                             <option value="{{ $location->id }}">{{ $location->name }}</option>
                                         @endforeach
                                     </select>
                                 </td> --}}
                                 <td class="px-6 py-2">
-                                    <button wire:click="removeProductRow({{ $index }})" type="button" class="text-red-500 hover:text-red-700">
+                                    <button wire:click="removeProductRow({{ $index }})" type="button"
+                                        class="text-red-500 hover:text-red-700">
                                         <i class="fas fa-trash-alt"></i>
                                     </button>
                                 </td>
@@ -173,44 +184,34 @@
         </div>
     </form>
 </div>
-{{-- <script>
-   document.addEventListener("DOMContentLoaded", function () {
-    // تحديد العناصر المطلوبة
-    const transactionTypeSelect = document.getElementById("transaction_type_id");
-    const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container");
-
-    // تعريف الدالة المسؤولة عن إظهار أو إخفاء المستودع الثانوي
-    function toggleSecondaryWarehouse() {
-        const selectedValue = transactionTypeSelect.value;
-        
-        // إظهار المستودع الثانوي فقط إذا كانت القيمة 5
-        if (selectedValue === "5") {
-            secondaryWarehouseContainer.style.display = "block";
-        } else {
-            secondaryWarehouseContainer.style.display = "none";
-        }
+<script>
+    // دالة تهيئة TomSelect كما لديك
+    function initializeTomSelects() {
+        document.querySelectorAll('.tom-select').forEach((el) => {
+            if (!el.tomselect) {
+                new TomSelect(el, {
+                    persist: false,
+                    createOnBlur: true,
+                    create: false,
+                    placeholder: el.getAttribute('placeholder') || 'اختر',
+                    searchField: 'text'
+                });
+            }
+        });
     }
 
-    // ربط الحدث بالتغيير واستدعاء الدالة عند التحميل
-    transactionTypeSelect.addEventListener("change", function() {
-        toggleSecondaryWarehouse();
-    });
+    document.addEventListener("DOMContentLoaded", () => {
+        // استدعاء التهيئة عند تحميل الصفحة أول مرة
+        initializeTomSelects();
 
-    // التأكد من ظهور المستودع الثانوي بناءً على القيمة الافتراضية
-    toggleSecondaryWarehouse(); // للتحقق من القيمة الافتراضية عند تحميل الصفحة
-});
-
-
-
-</script> --}}
-
-<script>
-    document.addEventListener('livewire:load', function () {
-        // استماع لحدث showSecondaryWarehouse من Livewire
-        Livewire.on('showSecondaryWarehouse', function (eventData) {
-            const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container");
-            // إظهار أو إخفاء المستودع الثانوي بناءً على الحدث
-            secondaryWarehouseContainer.style.display = eventData.show ? "block" : "none";
-        });
+        // استخدام MutationObserver لمراقبة تغييرات النموذج
+        const form = document.getElementById('transaction-form');
+        if (form) {
+            const observer = new MutationObserver((mutationsList) => {
+                // عند حدوث أي تغيرات، نعيد تهيئة TomSelect
+                initializeTomSelects();
+            });
+            observer.observe(form, { childList: true, subtree: true });
+        }
     });
 </script>

@@ -11,6 +11,40 @@ Livewire.on('alert', (data) => {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function () {
+  // تأكد من أن TomSelect تم تحميله بشكل صحيح
+  if (typeof TomSelect === 'undefined') {
+      console.error("TomSelect is not loaded.");
+      return;
+  }
+
+  // تهيئة TomSelect لجميع العناصر التي تحمل الكلاس tom-select
+  document.querySelectorAll('.tom-select').forEach(select => {
+      if (!select.tomselect) {
+          // إنشاء TomSelect مع الوراثة التلقائية
+          const tomSelect = new TomSelect(select, {
+              create: select.hasAttribute('data-create') ? select.getAttribute('data-create') === 'true' : false,
+              placeholder: select.getAttribute('placeholder') || 'اختر',
+              sortField: select.getAttribute('data-sort-field') || 'text',
+              maxItems: select.hasAttribute('multiple') ? null : 1,
+          });
+
+          // إضافة لون بناءً على الخاصية data-color
+          const color = select.getAttribute('data-color');
+          if (color) {
+              tomSelect.wrapper.style.borderColor = color;
+              tomSelect.wrapper.style.backgroundColor = color + '20'; 
+              tomSelect.wrapper.style.color = color;
+          }
+
+          // التعامل مع باقي الخصائص
+          if (select.hasAttribute('disabled')) tomSelect.disable();
+          if (select.hasAttribute('required')) tomSelect.wrapper.setAttribute('required', 'required');
+      }
+  });
+});
+
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
