@@ -4,16 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
-use App\Traits\
-{
-HasBranch,
-HasUser
+use App\Traits\{
+    HasBranch,
+    HasUser
 };
 
 class Product extends Model
 {
-    use HasUser,HasBranch,HasFactory;
+    use HasFactory, HasUser, HasBranch;
 
     protected $fillable = [
         'name',
@@ -47,15 +45,17 @@ class Product extends Model
         parent::boot();
 
         static::creating(function ($product) {
+            // إنشاء SKU عند إنشاء المنتج
             $product->sku = self::generateSKU($product);
         });
     }
 
+    // دالة لإنشاء SKU فريد
     public static function generateSKU($product)
     {
         $categoryCode = strtoupper(substr($product->category->code ?? 'GEN', 0, 3)); // أول 3 أحرف من اسم الفئة
         $brandCode = strtoupper(substr($product->brand ?? 'NO-BRAND', 0, 3)); // أول 3 أحرف من العلامة التجارية
-        $uniqueId = str_pad(self::max('id') + 1, 6, '0', STR_PAD_LEFT); // رقم فريد من6  أرقام
+        $uniqueId = str_pad(self::max('id') + 1, 6, '0', STR_PAD_LEFT); // رقم فريد من 6 أرقام
 
         return "{$categoryCode}-{$brandCode}-{$uniqueId}";
     }
@@ -77,9 +77,10 @@ class Product extends Model
     {
         return $this->belongsTo(Unit::class, 'unit_id');
     }
-    public function product()
-{
-    return $this->belongsTo(Product::class, 'product_id');
-}
 
+    // العلاقة مع الشحنات
+    public function shipments()
+    {
+        return $this->hasMany(Shipment::class);
+    }
 }

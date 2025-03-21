@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
+class ComposerStaticInitdc34c350302a576b5317d3943c3dff2d
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
@@ -643,7 +643,6 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Events\\InventoryTransactionCreated' => __DIR__ . '/../..' . '/app/Events/InventoryTransactionCreated.php',
         'App\\Events\\InventoryTransactionUpdated' => __DIR__ . '/../..' . '/app/Events/InventoryTransactionUpdated.php',
         'App\\Events\\NotificationCreated' => __DIR__ . '/../..' . '/app/Events/NotificationCreated.php',
-        'App\\Events\\PostCreate' => __DIR__ . '/../..' . '/app/Events/PostCreate.php',
         'App\\Events\\StockMovementCreated' => __DIR__ . '/../..' . '/app/Events/StockMovementCreated.php',
         'App\\Exports\\WarehouseReportExport' => __DIR__ . '/../..' . '/app/Exports/WarehouseReportExport.php',
         'App\\Http\\Controllers\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/AuthController.php',
@@ -657,16 +656,20 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Http\\Controllers\\InvoiceController' => __DIR__ . '/../..' . '/app/Http/Controllers/InvoiceController.php',
         'App\\Http\\Controllers\\NavbarController' => __DIR__ . '/../..' . '/app/Http/Controllers/NavbarController.php',
         'App\\Http\\Controllers\\NotificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/NotificationController.php',
+        'App\\Http\\Controllers\\OrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/OrderController.php',
         'App\\Http\\Controllers\\PartnerController' => __DIR__ . '/../..' . '/app/Http/Controllers/PartnerController.php',
         'App\\Http\\Controllers\\PasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/PasswordController.php',
         'App\\Http\\Controllers\\PostController' => __DIR__ . '/../..' . '/app/Http/Controllers/PostController.php',
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
         'App\\Http\\Controllers\\PurchaseInvoiceController' => __DIR__ . '/../..' . '/app/Http/Controllers/PurchaseInvoiceController.php',
+        'App\\Http\\Controllers\\ReturnOrderController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReturnOrderController.php',
+        'App\\Http\\Controllers\\ReturnOrderSupplierController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReturnOrderSupplierController.php',
         'App\\Http\\Controllers\\RoleController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoleController.php',
         'App\\Http\\Controllers\\RolePermissionController' => __DIR__ . '/../..' . '/app/Http/Controllers/RolePermissionController.php',
         'App\\Http\\Controllers\\RoleUserController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoleUserController.php',
         'App\\Http\\Controllers\\RoleWarehouseController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoleWarehouseController.php',
         'App\\Http\\Controllers\\SettingController' => __DIR__ . '/../..' . '/app/Http/Controllers/SettingController.php',
+        'App\\Http\\Controllers\\ShipmentController' => __DIR__ . '/../..' . '/app/Http/Controllers/ShipmentController.php',
         'App\\Http\\Controllers\\SignupController' => __DIR__ . '/../..' . '/app/Http/Controllers/SignupController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
         'App\\Http\\Controllers\\WarehouseLocationController' => __DIR__ . '/../..' . '/app/Http/Controllers/WarehouseLocationController.php',
@@ -682,6 +685,7 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Livewire\\InventoryTransactionListLivewire' => __DIR__ . '/../..' . '/app/Livewire/InventoryTransactionListLivewire.php',
         'App\\Livewire\\InventoryTransactionLivewire' => __DIR__ . '/../..' . '/app/Livewire/InventoryTransactionLivewire.php',
         'App\\Livewire\\RoleCompanyManager' => __DIR__ . '/../..' . '/app/Livewire/RoleCompanyManager.php',
+        'App\\Livewire\\TransactionSearch' => __DIR__ . '/../..' . '/app/Livewire/TransactionSearch.php',
         'App\\Livewire\\UserSteps' => __DIR__ . '/../..' . '/app/Livewire/UserSteps.php',
         'App\\Livewire\\WarehouseReports' => __DIR__ . '/../..' . '/app/Livewire/WarehouseReports.php',
         'App\\Models\\Branch' => __DIR__ . '/../..' . '/app/Models/Branch.php',
@@ -698,6 +702,7 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Models\\Module' => __DIR__ . '/../..' . '/app/Models/Module.php',
         'App\\Models\\ModuleAction' => __DIR__ . '/../..' . '/app/Models/ModuleAction.php',
         'App\\Models\\Notification' => __DIR__ . '/../..' . '/app/Models/Notification.php',
+        'App\\Models\\OrderDetail' => __DIR__ . '/../..' . '/app/Models/OrderDetail.php',
         'App\\Models\\Partner' => __DIR__ . '/../..' . '/app/Models/Partner.php',
         'App\\Models\\PartnerType' => __DIR__ . '/../..' . '/app/Models/PartnerType.php',
         'App\\Models\\PaymentType' => __DIR__ . '/../..' . '/app/Models/PaymentType.php',
@@ -706,12 +711,18 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Models\\Product' => __DIR__ . '/../..' . '/app/Models/Product.php',
         'App\\Models\\PurchaseInvoice' => __DIR__ . '/../..' . '/app/Models/PurchaseInvoice.php',
         'App\\Models\\PurchaseInvoiceItem' => __DIR__ . '/../..' . '/app/Models/PurchaseInvoiceItem.php',
+        'App\\Models\\ReturnOrder' => __DIR__ . '/../..' . '/app/Models/ReturnOrder.php',
+        'App\\Models\\ReturnOrderItem' => __DIR__ . '/../..' . '/app/Models/ReturnOrderItem.php',
+        'App\\Models\\ReturnSuppliersOrder' => __DIR__ . '/../..' . '/app/Models/ReturnSuppliersOrder.php',
+        'App\\Models\\ReturnSuppliersOrderItem' => __DIR__ . '/../..' . '/app/Models/ReturnSuppliersOrderItem.php',
         'App\\Models\\Role' => __DIR__ . '/../..' . '/app/Models/Role.php',
         'App\\Models\\RoleBranch' => __DIR__ . '/../..' . '/app/Models/RoleBranch.php',
         'App\\Models\\RolePermission' => __DIR__ . '/../..' . '/app/Models/RolePermission.php',
         'App\\Models\\RoleUser' => __DIR__ . '/../..' . '/app/Models/RoleUser.php',
         'App\\Models\\RoleWarehouse' => __DIR__ . '/../..' . '/app/Models/RoleWarehouse.php',
+        'App\\Models\\Scopes\\UserAccessScope' => __DIR__ . '/../..' . '/app/Models/Scopes/UserAccessScope.php',
         'App\\Models\\Setting' => __DIR__ . '/../..' . '/app/Models/Setting.php',
+        'App\\Models\\Shipment' => __DIR__ . '/../..' . '/app/Models/Shipment.php',
         'App\\Models\\TransactionType' => __DIR__ . '/../..' . '/app/Models/TransactionType.php',
         'App\\Models\\Unit' => __DIR__ . '/../..' . '/app/Models/Unit.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',
@@ -724,7 +735,10 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\TelescopeServiceProvider' => __DIR__ . '/../..' . '/app/Providers/TelescopeServiceProvider.php',
+        'App\\Providers\\UserScopeServiceProvider' => __DIR__ . '/../..' . '/app/Providers/UserScopeServiceProvider.php',
+        'App\\Rules\\ValidInventoryTransaction' => __DIR__ . '/../..' . '/app/Rules/ValidInventoryTransaction.php',
         'App\\Services\\InventoryTransaction\\InventoryCalculationService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryCalculationService.php',
+        'App\\Services\\InventoryTransaction\\InventoryService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryService.php',
         'App\\Services\\InventoryTransaction\\InventoryTransactionService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryTransactionService.php',
         'App\\Services\\InventoryTransaction\\InventoryValidationService' => __DIR__ . '/../..' . '/app/Services/InventoryTransaction/InventoryValidationService.php',
         'App\\Services\\NavbarService' => __DIR__ . '/../..' . '/app/Services/NavbarService.php',
@@ -9140,10 +9154,10 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitdc34c350302a576b5317d3943c3dff2d::$classMap;
 
         }, null, ClassLoader::class);
     }
