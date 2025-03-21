@@ -49,19 +49,7 @@
                     <option value="delivered">تم التوصيل</option>
                 </select>
             </div>
-
-            <!-- المنتج -->
-            <div class="col-span-1">
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400" for="product_id">
-                    المنتج:
-                </label>
-                <select name="product_id" id="product_id" class="form-select w-full bg-gray-100 dark:bg-gray-800 dark:text-gray-200" required>
-                    @foreach ($products as $product)
-                        <option value="{{ $product->id }}">{{ $product->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
+        </div>
             <!-- الكمية -->
             <div class="col-span-1">
                 <label class="block text-sm font-medium text-gray-600 dark:text-gray-400" for="quantity">
@@ -69,13 +57,6 @@
                 </label>
                 <input type="number" name="quantity" id="quantity" class="form-control w-full" required>
             </div>
-
-            <!-- العميل -->
-            <div class="col-span-1">
-                <label class="block text-sm font-medium text-gray-600 dark:text-gray-400" for="customer_id">
-              
-        </div>
-
         <div class="mt-4">
             <x-button class="bg-blue-500 text-white px-6 py-3 rounded" type="submit">
                 إضافة الشحنة
@@ -83,3 +64,4 @@
         </div>
     </form>
 </x-layout>
+

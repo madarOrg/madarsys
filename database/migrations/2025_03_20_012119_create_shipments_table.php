@@ -17,8 +17,6 @@ return new class extends Migration
             $table->date('shipment_date');  // تاريخ الشحنة
             $table->enum('status', ['pending', 'shipped', 'delivered']);  // حالة الشحنة
             $table->foreignId('product_id')->constrained('products');  // رابطة مع جدول المنتجات
-            $table->integer('quantity');  // الكمية المشحونة
-            $table->foreignId('customer_id')->constrained('customers');  // رابطة مع جدول العملاء
             $table->timestamps();  // تاريخ الإنشاء والتعديل
         });
     }
