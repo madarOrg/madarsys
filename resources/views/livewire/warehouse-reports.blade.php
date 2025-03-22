@@ -10,7 +10,7 @@
             <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6 ">
                 <div>
                     <label class="block text-sm font-medium  mb-2">المستودع</label>
-                    <select wire:model.live="warehouse_id" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <select wire:model.live="warehouse_id" class="mt-1 tom-select block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="">اختر المستودع</option>
                         @foreach($warehouses as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -20,7 +20,7 @@
                 
                 <div>
                     <label class="block text-sm font-medium  mb-2">نوع التقرير</label>
-                    <select wire:model.live="report_type" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <select wire:model.live="report_type" class="tom-select  mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="details">بيانات المستودع</option>
                         <option value="inventory">تقرير المخزون</option>
                         <option value="movement">تقرير الحركة</option>
@@ -102,116 +102,20 @@
                                 <div class="mb-4">
                                     <x-title :title="'تفاصيل التقرير '"></x-title>
 
+    
                                     @if($this->selectedReport->report_type === 'details')
-                                        <!-- معلومات المستودع -->
-                                        <div class="mb-6">
-                                            <x-title :title="' معلومات المستودع'"></x-title>
-                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                                <div>
-                                                    <span class="dark:dark:text-gray-200 ">الاسم:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['name'] }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">الكود:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['code'] }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">الفرع:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['branch'] }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">المشرف:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['supervisor'] }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">المساحة:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['area'] }} م²</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">السعة:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['capacity'] }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">عدد الرفوف:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['shelves_count'] }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">درجة الحرارة:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['temperature'] }}°C</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">الرطوبة:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['warehouse_info']['humidity'] }}%</span>
-                                                </div>
-                                            </div>
-                                        </div>
+                                                @include('reports.warehouse') <!-- تقرير المستودع -->
 
-                                        <!-- مميزات المستودع -->
-                                        <div>
-                                            <x-title :title="' مميزات المستودع'"></x-title>
-                                            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                                                <div>
-                                                    <span class="dark:text-gray-200">مستودع ذكي:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['features']['is_smart'] ? 'نعم' : 'لا' }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">نظام أمني:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['features']['has_security_system'] ? 'نعم' : 'لا' }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">كاميرات مراقبة:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['features']['has_cctv'] ? 'نعم' : 'لا' }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">متكامل مع WMS:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['features']['is_integrated_with_wms'] ? 'نعم' : 'لا' }}</span>
-                                                </div>
-                                                <div>
-                                                    <span class="dark:text-gray-200">أنظمة آلية:</span>
-                                                    <span class="font-medium">{{ $this->selectedReport->report_data['features']['has_automated_systems'] ? 'نعم' : 'لا' }}</span>
-                                                </div>
-                                            </div>
-                                        </div>
                                     @endif
 
                                     @if($this->selectedReport->report_type === 'inventory')
-                                        <!-- تفاصيل المخزون -->
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <span class="dark:text-gray-200">إجمالي المواد:</span>
-                                                <span class="font-medium">{{ $this->selectedReport->report_data['inventory']['total_items'] }}</span>
-                                            </div>
-                                            <div>
-                                                <span class="dark:text-gray-200">المواد منخفضة المخزون:</span>
-                                                <span class="font-medium">{{ $this->selectedReport->report_data['inventory']['low_stock_items'] }}</span>
-                                            </div>
-                                            <div>
-                                                <span class="dark:text-gray-200">عدد الفئات:</span>
-                                                <span class="font-medium">{{ $this->selectedReport->report_data['inventory']['categories'] }}</span>
-                                            </div>
-                                            <div>
-                                                <span class="dark:text-gray-200">القيمة الإجمالية:</span>
-                                                <span class="font-medium">{{ number_format($this->selectedReport->report_data['inventory']['total_value'], 2) }}</span>
-                                            </div>
-                                        </div>
+                                             @include('reports.inventory') <!-- تقرير المخزون -->
+
                                     @endif
 
                                     @if($this->selectedReport->report_type === 'movement')
-                                        <!-- تفاصيل الحركة -->
-                                        <div class="grid grid-cols-2 gap-4">
-                                            <div>
-                                                <span class="dark:text-gray-200">الفترة:</span>
-                                                <span class="font-medium">{{ $this->selectedReport->report_data['movements']['period']['from'] }} إلى {{ $this->selectedReport->report_data['movements']['period']['to'] }}</span>
-                                            </div>
-                                            <div>
-                                                <span class="dark:text-gray-200">عدد العمليات الواردة:</span>
-                                                <span class="font-medium">{{ $this->selectedReport->report_data['movements']['incoming'] }}</span>
-                                            </div>
-                                            <div>
-                                                <span class="dark:text-gray-200">عدد العمليات الصادرة:</span>
-                                                <span class="font-medium">{{ $this->selectedReport->report_data['movements']['outgoing'] }}</span>
-                                            </div>
-                                        </div>
+                                              @include('reports.movement') <!-- تقرير الحركة -->
+
                                     @endif
                                 </div>
                             </div>
