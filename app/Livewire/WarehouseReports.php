@@ -54,8 +54,8 @@ class WarehouseReports extends Component
         }
 
         try {
-            $warehouse = Warehouse::with(['branch', 'supervisor'])->findOrFail($this->warehouse_id);
-            
+            $warehouse = Warehouse::with(['branch', 'supervisor', 'storageAreas','locations'])->findOrFail($this->warehouse_id);
+        
             $reportData = [
                 'warehouse_info' => [
                     'name' => $warehouse->name,
@@ -63,8 +63,24 @@ class WarehouseReports extends Component
                     'address' => $warehouse->address,
                     'branch' => $warehouse->branch->name ?? 'غير محدد',
                     'supervisor' => $warehouse->supervisor->name ?? 'غير محدد',
-                    'area' => $warehouse->area,
-                    'capacity' => $warehouse->capacity,
+           'areas' => $warehouse->storageAreas->map(function ($area) use ($warehouse) {
+            // استرجاع الرفوف الخاصة بكل منطقة تخزين
+            $shelves = $warehouse->locations()->where('storage_area_id', $area->id)
+                ->select('shelf', 'rack', 'aisle')  // تحديد الأعمدة التي نحتاجها
+                ->distinct()
+                ->get();
+
+            return [
+                'area_name' => $area->area_name,
+                'shelves' => $shelves->map(function ($location) {
+                    return [
+                        'shelf' => $location->shelf,
+                        'rack' => $location->rack,
+                        'aisle' => $location->aisle,
+                    ];
+                }),
+            ];
+        })->toArray(),                    'capacity' => $warehouse->capacity,
                     'shelves_count' => $warehouse->shelves_count,
                     'temperature' => $warehouse->temperature,
                     'humidity' => $warehouse->humidity,
@@ -115,7 +131,6 @@ class WarehouseReports extends Component
 
             session()->flash('success', 'تم إنشاء التقرير بنجاح');
             $this->dispatch('report-generated');
-
         } catch (\Exception $e) {
             session()->flash('error', 'حدث خطأ أثناء إنشاء التقرير: ' . $e->getMessage());
         }
@@ -160,7 +175,7 @@ class WarehouseReports extends Component
 
         $mpdf->WriteHTML($html);
 
-        return response()->streamDownload(function() use ($mpdf) {
+        return response()->streamDownload(function () use ($mpdf) {
             echo $mpdf->Output('', 'S');
         }, 'warehouse-report-' . $this->selectedReport->id . '.pdf');
     }
@@ -181,10 +196,10 @@ class WarehouseReports extends Component
     {
         try {
             $warehouses = Warehouse::all();
-            $reports = WarehouseReport::when($this->warehouse_id, function($query) {
-                    return $query->where('warehouse_id', $this->warehouse_id);
-                })
-                ->when($this->report_type, function($query) {
+            $reports = WarehouseReport::when($this->warehouse_id, function ($query) {
+                return $query->where('warehouse_id', $this->warehouse_id);
+            })
+                ->when($this->report_type, function ($query) {
                     return $query->where('report_type', $this->report_type);
                 })
                 ->latest('report_date')
