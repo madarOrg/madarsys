@@ -25,7 +25,8 @@ class InventoryProductController extends Controller
         $this->inventoryService = $inventoryService;
     }
     // دالة البحث: مسؤولة عن تنفيذ الاستعلام وجلب البيانات
-    public function search(Request $request){
+    public function search(Request $request)
+    {
         $warehouses = Warehouse::ForUserWarehouse()->get();
 
         $query = InventoryProduct::query()
@@ -50,15 +51,15 @@ class InventoryProductController extends Controller
             ->leftJoin('warehouse_storage_areas', 'inventory_products.storage_area_id', '=', 'warehouse_storage_areas.id')
             ->leftJoin('warehouse_locations', 'inventory_products.location_id', '=', 'warehouse_locations.id')
             ->leftJoin('inventory_transaction_items', 'inventory_products.inventory_transaction_item_id', '=', 'inventory_transaction_items.id');
-       
-       
-            // البحث حسب المستودع
+
+
+        // البحث حسب المستودع
 
         // dd($query);
         // البحث حسب النوع (إدخال أو إخراج)
-if ($request->filled('distribution_type')) {
-    $query->where('inventory_products.distribution_type', $request->distribution_type);
-}
+        if ($request->filled('distribution_type')) {
+            $query->where('inventory_products.distribution_type', $request->distribution_type);
+        }
 
         if ($request->filled('warehouse_id')) {
             $query->where('inventory_products.warehouse_id', $request->warehouse_id);
@@ -165,13 +166,13 @@ if ($request->filled('distribution_type')) {
         // جلب جميع المستودعات
         // $warehouses = Warehouse::toSql();  // للحصول على الاستعلام الفعلي
         // dd($warehouses); 
-               $warehouses = Warehouse::ForUserWarehouse()->get();
+        $warehouses = Warehouse::ForUserWarehouse()->get();
 
         // بناء الاستعلام لجلب المنتجات مع العلاقات اللازمة
         $products = InventoryProduct::query()
             ->select([
                 'inventory_products.id',
-                 'inventory_products.distribution_type',
+                'inventory_products.distribution_type',
                 'inventory_products.warehouse_id',
                 'inventory_products.product_id',
                 'inventory_products.storage_area_id',
@@ -192,32 +193,47 @@ if ($request->filled('distribution_type')) {
             ->leftJoin('warehouse_locations', 'inventory_products.location_id', '=', 'warehouse_locations.id')
             ->leftJoin('inventory_transaction_items', 'inventory_products.inventory_transaction_item_id', '=', 'inventory_transaction_items.id')
             ->paginate(10);  // جلب البيانات
-           
+
 
         // متغير لتجميع الكميات الموزعة
         $distributedQuantities = collect();
-    
+
         // جلب مناطق التخزين بناءً على المستودع المحدد (إذا تم تحديده)
         $storageAreas = WarehouseStorageArea::when($request->warehouse_id, function ($query) use ($request) {
             return $query->where('warehouse_id', $request->warehouse_id);
         })->get();
-    
+
         // جلب المواقع بناءً على منطقة التخزين المحددة (إذا تم تحديدها)
         $locations = WarehouseLocation::when($request->storage_area_id, function ($query) use ($request) {
             return $query->where('storage_area_id', $request->storage_area_id);
         })->get()->mapWithKeys(function ($location) {
             return [$location->id => $location->rack_code];
         });
-    
+
         // إرجاع البيانات إلى العرض
         return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities'));
     }
-        /**
+    /**
      * عرض صفحة إضافة حركة مخزنية جديدة.
      *
      * @return \Illuminate\View\View
      */
-
+    public function getProduct($transactionId)
+    {
+        $transaction = InventoryTransactionItem::with('product')->find($transactionId);
+    
+        if (!$transaction) {
+            return response()->json(['error' => 'Transaction not found'], 404);
+        }
+    
+        return response()->json([
+            'product_id' => $transaction->product->id,
+            'product_name' => $transaction->product->name,
+            'production_date' => $transaction->production_date,
+            'expiration_date' => $transaction->expiration_date,
+        ]);
+    }
+    
     public function create(Request $request)
     {
 
@@ -230,9 +246,27 @@ if ($request->filled('distribution_type')) {
                 });
             })
             ->unique('id'); // تجنب التكرار
-        
+        // $transactions = InventoryTransaction::with('items.product')
+        //     ->get()
+        //     ->flatMap(function ($transaction) {
+        //         return $transaction->items->map(function ($item) use ($transaction) {
+        //             return [
+        //                 'id' => $item->id,
+        //                 'reference' => $transaction->reference,
+        //                 'product_id' => $item->product->id,
+        //                 'product_name' => $item->product->name,
+        //                 'suk' => $item->product->suk,
+        //                 'production_date' => $item->production_date,
+        //                 'expiration_date' => $item->expiration_date,
+        //             ];
+        //         });
+        //     });
+
+        $products = $transactions->unique('product_id')->values(); // تجنب التكرار واسترجاع القيم
+
+
         $distributionType = $request->input('distribution_type', 1); // Default to '1' (توزيع)
-            
+
         $branches = Branch::all();
         $userBranch = Auth::user()->branch_id; // فرع المستخدم الحالي
 
@@ -252,18 +286,18 @@ if ($request->filled('distribution_type')) {
             return [$location->id => $location->rack_code];
         });
 
-        return view('inventory-products.create', compact('transactions', 'products', 'branches', 'warehouses', 'storageAreas', 'locations','distributionType'));
+        return view('inventory-products.create', compact('transactions', 'products', 'branches', 'warehouses', 'storageAreas', 'locations', 'distributionType'));
     }
     public function createOut(Request $request)
     {
         // $transactions = InventoryTransaction::with('items')->get();
         $transactions = InventoryTransactionItem::join('inventory_transactions as t', 'inventory_transaction_items.inventory_transaction_id', '=', 't.id')
-        ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id')
-        ->where('inventory_transaction_items.target_warehouse_id',  $request->warehouse_id)
-        ->where('inventory_transaction_items.quantity', '<', 0)  // فقط الحركات الخارجة
-        ->where('t.status', 1)
-        ->select('inventory_transaction_items.id', 't.reference', 'p.name as product_name', 'p.id as product_id', 'p.sku')
-        ->get();
+            ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id')
+            ->where('inventory_transaction_items.target_warehouse_id',  $request->warehouse_id)
+            ->where('inventory_transaction_items.quantity', '<', 0)  // فقط الحركات الخارجة
+            ->where('t.status', 1)
+            ->select('inventory_transaction_items.id', 't.reference', 'p.name as product_name', 'p.id as product_id', 'p.sku')
+            ->get();
 
         // جلب المنتج باستخدام inventory_transaction_item_id
         $transactionItem = InventoryTransactionItem::with([
@@ -285,7 +319,7 @@ if ($request->filled('distribution_type')) {
         });
         // dump($locations);
 
-        return view('inventory-products.createOut', compact('transactions','transactionItem', 'product', 'storageAreas', 'locations'));
+        return view('inventory-products.createOut', compact('transactions', 'transactionItem', 'product', 'storageAreas', 'locations'));
     }
 
     public function new(Request $request)
@@ -309,7 +343,7 @@ if ($request->filled('distribution_type')) {
         })->get()->mapWithKeys(function ($location) {
             return [$location->id => $location->rack_code];
         });
-        // dump($locations);
+        dump($transactionItem);
 
         return view('inventory-products.new', compact('transactionItem', 'product', 'storageAreas', 'locations'));
     }
@@ -321,7 +355,8 @@ if ($request->filled('distribution_type')) {
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request){
+    public function store(Request $request)
+    {
 
         // التحقق من تاريخ الإنتاج والانتهاء
         // if ($request->has('production_date') && $request->has('expiration_date')) {
@@ -365,26 +400,26 @@ if ($request->filled('distribution_type')) {
             ->where('warehouse_id', $request->warehouse_id)
             ->sum('quantity');
         //  dump($distributedQuantity);
-     
-// التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
-if ($request->distribution_type == 1) {
-    $quantityInvertory=$request->quantity;
 
-    // في حالة التوزيع (إدخال)
-    if (($distributedQuantity + $request->quantity) > $originalQuantity) {
-        return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
-    }
-} elseif ($request->distribution_type == -1) {
-    $quantityInvertory=-$request->quantity;
+        // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
+        if ($request->distribution_type == 1) {
+            $quantityInvertory = $request->quantity;
 
-    // dd(($distributedQuantity + $request->quantity) , $originalQuantity);
-    // في حالة الإخراج (تخفيض الكمية)
-    if (-($distributedQuantity + $request->quantity) < $originalQuantity) {
-        return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات المسحوبة أكثر من الكمية المطلوبة للإخراج.']);
-    }
-}
-// dd($distributionType);
-// إنشاء حركة مخزنية جديدة باستخدام المنتج المستخرج من العملية المخزنية
+            // في حالة التوزيع (إدخال)
+            if (($distributedQuantity + $request->quantity) > $originalQuantity) {
+                return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
+            }
+        } elseif ($request->distribution_type == -1) {
+            $quantityInvertory = -$request->quantity;
+
+            // dd(($distributedQuantity + $request->quantity) , $originalQuantity);
+            // في حالة الإخراج (تخفيض الكمية)
+            if (- ($distributedQuantity + $request->quantity) < $originalQuantity) {
+                return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات المسحوبة أكثر من الكمية المطلوبة للإخراج.']);
+            }
+        }
+        // dd($distributionType);
+        // إنشاء حركة مخزنية جديدة باستخدام المنتج المستخرج من العملية المخزنية
         InventoryProduct::create([
             'product_id' => $transactionItem->product_id, // استخراج المنتج من الحركة المخزنية
             'branch_id' => $request->input('branch_id'),
@@ -419,12 +454,12 @@ if ($request->distribution_type == 1) {
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
-        
+
             return redirect()->back()->withErrors([
                 'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
             ])->withInput();
         }
-        
+
 
         // إعادة التوجيه بعد حفظ البيانات
         return redirect()->route('inventory-products.search')->with('success', 'تم إضافة موقع المخزون بنجاح');
@@ -507,20 +542,20 @@ if ($request->distribution_type == 1) {
                 ->where('warehouse_id', $request->warehouse_id)
                 ->where('id', '=', $id) //  السجل الحالي
                 ->first('quantity');
-         }
-            // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
-    if ($request->distribution_type == 1) {
-        // في حالة التوزيع (إدخال)
-        if (($distributedQuantity + $request->quantity) > $originalQuantity) {
-            return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
         }
-    } elseif ($request->distribution_type == -1) {
-        // في حالة الإخراج (تخفيض الكمية)
-        if ($distributedQuantity < $request->quantity) {
-            return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة أقل من الكمية المطلوبة للإخراج.']);
+        // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
+        if ($request->distribution_type == 1) {
+            // في حالة التوزيع (إدخال)
+            if (($distributedQuantity + $request->quantity) > $originalQuantity) {
+                return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
+            }
+        } elseif ($request->distribution_type == -1) {
+            // في حالة الإخراج (تخفيض الكمية)
+            if ($distributedQuantity < $request->quantity) {
+                return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة أقل من الكمية المطلوبة للإخراج.']);
+            }
         }
-    }
-        
+
 
         // تحديث السجل
         $inventoryProduct->update([
@@ -541,29 +576,29 @@ if ($request->distribution_type == 1) {
         //  dd($request->quantity);
         $quantityDifference = $request->quantity - $currentQuantity;
 
-     // استدعاء دالة updateInventoryStock من الخدمة
-     try {
-        $this->inventoryService->updateInventoryStock(
-            $request->warehouse_id,
-            $transactionItem->product_id,
-            $request->quantity,
-            $transactionItem->unit_prices
-        );
-    } catch (\Exception $e) {
-        \DB::table('inventory_update_errors')->insert([
-            'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
-            'product_id' => $transactionItem->product_id,
-            'warehouse_id' => $request->warehouse_id,
-            'quantity' => $request->quantity,
-            'error_message' => $e->getMessage(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    
-        return redirect()->back()->withErrors([
-            'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
-        ])->withInput();
-    }
+        // استدعاء دالة updateInventoryStock من الخدمة
+        try {
+            $this->inventoryService->updateInventoryStock(
+                $request->warehouse_id,
+                $transactionItem->product_id,
+                $request->quantity,
+                $transactionItem->unit_prices
+            );
+        } catch (\Exception $e) {
+            \DB::table('inventory_update_errors')->insert([
+                'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
+                'product_id' => $transactionItem->product_id,
+                'warehouse_id' => $request->warehouse_id,
+                'quantity' => $request->quantity,
+                'error_message' => $e->getMessage(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return redirect()->back()->withErrors([
+                'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
+            ])->withInput();
+        }
 
         return redirect()->route('inventory-products.search')->with('success', 'تم تعديل موقع المنتج بنجاح.');
     }
@@ -574,30 +609,30 @@ if ($request->distribution_type == 1) {
         $transactionItem = InventoryTransactionItem::findOrFail($inventoryProduct->inventory_transaction_item_id);
 
         $inventoryProduct->delete();
-  
-     // استدعاء دالة updateInventoryStock من الخدمة
-     try {
-        $this->inventoryService->updateInventoryStock(
-            $inventoryProduct->warehouse_id,
-            $transactionItem->product_id,
-            -$inventoryProduct->quantity,
-            $transactionItem->unit_prices
-        );
-    } catch (\Exception $e) {
-        \DB::table('inventory_update_errors')->insert([
-            'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
-            'product_id' => $transactionItem->product_id,
-            'warehouse_id' => $inventoryProduct->warehouse_id,
-            'quantity' => $inventoryProduct->quantity,
-            'error_message' => $e->getMessage(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
-    
-        return redirect()->back()->withErrors([
-            'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
-        ])->withInput();
-    }
+
+        // استدعاء دالة updateInventoryStock من الخدمة
+        try {
+            $this->inventoryService->updateInventoryStock(
+                $inventoryProduct->warehouse_id,
+                $transactionItem->product_id,
+                -$inventoryProduct->quantity,
+                $transactionItem->unit_prices
+            );
+        } catch (\Exception $e) {
+            \DB::table('inventory_update_errors')->insert([
+                'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
+                'product_id' => $transactionItem->product_id,
+                'warehouse_id' => $inventoryProduct->warehouse_id,
+                'quantity' => $inventoryProduct->quantity,
+                'error_message' => $e->getMessage(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return redirect()->back()->withErrors([
+                'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
+            ])->withInput();
+        }
     }
 
     //  دالة جلب المناطق التخزينية بناءً على المستودع المحدد
@@ -668,6 +703,7 @@ if ($request->distribution_type == 1) {
 
         // إرجاع المنتجات بصيغة [id => name]
         return response()->json($products->pluck('name', 'id'));
+        
     }
 
     public function getDistributedQuantity($transactionItemId, $warehouseId)

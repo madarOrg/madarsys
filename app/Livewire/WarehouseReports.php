@@ -48,14 +48,15 @@ class WarehouseReports extends Component
 
     public function generateReport()
     {
+        // dd($this->warehouse_id);
         if (!$this->warehouse_id) {
+            dd('in');
             session()->flash('error', 'الرجاء اختيار المستودع أولاً');
             return;
         }
-
+      
         try {
-            $warehouse = Warehouse::with(['branch', 'supervisor', 'storageAreas','locations'])->findOrFail($this->warehouse_id);
-        
+            $warehouse = Warehouse::with(['branch', 'supervisor', 'storageAreas','warehouseLocations'])->findOrFail($this->warehouse_id);
             $reportData = [
                 'warehouse_info' => [
                     'name' => $warehouse->name,
@@ -65,7 +66,7 @@ class WarehouseReports extends Component
                     'supervisor' => $warehouse->supervisor->name ?? 'غير محدد',
            'areas' => $warehouse->storageAreas->map(function ($area) use ($warehouse) {
             // استرجاع الرفوف الخاصة بكل منطقة تخزين
-            $shelves = $warehouse->locations()->where('storage_area_id', $area->id)
+            $shelves = $warehouse->warehouseLocations()->where('storage_area_id', $area->id)
                 ->select('shelf', 'rack', 'aisle')  // تحديد الأعمدة التي نحتاجها
                 ->distinct()
                 ->get();
@@ -93,7 +94,6 @@ class WarehouseReports extends Component
                     'has_automated_systems' => $warehouse->has_automated_systems,
                 ],
             ];
-
             if ($this->report_type === 'details') {
                 // لا نحتاج لإضافة بيانات إضافية لأن معلومات المستودع موجودة بالفعل
             } elseif ($this->report_type === 'inventory') {
