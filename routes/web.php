@@ -34,7 +34,8 @@ use App\Http\Controllers\{
     OrderController,
     ReturnOrderSupplierController,
     ReturnOrderController,
-    ShipmentController
+    ShipmentController,
+    InventoryReportController
 };
 use App\Services\UnitService;
 
@@ -367,10 +368,13 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/get-inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
     Route::get('/get-inventory-transactions-out/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactionsOut']);
 
+    Route::get('/get-product/{transaction_id}', [InventoryProductController::class, 'getProduct']);
     Route::get('/get-products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
 
 Route::get('/inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
 Route::get('/products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
+Route::get('/expired-products-report', [InventoryReportController::class, 'expirationReport']);
+Route::get('/reports/expired-products', [InventoryReportController::class, 'expirationReport'])->name('reports.expired-products');
 
     // عرض الحركات المراجعة
     Route::get('/inventory-review', [InventoryReviewController::class, 'index'])->name('inventory-review.index');

@@ -36,13 +36,17 @@
                     <!-- تاريخ الإنتاج -->
                     <div class="mb-4">
                         <x-file-input type="date" id="production_date" name="production_date" label="تاريخ الإنتاج"
-                            required />
+                             />
+                            <input type="hidden" name="production_date" value="{{ $transactionItem->production_date }}">
+
                     </div>
 
                     <!-- تاريخ الانتهاء -->
                     <div class="mb-4">
                         <x-file-input type="date" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء"
-                            required />
+                             />
+                            <input type="hidden" name="expiration_date" value="{{ $transactionItem->expiration_date }}">
+
                     </div>
 
                     <!-- الكمية -->

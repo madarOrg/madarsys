@@ -27,6 +27,12 @@
     <ul class="flex flex-row justify-start pl-0 mb-0 list-none md-max:w-full">
       <li class="flex items-center">
         @auth
+        <!-- عرض اسم المستخدم -->
+        <li class="flex items-center pr-6">
+          <span class="text-sm text-gray-700 dark:text-white border-b  border-gray-300 pb-2  ml-4">
+            {{ auth()->user()->name }}
+          </span>
+        </li>
           <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit" class="block px-0 py-2 font-semibold transition-all ease-nav-brand text-sm text-slate-500 dark:text-white">

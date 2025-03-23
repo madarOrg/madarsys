@@ -32,6 +32,8 @@ class StoreInventoryTransactionRequest extends FormRequest
         return [
             'transaction_type_id' => 'required|exists:transaction_types,id',
             'transaction_date' => 'required|date|date_format:Y-m-d\TH:i',
+            
+
             // ['required', 'date', function ($attribute, $value, $fail) use ($warehouseId, $secondaryWarehouseId, $inventoryValidationService) {
             //     $errorMessage = $inventoryValidationService->validateTransactionDate($value, $warehouseId);
             //     if ($errorMessage) {

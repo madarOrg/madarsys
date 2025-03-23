@@ -43,7 +43,7 @@ class CreateInventoryTransactionListener
                 'inventory_request_id'    => $data['inventory_request_id'] ?? null,
                 'status'                  => $data['status'] ?? 0,
             ]);
-        
+
             // تحقق من المصفوفات المرتبطة
             $products = $data['products'];
             $units = $data['units'];
@@ -63,14 +63,14 @@ class CreateInventoryTransactionListener
                 // استدعاء دالة معالجة الحركة المخزنية
                 $this->createInventoryMovement($transaction, $data, $product, $quantity, $unitId, $pricePerUnit, $priceTotal, $location, $index);
             }
-        // dd($products);
+            // dd($products);
             DB::commit();
         } catch (\Exception $e) {
             DB::rollBack();
             // التعامل مع الأخطاء
             throw new \Exception($e->getMessage());
         }
-        
+
         // try {
         //     // إنشاء السجل الرئيسي للحركة المخزنية
         //     try {
@@ -147,6 +147,9 @@ class CreateInventoryTransactionListener
                 'converted_quantity'       => $convertedOutQuantity,
                 'unit_product_id'          => $productUnit,
                 'converted_price'          => $convertedPrice,
+                'source_warehouse_id'      => $data['warehouse_id'],
+                'production_date' => $data['production_date'],
+                'expiration_date' => $data['expiration_date'],
 
             ]);
             // تحديث الكميات في جدول المخزون
@@ -169,6 +172,9 @@ class CreateInventoryTransactionListener
                 'converted_quantity'       => $convertedInQuantity,
                 'unit_product_id'          => $productUnit,
                 'converted_price'          => $convertedPrice,
+                'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
+                'production_date' => $data['production_date'][$index] ?? null,
+                'expiration_date' => $data['expiration_date'][$index] ?? null,
 
             ]);
             // تحديث الكميات في جدول المخزون
@@ -210,10 +216,12 @@ class CreateInventoryTransactionListener
                     'converted_quantity'       => $convertedQuantity,
                     'unit_product_id'          => $productUnit,
                     'converted_price'          => $convertedPrice,
-
+                    'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
+                    'production_date'          => $data['production_date'][$index] ?? null,
+                    'expiration_date'          => $data['expiration_date'][$index] ?? null,
 
                 ]);
-// dd($data['warehouse_locations'][$index] );
+                // dd($data['warehouse_locations'][$index] );
                 // تحديث الكميات في جدول المخزون
             } catch (\Exception $e) {
                 // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:", $e->getMessage());
@@ -248,5 +256,4 @@ class CreateInventoryTransactionListener
         // التحقق مما إذا كانت الكمية المتوفرة أكبر من أو تساوي الكمية المطلوبة
         return $inventory->quantity >= $requestedQuantity;
     }
-
 }

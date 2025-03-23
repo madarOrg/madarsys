@@ -11,10 +11,8 @@
                     <x-title :title="'بيانات الحركة'" />
 
                     <!-- نوع العملية -->
-                    <label for="transaction_type_id"
-                        class="">نوع العملية</label>
-                    <select name="transaction_type_id" id="transaction_type_id"
-                        class="form-select tom-select ">
+                    <label for="transaction_type_id" class="">نوع العملية</label>
+                    <select name="transaction_type_id" id="transaction_type_id" class="form-select tom-select  ">
                         <option value="">اختر نوع العملية</option>
                         @foreach ($transactionTypes as $transactionType)
                             <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">
@@ -27,8 +25,7 @@
                         type="datetime-local" required="true" value="{{ now()->format('Y-m-d\TH:i') }}" />
 
                     <!-- التأثير (تحديث تلقائي عند اختيار نوع العملية) -->
-                    <label for="effect"
-                        class=" mt-2">التأثير</label>
+                    <label for="effect" class=" mt-2">التأثير</label>
                     <select id="effect"
                         class="form-select w-full mt-1 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                         <option value="1">+</option>
@@ -40,10 +37,8 @@
                     <x-file-input id="reference" name="reference" label="الرقم المرجعي (اختياري)" type="text" />
 
                     <!-- الشريك -->
-                    <label for="partner_id"
-                        class="">الشريك</label>
-                    <select id="partner_id" name="partner_id"
-                        class="form-select tom-select ">
+                    <label for="partner_id" class="">الشريك</label>
+                    <select id="partner_id" name="partner_id" class="form-select tom-select ">
                         @foreach ($partners as $partner)
                             <option value="{{ $partner->id }}">{{ $partner->name }}</option>
                         @endforeach
@@ -59,10 +54,8 @@
                     </select> --}}
 
                     <!-- المستودع -->
-                    <label for="warehouse_id"
-                        class="">المستودع</label>
-                    <select id="warehouse_id" name="warehouse_id"
-                        class="form-select tom-select ">
+                    <label for="warehouse_id" class="">المستودع</label>
+                    <select id="warehouse_id" name="warehouse_id" class="form-select tom-select ">
                         <option value="" disabled selected>اختر مستودعًا</option>
                         @foreach ($warehouses as $warehouse)
                             <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -71,11 +64,9 @@
 
                     <!-- المستودع الثانوي (يظهر عند الحاجة) -->
                     <div id="secondary_warehouse_container" style="display: none;">
-                        <label for="secondary_warehouse_id"
-                            class="">المستودع
+                        <label for="secondary_warehouse_id" class="">المستودع
                             الثانوي</label>
-                        <select id="secondary_warehouse_id" name="secondary_warehouse_id"
-                            class="form-select ">
+                        <select id="secondary_warehouse_id" name="secondary_warehouse_id" class="form-select ">
                             <option value="">اختر مستودعًا</option>
                             @foreach ($warehouses as $warehouse)
                                 <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
@@ -104,52 +95,67 @@
                                 <th class="px-6 py-3">الكمية</th>
                                 <th class="px-6 py-3">سعر الوحدة</th>
                                 <th class="px-6 py-3">الإجمالي</th>
-                                <th class="px-6 py-3">موقع التخزين</th>
+                                <th class="px-6 py-3">موقغ التخزين</th>
+                                <th class="px-6 py-3">تاريخ إنتاج المنتج </th>
+                                <th class="px-6 py-3">تاريخ إنتهاء المنتج </th>
+
                                 <th class="px-6 py-3">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody id="transaction-items">
                             @foreach (old('products', []) as $index => $productId)
                                 <tr
-                                    class="product-row border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
-                                    <td class="px-6 py-4">
+                                    class="product-row border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+                                    <td class="px-0 py-4">
                                         <select name="products[]"
-                                            class="w-full product-select  tom-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                            class="w-full product-select tom-select min-w-[250px] border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                                             <option value="">اختر منتج</option>
                                             @foreach ($products as $product)
                                                 <option value="{{ $product->id }}">{{ $product->name }}</option>
                                             @endforeach
                                         </select>
                                     </td>
+                                    
+                                   
+                                    
                                     <td class="px-6 py-4">
                                         <select name="units[]"
-                                            class="w-full units-select tom-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                            class="w-full units-select tom-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                                             <option value="">اختر وحدة</option>
                                         </select>
                                     </td>
                                     <td class="px-6 py-4">
                                         <input type="number" name="quantities[]"
-                                            class="w-full quantity-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                            class="w-full quantity-input  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
                                     </td>
                                     <td class="px-6 py-4">
                                         <input type="number" name="unit_prices[]"
-                                            class="w-full unit-price-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
+                                            class="w-full unit-price-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
                                             min="0" step="0.01" />
                                     </td>
                                     <td class="px-6 py-4">
                                         <input type="number" name="totals[]"
-                                            class="w-full total-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
+                                            class="w-full total-input  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
                                             min="0" step="0.01" />
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="">
+                                        <input type="date" name="production_date[]"
+                                            class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                    </td>
+                                    <td class="">
+                                        <input type="date" name="expiration_date[]"
+                                            class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                    </td>
+
+                                    {{-- <td class="px-6 py-4">
                                         <select name="warehouse_locations[]"
-                                            class="w-full warehouse-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                            class="w-full warehouse-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                                             <option value="">اختر موقع التخزين</option>
                                             @foreach ($warehouseLocations as $location)
                                                 <option value="{{ $location->id }}">{{ $location->name }}</option>
                                             @endforeach
                                         </select>
-                                    </td>
+                                    </td> --}}
                                     <td class="px-6 py-4 flex space-x-2">
                                         <!-- زر تحديث الصف: عند النقر يتم استدعاء دالة JavaScript لتحديث بيانات الصف عبر AJAX -->
                                         {{-- <button type="button"
@@ -180,9 +186,10 @@
         function addProductRow() {
             const tableBody = document.getElementById('transaction-items');
             const newRow = `
-                <tr id="productRows" class="product-row border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
-                    <td class="px-2 py-2">
-                        <select name="products[]" class="w-full product-select tom-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                <tr id="productRows" class="product-row border-b  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+                    <td class="px-0 py-2">
+                        <select name="products[]" 
+                                            class="w-full product-select tom-select min-w-[250px] border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                             <option value="">اختر منتج</option>
                             @foreach ($products as $product)
                                 <option value="{{ $product->id }}">
@@ -192,7 +199,7 @@
                         </select>
                     </td>
                     <td class="px-6 py-4">
-                        <select name="units[]" class="w-full units-select tom-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                        <select name="units[]" class="w-full units-select tom-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                             <option value="">اختر وحدة</option>
                         </select>
                     </td>
@@ -205,20 +212,26 @@
                     <td class="px-6 py-4">
                         <input type="number" name="totals[]" class="w-full total-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" min="0" step="0.01" />
                     </td>
-                    <td class="px-6 py-4">
-                        <select name="warehouse_locations[]" class="w-full warehouse-select bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                            <option value="">اختر موقع التخزين</option>
-                            @foreach ($warehouseLocations as $location)
-                                <option value="{{ $location->id }}">{{ $location->name }}</option>
-                            @endforeach
-                        </select>
-                    </td>
-                    <td class="px-6 py-4 flex space-x-2">
-                        <button type="button" class="update-row-btn text-blue-600 hover:text-blue-800" onclick="updateRow(this)">تحديث</button>
-                        <button type="button" class="remove-row-btn text-red-600 hover:text-red-800" onclick="removeProductRow(this)">
-                            <i class="fas fa-trash-alt"></i>
-                        </button>
-                    </td>
+                   <td class="px-6 py-4">
+                <select name="warehouse_locations[]" 
+                    class="w-full warehouse-select tom-select min-w-[250px] border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                    <option value="">اختر موقع التخزين</option>
+                    @foreach ($warehouseLocations as $location)
+                        <option value="{{ $location->id }}">{{ $location->name }}</option>
+                    @endforeach
+                </select>
+            </td>
+                     <td class="">
+            <input type="date" name="production_date[]" class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+            </td>
+            <td class="">
+                <input type="date" name="expiration_date[]" class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+            </td>
+            <td class="px-6 py-4">
+                <button type="button" class="remove-row-btn text-red-600 hover:text-red-800" onclick="removeProductRow(this)">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </td>
                 </tr>`;
             tableBody.insertAdjacentHTML('beforeend', newRow);
 

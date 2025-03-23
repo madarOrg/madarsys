@@ -83,4 +83,10 @@ class Product extends Model
     {
         return $this->hasMany(Shipment::class);
     }
+    public function inventoryTransactionItems()
+{
+    return $this->hasMany(InventoryTransactionItem::class, 'product_id');
+}
+
+
 }
