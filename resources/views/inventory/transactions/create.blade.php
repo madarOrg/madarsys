@@ -124,16 +124,16 @@
                                             <option value="">اختر وحدة</option>
                                         </select>
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="">
                                         <input type="number" name="quantities[]"
                                             class="w-full quantity-input  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="">
                                         <input type="number" name="unit_prices[]"
                                             class="w-full unit-price-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
                                             min="0" step="0.01" />
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="">
                                         <input type="number" name="totals[]"
                                             class="w-full total-input  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
                                             min="0" step="0.01" />
@@ -147,16 +147,16 @@
                                             class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
                                     </td>
 
-                                    {{-- <td class="px-6 py-4">
+                                    <td class="">
                                         <select name="warehouse_locations[]"
-                                            class="w-full warehouse-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                            class=" warehouse-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                                             <option value="">اختر موقع التخزين</option>
                                             @foreach ($warehouseLocations as $location)
                                                 <option value="{{ $location->id }}">{{ $location->name }}</option>
                                             @endforeach
                                         </select>
-                                    </td> --}}
-                                    <td class="px-6 py-4 flex space-x-2">
+                                    </td>
+                                    <td class="px-6 py-4">
                                         <!-- زر تحديث الصف: عند النقر يتم استدعاء دالة JavaScript لتحديث بيانات الصف عبر AJAX -->
                                         {{-- <button type="button"
                                             class="update-row-btn text-blue-600 hover:text-blue-800"
@@ -203,18 +203,18 @@
                             <option value="">اختر وحدة</option>
                         </select>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="">
                         <input type="number" name="quantities[]" class="w-full quantity-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="">
                         <input type="number" name="unit_prices[]" class="w-full unit-price-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" min="0" step="0.01" />
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="">
                         <input type="number" name="totals[]" class="w-full total-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" min="0" step="0.01" />
                     </td>
-                   <td class="px-6 py-4">
+                   <td class="">
                 <select name="warehouse_locations[]" 
-                    class="w-full warehouse-select tom-select min-w-[250px] border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                    class="warehouse-select tom-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                     <option value="">اختر موقع التخزين</option>
                     @foreach ($warehouseLocations as $location)
                         <option value="{{ $location->id }}">{{ $location->name }}</option>

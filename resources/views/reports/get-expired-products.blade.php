@@ -11,7 +11,7 @@
 
             {{-- نموذج الفلترة --}}
             <div x-show="open" x-transition>
-                <form method="GET" action="{{ route('reports.expired-products') }}" class="mb-4 hide-on-print">
+                <form method="GET" action="{{ route('reports.get-expired-products') }}" class="mb-4 hide-on-print">
                     <div class="row g-3">
                         <div class="flex flex-wrap gap-4 items-end">
                             <!-- اختيار المستودع -->
@@ -22,6 +22,7 @@
                                     <option value="">كل المستودعات</option>
                                     @foreach ($warehouses as $warehouse)
                                         <option value="{{ $warehouse->id }}"
+
                                             {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
                                             {{ $warehouse->name }}
                                         </option>
@@ -59,15 +60,15 @@
 
                         <!-- زر الفلترة -->
                         <div class="col-md-12 mt-4">
-                            <button type="submit"  name="filter" value="1" class="btn btn-primary  text-red-500">
-                                تصفية</button>
+                            <button type="submit"  name="filter" value="1" class="btn btn-primary text-red-500">
+                                تصفية
+                            </button>
                         </div>
                     </div>
                 </form>
             </div>
         </div>
     </div>
-
 
     <div class="container mx-auto p-4">
         <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
@@ -86,14 +87,13 @@
                 </div>
                 <img src="{{ asset('storage/' . $company->logo) }}" alt="شعار الشركة" class="w-16 h-16  rounded-full">
             </div>
-            <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المقاربة لإنتهاء الصلاحية  </h1>
-            {{-- <hr class="border-t border-gray-300"> --}}
+            <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المنتهية  الصلاحية </h1>
         </header>
 
         <!-- محتوى التقرير -->
         <main>
             @if ($report->isEmpty())
-                <p class="text-red-500 text-center">لا توجد منتجات مقاربة لإنتهاء الصلاحية بناءً على الفلترة.</p>
+                <p class="text-red-500 text-center">لا توجد منتجات منتهية الصلاحية بناءً على الفلترة.</p>
             @else
             <div class="">
                 <table class="w-full border-collapse border border-gray-300 text-sm">
@@ -153,9 +153,6 @@
         <!-- فوتر التقرير - يختفي أثناء الطباعة -->
         <footer class="text-center mt-6">
             <p>تمت الطباعة بواسطة: {{ auth()->user()->name }} | تاريخ الطباعة: {{ \Carbon\Carbon::now()->format('Y-m-d H:i') }}</p>
-          
         </footer>
     </div>
-    </div>
-</div>
 </x-layout>

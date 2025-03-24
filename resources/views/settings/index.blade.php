@@ -112,7 +112,15 @@
                     class="flex items-center space-x-2"
                     required 
                 />
-
+                <x-file-input 
+                type="number" 
+                id="expiration_threshold_days" 
+                name="expiration_threshold_days" 
+                :label="'عدد الأيام لتحديد انتهاء الصلاحية'" 
+                :value="old('expiration_threshold_days', $settings->where('key', 'expiration_threshold_days')->first()->value ?? 0)" 
+                class="flex items-center space-x-2"
+                required 
+            />
                 <div class="sm:col-span-2 flex justify-end">
                     <x-button type="submit">حفظ</x-button>
                 </div>

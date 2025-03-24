@@ -1,11 +1,11 @@
 <div>
     <form id="transaction-view-form">
         <div class="p-4 rounded-lg shadow w-full overflow-x-auto">
-            <x-title :title="'بحث عن عملية مخزنية'" />
+            <x-title :title="'   قائمة الحركات المخزنية'" />
         
-            <input type="text" wire:model="search" wire:keydown.enter="searchTransactions"
-                placeholder="ابحث برقم المرجع، الشريك، القسم، أو المستودع..."
-                class="w-full p-2 border rounded-lg">
+            <div class="relative">
+                <x-search-input id="custom-id" name="search" placeholder=" ابحث برقم المرجع، الشريك، القسم، أو المستودع..." :value="request()->input('search')" />
+
         </div>
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <!-- قسم بيانات العملية -->

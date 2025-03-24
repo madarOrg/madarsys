@@ -147,7 +147,7 @@ class CreateInventoryTransactionListener
                 'converted_quantity'       => $convertedOutQuantity,
                 'unit_product_id'          => $productUnit,
                 'converted_price'          => $convertedPrice,
-                'source_warehouse_id'      => $data['warehouse_id'],
+                'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
                 'production_date' => $data['production_date'],
                 'expiration_date' => $data['expiration_date'],
 

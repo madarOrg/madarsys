@@ -1,4 +1,4 @@
-<header>
+<header class="hide-on-print">
   <div class="m-4 flex justify-between items-end lg:order-2">
     <!-- الجزء الخاص بالشعار في أقصى اليمين مع تأثير الدوران -->
     <div class="flex justify-end items-center">
@@ -29,7 +29,7 @@
         @auth
         <!-- عرض اسم المستخدم -->
         <li class="flex items-center pr-6">
-          <span class="text-sm text-gray-700 dark:text-white border-b  border-gray-300 pb-2  ml-4">
+          <span class="text-sm text-gray-700 dark:text-white border-b  border-gray-300   ml-4">
             {{ auth()->user()->name }}
           </span>
         </li>
