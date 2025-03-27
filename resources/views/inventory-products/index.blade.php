@@ -144,7 +144,11 @@
                                     </td>
                                     
                                     
-                                    <td class="px-6 py-4">{{ $product->product->name }}</td>
+                                    <td class="px-6 py-4">
+                                        <a href="{{ route('products.show', $product->product->id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                                            {{ $product->product->name }}
+                                        </a>
+                                    </td>
                                     <td class="px-6 py-4">{{ $product->productQuantity ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">{{ $product->location->rack_code ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">{{ $product->storageArea->area_name ?? 'غير محدد' }}</td>
@@ -162,6 +166,7 @@
                                             'warehouse_id' => $product->warehouse_id,
                                             'inventory_transaction_item_id' => $product->inventory_transaction_item_id,
                                             'product_id' => $product->product_id,
+                                            'distribution_type'=>'1'
                                         ]) }}"
                                             class=" text-blue-500 hover:underline dark:text-white-500">
                                             <i class="fas fa-arrow-up ml-2"></i> <!-- توزيع عبر النقل -->
@@ -170,6 +175,8 @@
                                             'warehouse_id' => $product->warehouse_id,
                                             'inventory_transaction_item_id' => $product->inventory_transaction_item_id,
                                             'product_id' => $product->product_id,
+                                                                                        'distribution_type'=>'-1'
+
                                         ]) }}"
                                             class=" text-red-500 hover:underline dark:text-white-500">
                                             <i class="fas fa-arrow-down"></i> <!-- توزيع عبر النقل -->

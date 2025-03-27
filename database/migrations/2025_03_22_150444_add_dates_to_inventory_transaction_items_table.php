@@ -12,7 +12,7 @@ return new class extends Migration
             Schema::table('inventory_transaction_items', function (Blueprint $table) {
                 $table->timestamp('production_date')->nullable();
                 $table->timestamp('expiration_date')->nullable();
-                $table->foreignId('source_warehouse_id');
+                $table->foreignId('source_warehouse_id')->nullable();
 
             });
         }
@@ -20,7 +20,8 @@ return new class extends Migration
         public function down(): void
         {
             Schema::table('inventory_transaction_items', function (Blueprint $table) {
-                $table->dropColumn(['production_date', 'expiration_date']);
+            });
+                $table->dropColumn(['production_date', 'expiration_date','source_warehouse_id']);
             });
         }
     };

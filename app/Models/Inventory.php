@@ -43,8 +43,8 @@ class Inventory extends Model
     /**
      * تخصيص الوصول إلى الكميات التراكمية (total_value)
      */
-    public function getTotalValueAttribute($value)
-    {
-        return number_format($value, 2);
-    }
+    // public function getTotalValueAttribute($value)
+    // {
+    //     return number_format($value, 2);
+    // }
 }

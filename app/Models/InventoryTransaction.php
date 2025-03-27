@@ -47,6 +47,11 @@ class InventoryTransaction extends Model
             'product_id'                // المفتاح الأجنبي في InventoryTransactionItem
         );
     }
+// public function product()
+// {
+//     return $this->belongsTo(Product::class);
+// }
+
         
     public function branch()
     {
@@ -84,5 +89,14 @@ class InventoryTransaction extends Model
     {
         return $this->hasMany(InventoryTransactionItem::class, 'inventory_transaction_id');
     }
-    
+    public function createdUser()
+{
+    return $this->belongsTo(User::class, 'created_user');
+}
+
+public function updatedUser()
+{
+    return $this->belongsTo(User::class, 'updated_user');
+}
+
 }

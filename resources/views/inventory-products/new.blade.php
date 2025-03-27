@@ -9,6 +9,7 @@
             <form action="{{ route('inventory-products.store') }}" method="POST">
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
+                    <input type="hidden" name="distribution_type" value="{{ request('distribution_type', '1') }}">
 
                 <div class="mb-4">
                     <x-file-input label="المستودع" id="warehouse_id" value="{{ $product->warehouse->name }}" readonly

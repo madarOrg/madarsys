@@ -14,40 +14,48 @@
                 <!-- نموذج البحث -->
                 <form action="{{ route('reports.search-products') }}" method="GET" class="">
                     <div class="">
-                      
-                            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            
                                 <div class="hide-on-print mb-2">
-                                    <label for="name" class="block">اسم المنتج</label>
-                                    <input type="text" id="name" name="name" value="{{ request('name') }}" class="tom-select ">
-                                </div>
-                                <div class="hide-on-print mb-2">
-                                    <label for="sku" class="block">رقم المنتج (SKU)</label>
-                                    <input type="text" id="sku" name="sku" value="{{ request('sku') }}" class="tom-select  ">
-                                </div>
-                                <div class="mb-2">
-                                    <label for="warehouse_id" class="block">المستودع</label>
-                                    <select name="warehouse_id" id="warehouse_id" class="tom-select  ">
-                                        <option value="">اختر المستودع</option>
-                                        @foreach ($warehouses as $warehouse)
-                                            <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
-                                                {{ $warehouse->name }}
+                                    <label for="name" class="block">اسم المنتج/الباركود/SKU </label>
+                                    <select name="products[]"
+                                        class="w-full product-select tom-select min-w-[250px] border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                        <option value="">اختر منتج</option>
+                                        @foreach ($products as $product)
+                                            <option value="{{ $product->id }}">
+                                                {{ $product->name }}-{{ $product->barcode }}--{{ $product->sku }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
-                                <div class="col-md-12 mt-1 ">
-                                    <button type="submit" name="filter" value="1"
-                                        class=" hide-on-print btn btn-primary  text-red-500">
-                                        تصفية</button>
-                                </div>
+                          
+
+                            <div class="mb-2">
+                                <label for="warehouse_id" class="block">اسم المستودع</label>
+                                <select name="warehouse_id" id="warehouse_id" class="tom-select  ">
+                                    <option value="">اختر المستودع</option>
+                                    @foreach ($warehouses as $warehouse)
+                                        <option value="{{ $warehouse->id }}"
+                                            {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                            {{ $warehouse->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
                             </div>
-                     
+                            <div class="col-md-12 mt-1 ">
+                                <button type="submit" name="filter" value="1"
+                                    class=" hide-on-print btn btn-primary  text-red-500">
+                                    تصفية</button>
+                            </div>
+                        </div>
+
                     </div>
-                    
+
                 </form>
             </div>
         </div>
-        
+
         <div class="container mx-auto p-4">
             <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
             <div class="hide-on-print text-right mb-4 ">
@@ -57,18 +65,10 @@
                 </button>
             </div>
             <!-- رأس التقرير -->
-            <header class="mb-0">
-                <div class="flex items-center justify-between mb-0">
-                    <div class="text-right">
-                        <h1 class="text-2xl font-bold">{{ $company->name ?? 'غير متاح' }}</h1>
-                        <h3 class="text-lg">المستودع: {{ $warehouse->name ?? 'غير متاح' }}</h3>
-                    </div>
-                    <img src="{{ asset('storage/' . $company->logo) }}" alt="شعار الشركة"
-                        class="w-16 h-16  rounded-full">
-                </div>
-                <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300 ">تقرير المنتجات التي وصلت لحد إعادة الطلب</h1>
-                {{-- <hr class="border-t border-gray-300"> --}}
-            </header>
+            <x-reportHeader :company="$company" :warehouse="$warehouse">
+                 <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300 ">تقرير المنتجات التي وصلت
+                    لحد إعادة الطلب</h1>
+            </x-reportHeader>    
 
             @if ($reorderProducts->isEmpty())
                 <p class="text-center text-red-500">لا توجد منتجات وصلت لحد إعادة الطلب.</p>

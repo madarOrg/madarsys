@@ -35,7 +35,8 @@ use App\Http\Controllers\{
     ReturnOrderSupplierController,
     ReturnOrderController,
     ShipmentController,
-    InventoryReportController
+    InventoryReportController,
+    InventoryAuditController
 };
 use App\Services\UnitService;
 
@@ -389,8 +390,11 @@ Route::prefix('reports')->name('reports.')->group(function () {
     
     // تقرير المنتحات المنتهيه
     Route::get('/get-expired-products', [InventoryReportController::class, 'getExpiredProducts'])->name('get-expired-products');
+// تقرير الحركات المخزنية
+        Route::get('/inventory-transactions', [InventoryReportController::class, 'inventoryTransactions'])
+                ->name('inventory-transactions');
 
-    // البحث عن المنتجات
+
 });
     // عرض الحركات المراجعة
     Route::get('/inventory-review', [InventoryReviewController::class, 'index'])->name('inventory-review.index');
@@ -441,6 +445,13 @@ Route::prefix('returns/supplier')->name('return_suppliers.')->group(function () 
 
 });
 
+//Auditing
+Route::prefix('/inventory/audit')->name('inventory.audit.')->group(function () {
+
+Route::get('/', [InventoryAuditController::class, 'index'])->name('index');
+
+});
+//--------------------------------------------------
 Route::get('/shipments', [ShipmentController::class, 'index']);
 
 Route::prefix('shipments')->group(function () {

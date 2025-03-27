@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\Setting;
 use App\Models\InventoryTransactionItem;
+use App\Models\TransactionType;
+use App\Models\InventoryTransaction;
 use App\Models\Product;
 use App\Models\Warehouse; // إضافة الموديل الخاص بالمستودعات
 use Illuminate\Http\Request;
@@ -180,6 +182,7 @@ class InventoryReportController extends Controller
         // تمرير المتغيرات إلى الـ View
         return view('reports.reorder-report', compact('reorderProducts', 'products', 'company', 'warehouses'));
     }
+    // تقرير موردي المنتجات
     public function searchProducts(Request $request)
     {
         // Start the query for products
@@ -224,14 +227,14 @@ class InventoryReportController extends Controller
         return view('reports.reorder-report', compact('reorderProducts', 'products', 'company', 'warehouses'));
     }
 
-    /////////// getProductPurchasesByPartner
+    /////////// getProductPurchasesByPartnerpublic function searchPartners(Request $request)
 
     public function searchPartners(Request $request)
     {
-        // Start the query for products
+        // بدء استعلام البحث للمنتجات
         $query = Product::query();
 
-        // Apply filters if provided
+        // تطبيق عوامل التصفية إذا كانت موجودة
         if ($request->filled('id')) {
             $query->where('id', $request->id);
         }
@@ -250,65 +253,149 @@ class InventoryReportController extends Controller
             });
         }
 
-        // Get filtered products
+        // تنفيذ الاستعلام وجلب المنتجات مع علاقة inventory.warehouse
         $products = $query->with('inventory.warehouse')->get();
 
-        // Get reorder products based on stock levels
-        $reorderProducts = collect();
+        // جلب بيانات الحركات (تفاصيل المنتج مع بيانات الشركاء) لكل منتج باستخدام الدالة نفسها كما في العرض
+        $purchasesByPartner = [];
         foreach ($products as $product) {
-            $details = $this->getProductReorderDetails($product);
-            if ($details['available_quantity'] <= $details['min_stock_level']) {
-                $reorderProducts->push($details);
-            }
+            $purchasesByPartner[$product->id] = $this->getProductDetailsWithPartners($product);
         }
 
-        // Get warehouses and company information for the view
+        // جلب بيانات المستودعات والشركة
         $warehouses = Warehouse::ForUserWarehouse()->get();
         $company = Company::forUserCompany()->first();
 
-        // Pass all variables to the view
-        return view('reports.purchase-report', compact('reorderProducts', 'products', 'company', 'warehouses'));
+        // تمرير المتغيرات إلى الـ View لنفس تقرير الشراء
+        return view('reports.purchase-report', compact('purchasesByPartner', 'products', 'company', 'warehouses'));
     }
 
-    public function getProductPurchasesByPartner(Product $product)
+
+
+    public function getProductDetailsWithPartners(Product $product)
     {
-        // جلب جميع حركات الشراء التي تخص المنتج
-        $purchases = InventoryTransactionItem::with(['partner', 'product'])
-            ->where('product_id', $product->id) // فلترة المنتج
-            ->where('transaction_type_id', 1) // فقط حركات الشراء
+        // جلب الكمية من العلاقة مع جدول المخزون (إذا كانت العلاقة موجودة)
+        $availableQuantity = $product->inventory ? $product->inventory->quantity : 0;
+
+        // استخدام المنتج الحالي للحصول على التفاصيل (لا حاجة لإعادة استعلام)
+        $productDetails = $product;
+
+        // جلب المشتريات المتعلقة بالمنتج من الشركاء
+        $purchases = $product->inventoryTransactions()
+            ->with(['partner'])
+            ->where('inventory_transaction_items.product_id', $product->id)
+            ->where('transaction_type_id', 1) // فرضًا أن هذا يحدد حركات الشراء
+            ->select(
+                'inventory_transactions.partner_id',
+                'inventory_transactions.transaction_date',
+                'inventory_transactions.status', // إضافة حقل الحالة
+                'inventory_transaction_items.quantity as available_quantity',
+                'units.name as unit_name',
+
+                'partners.name as partner_name'
+            )
+            ->join('inventory_transaction_items as iti', 'iti.inventory_transaction_id', '=', 'inventory_transactions.id')
+            ->join('partners', 'partners.id', '=', 'inventory_transactions.partner_id')
+            ->join('units', 'units.id', '=', 'inventory_transaction_items.unit_id')
+
             ->get();
 
-        // تحضير البيانات التي سيتم عرضها
+        // تحضير البيانات للعرض
         $purchaseDetails = [];
-
         foreach ($purchases as $purchase) {
             $purchaseDetails[] = [
-                'partner_name' => $purchase->partner ? $purchase->partner->name : 'غير معروف',
-                'quantity' => $purchase->quantity,
-                'transaction_date' => $purchase->created_at->format('Y-m-d H:i:s'), // تاريخ الحركة
+                'partner_name'      => $purchase->partner_name, // اسم الشريك
+                'quantity'          => $purchase->available_quantity ?? 0, // كمية الشراء
+                'unit_name'          => $purchase->unit_name, // وحدة الشراء
+
+                'transaction_date'  => $purchase->transaction_date
+                    ? \Carbon\Carbon::parse($purchase->transaction_date)->format('Y-m-d H:i:s')
+                    : 'تاريخ غير محدد',
+                'status'            => $purchase->status ?? 'غير متاح'  // الحالة
             ];
         }
 
-        return $purchaseDetails;
+        return [
+            'product' => [
+                'id'                => $productDetails->id,
+                'barcode'           => $productDetails->barcode,
+                'name'              => $productDetails->name,
+                'description'       => $productDetails->description,
+                'available_quantity' => $availableQuantity,
+                'min_stock_level'   => $productDetails->min_stock_level,
+            ],
+            'purchases' => $purchaseDetails,
+        ];
     }
+
 
     public function purchaseReport(Request $request)
     {
         // جلب جميع المنتجات
         $products = Product::all();
 
-        // جلب بيانات الحركات الخاصة بكل منتج
+        // جلب بيانات الحركات (تفاصيل المنتج مع بيانات الشركاء) لكل منتج
         $purchasesByPartner = [];
-
         foreach ($products as $product) {
-            $purchasesByPartner[$product->id] = $this->getProductPurchasesByPartner($product);
+            $purchasesByPartner[$product->id] = $this->getProductDetailsWithPartners($product);
         }
 
-        // جلب المستودعات والشركات
+        // جلب المستودعات والشركة
         $warehouses = Warehouse::ForUserWarehouse()->get();
         $company = Company::forUserCompany()->first();
 
         // تمرير البيانات إلى الـ View
         return view('reports.purchase-report', compact('purchasesByPartner', 'products', 'company', 'warehouses'));
+    }
+    // تقرير الحركات المخزمية
+
+    public function inventoryTransactions(Request $request)
+    {
+        // جلب جميع المنتجات
+           $products = Product::with('unit')->get();
+           $TransactionType = TransactionType::all();
+           $createdAtFrom = $request->input('created_at_from');
+        $createdAtTo = $request->input('created_at_to');
+        // جلب بيانات الحركات (تفاصيل المنتج مع بيانات الشركاء) لكل منتج
+        $purchasesByPartner = [];
+        // foreach ($products as $product) {
+        //     $purchasesByPartner[$product->id] = $this->getProductDetailsWithPartners($product);
+        // }
+
+        // جلب المستودعات والشركة
+        $warehouses = Warehouse::ForUserWarehouse()->get();
+        $company = Company::forUserCompany()->first();
+
+
+        // جلب الفلاتر من الطلب
+        $productIds = $request->input('products', []); 
+        $warehouseId = $request->input('warehouse_id');
+        $transactionType = $request->input('transaction_type_id');
+
+        // بناء الاستعلام مع الفلاتر
+        $query = InventoryTransaction::with(['transactionType', 'products','items.unit', 'createdUser',  'updatedUser'   ])
+            ->when($productIds, function ($q) use ($productIds) {
+                $q->whereHas('items', function ($query) use ($productIds) {
+                    $query->where('product_id', $productIds);
+                });
+            })
+            ->when($warehouseId, function($q) use ($warehouseId) {
+                $q->where('warehouse_id', $warehouseId);
+            })
+            ->when($transactionType, function ($q) use ($transactionType) {
+                $q->where('transaction_type_id', $transactionType);
+            })
+            ->when($createdAtFrom, function ($q) use ($createdAtFrom) {
+                $q->whereDate('created_at', '>=', $createdAtFrom);
+            })
+            ->when($createdAtTo, function ($q) use ($createdAtTo) {
+                $q->whereDate('created_at', '<=', $createdAtTo);
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $inventoryMovements = $query;
+        // dd($inventoryMovements);
+        return view('reports.inventory-transactions', compact('company', 'warehouses', 'inventoryMovements', 'products','TransactionType'));
     }
 }

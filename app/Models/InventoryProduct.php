@@ -30,10 +30,13 @@ class InventoryProduct extends Model
         'batch_number',
         'production_date',
         'expiration_date',
-        'distribution_type'
+        'distribution_type',
+        'unit_id',
+        'unit_product_id',
+        'converted_quantity'
     ];
 
-    
+
 
     /**
      * دالة boot لإنشاء رقم الدفعة عند إنشاء المنتج

@@ -29,32 +29,74 @@ class InventoryCalculationService
     }
 
 
-    /**
-     * حساب الكمية المحولة بناءً على معامل التحويل للوحدة
-     */
-    public function calculateConvertedQuantity($quantity, $unitId)
-    {
+   /**
+ * تحويل كمية من الوحدة المُدخلة إلى وحدة المنتج الأساسية
+ *
+ * @param float $quantity الكمية المدخلة
+ * @param int $inputUnitId الوحدة التي بواسطتها تم إدخال الكمية
+ * @param int $baseUnitId معرف المنتج للحصول على وحدة المنتج الأساسية
+ * @return float الكمية المحولة إلى وحدة المنتج الأساسية
+ */
+function calculateConvertedQuantity($quantity, $inputUnitId, $baseUnitId)
+{
+    
 
-        $unit = Unit::find($unitId);
-        if ($unit && $unit->conversion_factor) {
-            return $quantity * $unit->conversion_factor;
+    $conversionFactor = 1;
+    $currentUnitId = $inputUnitId;
+
+    // حلقة التحويل: استمر حتى تصل إلى وحدة المنتج الأساسية
+    while ($currentUnitId != $baseUnitId) {
+        $unit = Unit::find($currentUnitId);
+
+        if (!$unit || !$unit->conversion_factor || !$unit->parent_unit_id) {
+            throw new Exception('لا يمكن تحويل الوحدة إلى وحدة المنتج الأساسية.');
         }
-        return $quantity;
+
+        // تحديث معامل التحويل
+        $conversionFactor *= $unit->conversion_factor;
+        // الانتقال إلى الوحدة الأم
+        $currentUnitId = $unit->parent_unit_id;
     }
+
+    return $quantity * $conversionFactor;
+}
+
 
     /**
      * حساب السعر  بناءً على معامل التحويل للوحدة
      */
-    public function calculateConvertedPrice($pricePerUnit, $unitId)
-    {
-        $unit = Unit::find($unitId);
-        if ($unit && $unit->conversion_factor) {
-            // إذا كانت الوحدة لها معامل تحويل، نحسب السعر للوحدة الأساسية بقسمة السعر على معامل التحويل
-            return $pricePerUnit * $unit->conversion_factor;
+   /**
+ * تحويل سعر الوحدة من الوحدة المُدخلة إلى وحدة المنتج الأساسية
+ *
+ * @param float $price السعر بوحدة الإدخال (x)
+ * @param int $inputUnitId معرف الوحدة المُدخلة
+ * @param int $baseUnitId معرف المنتج للحصول على وحدة المنتج الأساسية
+ * @return float السعر بوحدة المنتج الأساسية
+ * @throws Exception في حال عدم إمكانية تحويل الوحدة
+ */
+function calculateConvertedPrice($price, $inputUnitId, $baseUnitId)
+{
+    
+    $conversionFactor = 1;
+    $currentUnitId = $inputUnitId;
+    
+    // حلقة التحويل: الاستمرار حتى الوصول إلى وحدة المنتج الأساسية
+    while ($currentUnitId != $baseUnitId) {
+        $unit = Unit::find($currentUnitId);
+        if (!$unit || !$unit->conversion_factor || !$unit->parent_unit_id) {
+            throw new Exception('لا يمكن تحويل الوحدة إلى وحدة المنتج الأساسية.');
         }
-        // إذا لم توجد وحدة أو معامل تحويل، يرجع السعر كما هو
-        return $pricePerUnit;
+        // تحديث معامل التحويل: ضرب كل معاملات التحويل للوصول إلى الوحدة الأساسية
+        $conversionFactor *= $unit->conversion_factor;
+        $currentUnitId = $unit->parent_unit_id;
     }
+    
+    // حساب السعر بوحدة المنتج الأساسية من خلال قسمة السعر على معامل التحويل
+    $pricePerBaseUnit = $price / $conversionFactor;
+    
+    return $pricePerBaseUnit;
+}
+
 
     /**
      * حساب الكمية مع التأثير (إدخال أو إخراج)

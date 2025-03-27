@@ -51,11 +51,11 @@
                     </div>
                     
                     <div class="mb-4">
-                        <x-file-input type="timestamp" id="production_date" name="production_date" label="تاريخ الإنتاج" required />
+                        <x-file-input type="timestamp" id="production_date" name="production_date" label="تاريخ الإنتاج"  />
                     </div>
                     
                     <div class="mb-4">
-                        <x-file-input type="timestamp" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء" required />
+                        <x-file-input type="timestamp" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء"  />
                     </div>
                     
                     <!-- اختيار المنتج -->
