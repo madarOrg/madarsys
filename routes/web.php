@@ -36,7 +36,8 @@ use App\Http\Controllers\{
     ReturnOrderController,
     ShipmentController,
     InventoryReportController,
-    InventoryAuditController
+    InventoryAuditController,
+    InventoryTransactionItemsController
 };
 use App\Services\UnitService;
 
@@ -335,6 +336,11 @@ Route::middleware(['web', 'auth'])->group(function () {
             ->name('destroy');
     });
 
+    Route::prefix('inventory/transactions/items')->group(function () {
+        Route::get('/{item}/edit', [InventoryTransactionItemsController::class, 'edit'])->name('inventory.transactions.editItem');
+        Route::put('/{item}', [InventoryTransactionItemsController::class, 'update'])->name('inventory.transactions.updateItem');
+    });
+    
 
     // مجموعة Routes الخاصة بحركة المخزون
     Route::prefix('inventory-products')->name('inventory-products.')->group(function () {
@@ -396,7 +402,15 @@ Route::prefix('reports')->name('reports.')->group(function () {
 
 
 });
-    // عرض الحركات المراجعة
+//Auditing
+Route::prefix('/inventory/audit')->name('inventory.audit.')->group(function () {
+
+    Route::get('/', [InventoryAuditController::class, 'index'])->name('index');
+    
+    });
+    
+
+// عرض الحركات المراجعة
     Route::get('/inventory-review', [InventoryReviewController::class, 'index'])->name('inventory-review.index');
 
     // تحديث حالة المراجعة
@@ -445,12 +459,6 @@ Route::prefix('returns/supplier')->name('return_suppliers.')->group(function () 
 
 });
 
-//Auditing
-Route::prefix('/inventory/audit')->name('inventory.audit.')->group(function () {
-
-Route::get('/', [InventoryAuditController::class, 'index'])->name('index');
-
-});
 //--------------------------------------------------
 Route::get('/shipments', [ShipmentController::class, 'index']);
 

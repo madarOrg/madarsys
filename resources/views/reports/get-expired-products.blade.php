@@ -8,85 +8,87 @@
                     x-html="open ? '<i class=\'fa-solid fa-magnifying-glass-minus fa-lg\'></i>' :'<i class=\'fa-solid fa-magnifying-glass-plus fa-lg\'></i>'">
                 </span>
             </button>
-        
+
             {{-- نموذج الفلترة --}}
             <div x-show="open" x-transition>
-                <form method="GET" action="{{ route('reports.get-expired-products') }}" class="mb-4 hide-on-print">
-                    <div class="row g-3">
-                        <div class="flex flex-wrap gap-4 items-end">
-                            <!-- اختيار المستودع -->
-                            <div class="mb-2 flex-1 min-w-[150px]">
-                                <label for="warehouse_id" class="form-label">اسم المستودع</label>
-                                <select name="warehouse_id" id="warehouse_id"
-                                    class="w-full tom-select border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                                    <option value="">كل المستودعات</option>
-                                    @foreach ($warehouses as $warehouse)
-                                        <option value="{{ $warehouse->id }}"
-                                            {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
-                                            {{ $warehouse->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-        
-                            <!-- اختيار المنتج -->
-                            <div class="hide-on-print mb-2 flex-1 min-w-[250px]">
-                                <label for="name" class="block">اسم المنتج/الباركود/SKU </label>
-                                <select name="products[]"
-                                    class="w-full product-select tom-select border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                                    <option value="">اختر منتج</option>
-                                    @foreach ($products as $product)
-                                        <option value="{{ $product->id }}">
-                                            {{ $product->name }}-{{ $product->barcode }}--{{ $product->sku }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-        
-                            <!-- من تاريخ -->
-                            <div class="hide-on-print mb-2 flex-1 min-w-[150px]">
-                                <x-file-input id="expiration_from" name="expiration_from" label="من تاريخ" type="date"
-                                    :value="request('expiration_from')" />
-                            </div>
-        
-                            <!-- إلى تاريخ -->
-                            <div class="hide-on-print mb-2 flex-1 min-w-[150px]">
-                                <x-file-input id="expiration_to" name="expiration_to" label="إلى تاريخ" type="date"
-                                    :value="request('expiration_to')" />
-                            </div>
-        
-                            <!-- زر الفلترة -->
-                           
+                <form method="GET" action="{{ route('reports.get-expired-products') }}" class="mb-4 " id="filter-form">
+
+                    <div class="flex flex-wrap gap-4 items-end">
+                        <!-- اختيار المستودع -->
+                        <div class="mb-2 flex-1 min-w-[150px]">
+                            <label for="warehouse_id" class="form-label">اسم المستودع</label>
+                            <select name="warehouse_id" id="warehouse_id"
+                                class="w-full tom-select border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                <option value="">كل المستودعات</option>
+                                @foreach ($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}"
+                                        {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                                        {{ $warehouse->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
+
+                        <!-- اختيار المنتج -->
+                        <div class="hide-on-print mb-2 flex-1 min-w-[250px]">
+                            <label for="name" class="block">اسم المنتج/الباركود/SKU </label>
+                            <select name="products[]"
+                                class="w-full product-select tom-select border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                <option value="">اختر منتج</option>
+                                @foreach ($products as $product)
+                                    <option value="{{ $product->id }}">
+                                        {{ $product->name }}-{{ $product->barcode }}--{{ $product->sku }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- من تاريخ -->
+                        <div class="hide-on-print mb-2 flex-1 min-w-[150px]">
+                            <x-file-input id="expiration_from" name="expiration_from" label="من تاريخ" type="date"
+                                :value="request('expiration_from')" />
+                        </div>
+
+                        <!-- إلى تاريخ -->
+                        <div class="hide-on-print mb-2 flex-1 min-w-[150px]">
+                            <x-file-input id="expiration_to" name="expiration_to" label="إلى تاريخ" type="date"
+                                :value="request('expiration_to')" />
+                        </div>
+
+
+
                     </div>
-                    <div class="col-md-12 mt-1 ">
-                        <button type="submit" name="filter" value="1"
-                            class=" hide-on-print btn btn-primary  text-red-500">
-                            تصفية</button>
+                    <!-- زر التصفية -->
+                    <div class="hide-on-print  mt-1">
+                        <button type="submit"
+                            class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
+                    </div>
+
+                    <!-- زر تفريغ الفلاتر -->
+                    <div class="hide-on-print  mt-1">
+                        <button type="button" id="resetFilters"
+                            class="btn btn-secondary bg-gray-300 hover:bg-gray-500 text-gray-700">تفريغ الفلاتر</button>
                     </div>
                 </form>
             </div>
         </div>
-        
-          
 
 
 
-
-        <div class="container mx-auto p-4">
+        <div class="container mx-auto ">
             <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
             <div class="hide-on-print text-right mb-4">
                 <button onclick="window.print()"
-                    class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
-                    طباعة التقرير
+                class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
+                 التقرير
                 </button>
             </div>
 
             <!-- رأس التقرير -->
             <x-reportHeader :company="$company" :warehouse="$warehouse">
-                 <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المنتهية
+                <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المنتهية
                     الصلاحية </h1>
             </x-reportHeader>
-               
+
 
             <!-- محتوى التقرير -->
             <main>
@@ -170,3 +172,57 @@
             </footer>
         </div>
 </x-layout>
+<script>
+    document.getElementById('resetFilters').addEventListener('click', function() {
+        // حفظ موضع التمرير لمنع اهتزاز الصفحة عند إعادة التعيين
+        const scrollY = window.scrollY;
+
+        // إعادة تعيين جميع الحقول داخل النموذج
+        const form = document.getElementById('filter-form');
+        form.reset();
+
+        // إعادة تعيين حقول التاريخ يدويًا (لأن reset() لا يعيدها)
+        form.querySelectorAll('input[type="date"]').forEach(input => {
+            input.value = '';
+        });
+
+        // إعادة تعيين حقول checkbox يدويًا
+        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // إعادة تعيين الحقول التي تستخدم TomSelect
+        document.querySelectorAll('.tom-select').forEach(select => {
+            if (select.tomselect) {
+                select.tomselect.clear(); // يمسح جميع الاختيارات داخل TomSelect
+            }
+        });
+
+        // إعادة موضع التمرير بعد إعادة التعيين
+        setTimeout(() => {
+            window.scrollTo(0, scrollY);
+        }, 50);
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const tomSelects = document.querySelectorAll('.tom-select');
+        document.getElementById('filter-form').reset();
+
+        tomSelects.forEach(select => {
+            if (!select.tomselect) {
+                new TomSelect(select, {
+                    onChange: function() {
+                        // حفظ موضع التمرير قبل التحديث
+                        const scrollY = window.scrollY;
+
+                        // تأخير بسيط ثم إعادة التمرير إلى الموضع السابق
+                        setTimeout(() => {
+                            window.scrollTo(0, scrollY);
+                        }, 50);
+                    }
+                });
+            }
+        });
+    });
+</script>

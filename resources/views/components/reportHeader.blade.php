@@ -7,5 +7,5 @@
         <img src="{{ asset('storage/' . $company->logo) }}" 
             class="w-16 h-16 rounded-full">
     </div>
-    
+    {{ $slot }} 
 </header>

@@ -61,10 +61,10 @@ class StoreInventoryTransactionRequest extends FormRequest
                 function ($attribute, $value, $fail) use ($transactionType) {
                     if ($transactionType && $transactionType->inventory_movement_count == 2) {
                         if (!$value) {
-                            $fail('المستودع الثانوي مطلوب عند إجراء عملية مخزنية تتطلب مستودعين.');
+                            $fail('المستودع الوجه مطلوب عند إجراء عملية مخزنية تتطلب مستودعين.');
                         }
                     } elseif ($value) {
-                        $fail('لا يمكن تحديد مستودع ثانوي إلا إذا كانت العملية تتطلب مستودعين.');
+                        $fail('لا يمكن تحديد مستودع الوجه إلا إذا كانت العملية تتطلب مستودعين.');
                     }
                 }
             ],
@@ -111,7 +111,7 @@ class StoreInventoryTransactionRequest extends FormRequest
             'quantities.*.min' => 'يجب أن تكون الكمية أكبر من 0.01.',
             'warehouse_locations.array' => 'يجب أن يكون تنسيق مواقع المستودعات كمصفوفة.',
             'warehouse_locations.*.exists' => 'أحد مواقع المستودع المحددة غير صالح.',
-            'secondary_warehouse_id.exists' => 'المستودع الثانوي المحدد غير صالح.',
+            'secondary_warehouse_id.exists' => 'المستودع الوجه المحدد غير صالح.',
         ];
     }
 }

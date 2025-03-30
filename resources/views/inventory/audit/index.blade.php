@@ -17,19 +17,28 @@
                     </select>
                 </div>
 
-                <!-- فلترة حسب آخر عملية جرد -->
-                <div class="col-md-3">
-                    <label class="form-label">آخر عملية جرد:</label>
-                    <select name="last_inventory" class="form-select">
-                        <option value="">الكل</option>
-                        <option value="recent" {{ request('last_inventory') == 'recent' ? 'selected' : '' }}>حديث
-                        </option>
-                        <option value="never" {{ request('last_inventory') == 'never' ? 'selected' : '' }}>لم يُجرَد
-                            أبدًا</option>
-                        <option value="old" {{ request('last_inventory') == 'old' ? 'selected' : '' }}>لم يُجرَد منذ
-                            فترة</option>
-                    </select>
-                </div>
+                      <!-- فلترة حسب نوع الجرد -->
+                      <div class="col-md-3">
+                        <label class="form-label">نوع الفلترة:</label>
+                        <select name="filter" class="form-select">
+                            <option value="">اختر نوع الفلترة</option>
+                            <option value="recent" {{ request('filter') == 'recent' ? 'selected' : '' }}>
+                                تم الجرد حديثاً
+                            </option>
+                            <option value="never" {{ request('filter') == 'never' ? 'selected' : '' }}>
+                                لم يُجرَد أبداً
+                            </option>
+                            <option value="not_since" {{ request('filter') == 'not_since' ? 'selected' : '' }}>
+                                لم يُجرَد منذ تاريخ
+                            </option>
+                        </select>
+                    </div>
+    
+                    <!-- حقل التاريخ يظهر عند اختيار فلترة "not_since" -->
+                    <div class="col-md-3">
+                        <label class="form-label">من تاريخ:</label>
+                        <input type="date" name="given_date" class="form-control" value="{{ request('given_date') }}">
+                    </div>
 
                 <!-- فلترة حسب التصنيف -->
                 <div class="col-md-3">
@@ -79,6 +88,7 @@
                         <td>{{ $product->last_inventory_date ? $product->last_inventory_date->format('Y-m-d') : 'غير متوفر' }}
                         </td>
                         <td>{{ $product->status }}</td>
+                        <td>{{ $product->inventoryTransactions->sum('quantity') }}</td>
                     </tr>
                 @empty
                     <tr>

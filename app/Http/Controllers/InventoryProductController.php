@@ -401,7 +401,7 @@ class InventoryProductController extends Controller
             ->where('warehouse_id', $request->warehouse_id)
             ->where('distribution_type',-1)
             ->sum('converted_quantity');
-          dump($distributedQuantity);
+        //   dump($distributedQuantity);
         // / اجمع كل الكميات المدخلة من نفس المنتج ونفس رقم الدفعة في نفس المستودع
         $totalOutQuantity = InventoryProduct::where('product_id', $request->product_id)
             ->where('batch_number', $request->batch_number)

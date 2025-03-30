@@ -124,17 +124,20 @@ class InventoryTransactionController extends Controller
     public function edit($id)
     {
         try {
-            $transaction = InventoryTransaction::findOrFail($id);
-            $transactionTypes = TransactionType::all();
-            $partners = Partner::all();
-            $departments = Department::all();
-            // $warehouses = Warehouse::all();
+            // $transaction = InventoryTransaction::findOrFail($id);
+            // $transactionTypes = TransactionType::all();
+            // $partners = Partner::all();
+            // $departments = Department::all();
+            // // $warehouses = Warehouse::all();
             $warehouses = Warehouse::ForUserWarehouse()->get();
+            $units = Unit::all(); // جلب جميع الوحدات
 
-            $products = Product::all();
-            $warehouseLocations = WarehouseLocation::all();
+             $products = Product::all();
+            // $warehouseLocations = WarehouseLocation::all();
+            $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($id);
+            $items = $selectedTransaction->items()->paginate(6);
 
-            return view('inventory.transactions.edit', compact('transaction', 'transactionTypes', 'partners', 'departments', 'warehouses', 'products', 'warehouseLocations'));
+            return view('inventory.transactions.edit', compact('selectedTransaction','products','warehouses','units','items'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
         }
@@ -143,7 +146,8 @@ class InventoryTransactionController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $transaction = InventoryTransaction::findOrFail($id);
+            // $transaction = InventoryTransaction::findOrFail($id);
+            // dd($request);
 $transaction = $this->inventoryTransactionService->updateTransaction($id, $request->all());
      // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
      if ($request->expectsJson()) {
@@ -152,7 +156,7 @@ $transaction = $this->inventoryTransactionService->updateTransaction($id, $reque
             'transaction' => $transaction
         ], 201);
     }
-            return redirect()->route('inventory.transactions.show', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
+            return redirect()->route('inventory.transactions.edit', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحديث العملية المخزنية: ' . $e->getMessage()]);
         }

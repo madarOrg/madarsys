@@ -144,6 +144,7 @@ class InventoryReportController extends Controller
         $lastPurchaseDate = $product->inventoryTransactions()
             ->where('transaction_type_id', '1')  // فلترة لنوع حركة الشراء
             ->max('transaction_date');
+
         return [
             'name' => $product->name,
             'sku' => $product->sku,
@@ -152,26 +153,38 @@ class InventoryReportController extends Controller
                 : $product->description,
             'available_quantity' => $availableQuantity,
             'min_stock_level' => $product->min_stock_level, // يجب أن يكون هذا الحقل موجودًا في جدول المنتجات
+            'max_stock_level' => $product->max_stock_level, // أعلى حد طلب للمنتج
             'last_purchase_date' => $lastPurchaseDate ? \Carbon\Carbon::parse($lastPurchaseDate)->format('Y-m-d') : null,
         ];
     }
 
     /**
-     * عرض تقرير المنتجات التي وصلت لحد إعادة الطلب.
+     * عرض تقرير المنتجات بناءً على نوع التصفية (إعادة الطلب أو فائض المخزون).
      */
     public function reorderReport(Request $request)
     {
         // جلب جميع المنتجات (يمكنك تعديل الاستعلام حسب الحاجة، مثل فلترة حسب الفرع أو الشركة)
         $products = Product::all();
 
-        // بناء قائمة المنتجات التي وصلت لحد إعادة الطلب
-        $reorderProducts = collect();
+        // بناء قائمة المنتجات التي وصلت لحد إعادة الطلب أو تجاوزت الحد الأقصى
+        $filteredProducts = collect();
 
+        // تحديد نوع الفلتر بناءً على ما يمرره المستخدم
+        $stockFilter = $request->get('stock_filter');
         foreach ($products as $product) {
             $details = $this->getProductReorderDetails($product);
-            // شرط التحقق من أن الكمية المتوفرة أقل من أو تساوي مستوى إعادة الطلب
-            if ($details['available_quantity'] <= $details['min_stock_level']) {
-                $reorderProducts->push($details);
+
+            if ($stockFilter == 'reorder') {
+                // فلتر إعادة الطلب: إظهار المنتجات التي الكمية المتوفرة أقل من أو تساوي مستوى إعادة الطلب
+                if ($details['available_quantity'] <= $details['min_stock_level']) {
+                    $filteredProducts->push($details);
+                }
+            } elseif ($stockFilter == 'max_stock') {
+
+                // فلتر الحد الأقصى: إظهار المنتجات التي الكمية المتوفرة أكبر من أو تساوي الحد الأقصى
+                if ($details['available_quantity'] >=  $details['max_stock_level']) {
+                    $filteredProducts->push($details);
+                }
             }
         }
 
@@ -180,9 +193,30 @@ class InventoryReportController extends Controller
         $company = Company::forUserCompany()->first();
 
         // تمرير المتغيرات إلى الـ View
-        return view('reports.reorder-report', compact('reorderProducts', 'products', 'company', 'warehouses'));
+        return view('reports.reorder-report', compact('filteredProducts', 'products', 'company', 'warehouses'));
     }
-    // تقرير موردي المنتجات
+
+    // // تجلب المنتجات التي وصلت إلى أعلى حد طلب
+    // public function getProductMaxStockDetails(Product $product)
+    // {
+    //     // جلب الكمية المتاحة من جدول المخزون
+    //     $availableQuantity = $product->inventory ? $product->inventory->quantity : 0;
+
+    //     return [
+    //         'name' => $product->name,
+    //         'sku' => $product->sku,
+    //         'description' => strlen($product->description) > 100
+    //             ? substr($product->description, 0, 100) . '...'
+    //             : $product->description,
+    //         'available_quantity' => $availableQuantity,
+    //         'max_stock_level' => $product->max_stock_level, // أعلى حد طلب للمنتج
+            
+    //     ];
+    // }
+
+
+
+    // تقرير موردي حالة المخزون 
     public function searchProducts(Request $request)
     {
         // Start the query for products
@@ -206,19 +240,35 @@ class InventoryReportController extends Controller
                 $q->where('warehouse_id', $request->warehouse_id);
             });
         }
-
-        // Get filtered products
-        $products = $query->with('inventory.warehouse')->get();
-
-        // Get reorder products based on stock levels
-        $reorderProducts = collect();
-        foreach ($products as $product) {
-            $details = $this->getProductReorderDetails($product);
-            if ($details['available_quantity'] <= $details['min_stock_level']) {
-                $reorderProducts->push($details);
-            }
+        // Apply the stock filter if provided (reorder or max_stock)
+        $stockFilter = $request->get('stock_filter');
+        if ($stockFilter == 'reorder') {
+            // Filter for reorder products (quantity <= min_stock_level)
+            $query->whereHas('inventory', function ($q) {
+                $q->whereRaw('quantity <= min_stock_level');
+            });
+        } elseif ($stockFilter == 'max_stock') {
+            // Filter for max stock products (quantity >= max_stock_level)
+            $query->whereHas('inventory', function ($q) {
+                $q->whereRaw('quantity >= max_stock_level');
+            });
         }
+      // Get filtered products
+    $products = $query->with('inventory.warehouse')->get();
 
+    // Get reorder products based on stock levels
+    $reorderProducts = collect();
+    foreach ($products as $product) {
+        $details = $this->getProductReorderDetails($product);
+        // If reorder filter is selected, push products that meet the condition
+        if ($stockFilter == 'reorder' && $details['available_quantity'] <= $details['min_stock_level']) {
+            $reorderProducts->push($details);
+        }
+        // If max stock filter is selected, push products that meet the condition
+        if ($stockFilter == 'max_stock' && $details['available_quantity'] >= $details['max_stock_level']) {
+            $reorderProducts->push($details);
+        }
+    }
         // Get warehouses and company information for the view
         $warehouses = Warehouse::ForUserWarehouse()->get();
         $company = Company::forUserCompany()->first();
@@ -352,9 +402,9 @@ class InventoryReportController extends Controller
     public function inventoryTransactions(Request $request)
     {
         // جلب جميع المنتجات
-           $products = Product::with('unit')->get();
-           $TransactionType = TransactionType::all();
-           $createdAtFrom = $request->input('created_at_from');
+        $products = Product::with('unit')->get();
+        $TransactionType = TransactionType::all();
+        $createdAtFrom = $request->input('created_at_from');
         $createdAtTo = $request->input('created_at_to');
         // جلب بيانات الحركات (تفاصيل المنتج مع بيانات الشركاء) لكل منتج
         $purchasesByPartner = [];
@@ -368,18 +418,18 @@ class InventoryReportController extends Controller
 
 
         // جلب الفلاتر من الطلب
-        $productIds = $request->input('products', []); 
+        $productIds = $request->input('products', []);
         $warehouseId = $request->input('warehouse_id');
         $transactionType = $request->input('transaction_type_id');
 
         // بناء الاستعلام مع الفلاتر
-        $query = InventoryTransaction::with(['transactionType', 'products','items.unit', 'createdUser',  'updatedUser'   ])
+        $query = InventoryTransaction::with(['transactionType', 'products', 'items.unit', 'createdUser',  'updatedUser'])
             ->when($productIds, function ($q) use ($productIds) {
                 $q->whereHas('items', function ($query) use ($productIds) {
                     $query->where('product_id', $productIds);
                 });
             })
-            ->when($warehouseId, function($q) use ($warehouseId) {
+            ->when($warehouseId, function ($q) use ($warehouseId) {
                 $q->where('warehouse_id', $warehouseId);
             })
             ->when($transactionType, function ($q) use ($transactionType) {
@@ -396,6 +446,6 @@ class InventoryReportController extends Controller
 
         $inventoryMovements = $query;
         // dd($inventoryMovements);
-        return view('reports.inventory-transactions', compact('company', 'warehouses', 'inventoryMovements', 'products','TransactionType'));
+        return view('reports.inventory-transactions', compact('company', 'warehouses', 'inventoryMovements', 'products', 'TransactionType'));
     }
 }

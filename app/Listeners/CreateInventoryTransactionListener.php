@@ -18,16 +18,33 @@ class CreateInventoryTransactionListener
     {
         $this->inventoryCalculationService = $inventoryCalculationService;
     }
-    
+
     //////////////////
     public function handle(InventoryTransactionCreated $event)
     {
         $data = $event->data;
         // dd(gettype($data));
-        // dd($event);
+         dd($event);
+        // التحقق إذا كانت المصفوفة "products" فارغة
+
+        if (empty($data['products']) || count($data['products']) == 0) {
+            session()->flash('error', 'يجب إضافة منتجات إلى الحركة المخزنية قبل الحفظ.');
+            throw new \Exception('يجب إضافة منتجات إلى الحركة المخزنية قبل الحفظ.');
+        }
 
         DB::beginTransaction();
         // dd('b',$data['transaction_type_id']);
+
+        $transactionType = DB::table('transaction_types')
+            ->select('inventory_movement_count', 'effect')
+            ->where('id', $data['transaction_type_id'])
+            ->first();
+        //اذا كانت الحركة لا تؤثؤ على المخزون تكون الحالة فعالة 2 , مالم تكون الحالة معلقة حتى يتم التوزيع
+        if ($transactionType->inventory_movement_count == 0) {
+            $inventoryStatus = 2;
+        } else {
+            $inventoryStatus = 0;
+        };
 
         try {
             // إنشاء السجل الرئيسي للحركة المخزنية
@@ -42,7 +59,7 @@ class CreateInventoryTransactionListener
                 'secondary_warehouse_id'  => $data['secondary_warehouse_id'] ?? null,
                 'notes'                   => $data['notes'] ?? null,
                 'inventory_request_id'    => $data['inventory_request_id'] ?? null,
-                'status'                  => $data['status'] ?? 0,
+                'status'                  => $inventoryStatus,
             ]);
 
             // تحقق من المصفوفات المرتبطة
@@ -62,7 +79,7 @@ class CreateInventoryTransactionListener
                 $priceTotal = $totals[$index] ?? 0;
                 $location = $locations[$index] ?? null;
                 // استدعاء دالة معالجة الحركة المخزنية
-                $this->createInventoryMovement($transaction, $data, $product, $quantity, $unitId, $pricePerUnit, $priceTotal, $location, $index);
+                $this->createInventoryMovement($transaction, $data, $product, $quantity, $unitId, $pricePerUnit, $priceTotal, $location, $index, $transactionType);
             }
             // dd($products);
             DB::commit();
@@ -72,15 +89,12 @@ class CreateInventoryTransactionListener
             throw new \Exception($e->getMessage());
         }
     }
-    
+
     /////////////////create Inventory Movement
-    private function createInventoryMovement($transaction, $data, $productId, $quantityInput, $unitId, $pricePerUnit, $priceTotal, $location, $index)
+    private function createInventoryMovement($transaction, $data, $productId, $quantityInput, $unitId, $pricePerUnit, $priceTotal, $location, $index, $transactionType)
     {
-        $transactionType = DB::table('transaction_types')
-            ->select('inventory_movement_count', 'effect')
-            ->where('id', $data['transaction_type_id'])
-            ->first();
-        
+
+
         // جلب المنتج للحصول على وحدة المنتج الأساسية
         $product = Product::findOrFail($productId);
 
@@ -88,16 +102,16 @@ class CreateInventoryTransactionListener
 
         $priceTotal = $quantityInput * $pricePerUnit;
 
-            //transactionType->inventory_movement_count == 2 يعني ان الحركة تسجل حركة ادخال و اخراج
+        //transactionType->inventory_movement_count == 2 يعني ان الحركة تسجل حركة ادخال و اخراج
         if ($transactionType && $transactionType->inventory_movement_count == 2) {
             // إنشاء سجل خروج من المخزن المصدر
 
             $outQuantity = -$quantityInput;
-    
-            $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($outQuantity, $unitId,$baseUnitId);
-            
+
+            $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($outQuantity, $unitId, $baseUnitId);
+
             // $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId,$baseUnitId);
-        
+
             // التحقق من توفر الكمية قبل إنشاء الحركة
             if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $outQuantity)) {
                 session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
@@ -115,7 +129,7 @@ class CreateInventoryTransactionListener
                 'converted_quantity'       => $convertedOutQuantity,
                 'unit_product_id'          => $baseUnitId,
                 'converted_price'          => -$priceTotal,
-                'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
+                'source_warehouse_id'      => $data['source_warehouse_id'][$index] ?? $data['secondary_warehouse_id'],
                 'production_date' => $data['production_date'],
                 'expiration_date' => $data['expiration_date'],
 
@@ -125,11 +139,11 @@ class CreateInventoryTransactionListener
 
             // إنشاء سجل دخول في المخزن الوجهة
             $inQuantity = abs($quantityInput);
-     
-            $convertedInQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($inQuantity, $unitId,$baseUnitId);
-            
+
+            $convertedInQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($inQuantity, $unitId, $baseUnitId);
+
             // $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($inQuantity, $unitId,$baseUnitId);
-         
+
             InventoryTransactionItem::create([
                 'inventory_transaction_id' => $transaction->id,
                 'target_warehouse_id'      => $data['secondary_warehouse_id'],
@@ -142,7 +156,7 @@ class CreateInventoryTransactionListener
                 'converted_quantity'       => $convertedInQuantity,
                 'unit_product_id'          => $baseUnitId,
                 'converted_price'          => abs($priceTotal),
-                'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
+                'source_warehouse_id'      => $data['warehouse_id'][$index] ?? $data['warehouse_id'],
                 'production_date' => $data['production_date'][$index] ?? null,
                 'expiration_date' => $data['expiration_date'][$index] ?? null,
 
@@ -150,7 +164,7 @@ class CreateInventoryTransactionListener
             // تحديث الكميات في جدول المخزون
 
             // $this->updateInventoryStock($data['secondary_warehouse_id'], $productId, $inQuantity, $pricePerUnit);
-        } else if ($transactionType && $transactionType->inventory_movement_count == 1) {
+        } else if ($transactionType && $transactionType->inventory_movement_count != 2) {
             // إنشاء حركة عادية مثل بيع أو شراء
 
             if ($transactionType && $transactionType->effect != 0) {
@@ -169,8 +183,8 @@ class CreateInventoryTransactionListener
                     throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
                 }
             }
-            $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId,$baseUnitId);
-            
+            $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId, $baseUnitId);
+
             // $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($quantityInput, $unitId,$baseUnitId);
 
             // dd($convertedPrice);
@@ -188,7 +202,7 @@ class CreateInventoryTransactionListener
                     'converted_quantity'       => $convertedQuantity,
                     'unit_product_id'          => $baseUnitId,
                     'converted_price'          => $priceTotal,
-                    'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
+                    'source_warehouse_id'      => $data['source_warehouse_id'][$index] ?? $data['secondary_warehouse_id'],
                     'production_date'          => $data['production_date'][$index] ?? null,
                     'expiration_date'          => $data['expiration_date'][$index] ?? null,
 

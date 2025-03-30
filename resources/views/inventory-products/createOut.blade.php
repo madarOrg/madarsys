@@ -59,14 +59,14 @@
                     <!-- تاريخ الإنتاج -->
                     <div class="mb-4">
                         <x-file-input type="date" id="production_date" name="production_date" label="تاريخ الإنتاج"
-                            value="{{ $product->production_date }}" readonly required />
+                            value="{{ $product->production_date }}" readonly  />
                         <input type="hidden" name="production_date" value="{{ $product->production_date }}">
                     </div>
 
                     <!-- تاريخ الانتهاء -->
                     <div class="mb-4">
                         <x-file-input type="date" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء"
-                            value="{{ $product->expiration_date }}" readonly required />
+                            value="{{ $product->expiration_date }}" readonly  />
                         <input type="hidden" name="expiration_date" value="{{ $product->expiration_date }}">
                     </div>
 
