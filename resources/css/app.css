@@ -23,5 +23,30 @@
 .rotate:hover {
     transform: rotate(360deg); /* تدوير الشعار 360 درجة */
 }
+@media print {
+    /* إخفاء النافبار والفوتر وزر الطباعة عند الطباعة */
+    .hide-on-print {
+        display: none !important;
+    }
+     /* إخفاء الـ URL الذي يظهر في الأسفل أو في أي مكان آخر */
+  .url, .page-url {
+    display: none;
+}
+    
+}
+@media print {
+  footer {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    padding: 10px;
+    background-color: white;
+    font-size: 12px;
+    width: auto; 
+  }
+}
 
-  
+
+ 

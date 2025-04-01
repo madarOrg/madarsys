@@ -36,7 +36,23 @@ class InventoryTransaction extends Model
     protected $casts = [
         'transaction_date' => 'datetime',
     ];
-    
+    public function products()
+    {
+        return $this->hasManyThrough(
+            Product::class,
+            InventoryTransactionItem::class,
+            'inventory_transaction_id', // المفتاح الأجنبي في InventoryTransactionItem
+            'id',                       // المفتاح الرئيسي في Product
+            'id',                       // المفتاح الرئيسي في InventoryTransaction
+            'product_id'                // المفتاح الأجنبي في InventoryTransactionItem
+        );
+    }
+// public function product()
+// {
+//     return $this->belongsTo(Product::class);
+// }
+
+        
     public function branch()
     {
         return $this->belongsTo(Branch::class);
@@ -73,5 +89,14 @@ class InventoryTransaction extends Model
     {
         return $this->hasMany(InventoryTransactionItem::class, 'inventory_transaction_id');
     }
-    
+    public function createdUser()
+{
+    return $this->belongsTo(User::class, 'created_user');
+}
+
+public function updatedUser()
+{
+    return $this->belongsTo(User::class, 'updated_user');
+}
+
 }

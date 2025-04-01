@@ -8,7 +8,7 @@ use App\Traits\
 {
 HasUser
 };
-// use App\Models\Scopes\UserAccessScope;
+ use App\Models\Scopes\UserAccessScope;
 
 
 class Company extends Model
@@ -42,6 +42,25 @@ class Company extends Model
     //     static::addGlobalScope(new UserAccessScope);
     // }
 
+    public function scopeForUserCompany($query)
+    {
+        if (auth()->check()) {
+            $roleIds = auth()->user()->roles()->pluck('id');
+    
+            // جلب الشركات بناءً على الأدوار من جدول role_company
+            $defaultCompany =Company::whereIn('id', function ($q) use ($roleIds) {
+                $q->select('company_id')
+                    ->from('role_company')
+                    ->whereIn('role_id', $roleIds);
+            })->first();
+    
+            if ($defaultCompany) {
+                return $query->where('id', $defaultCompany->id);
+            }
+        }
+        return $query;
+    }
+    
     /**
      * الحقول التي يتم تحويلها تلقائيًا إلى أنواع أخرى.
      *

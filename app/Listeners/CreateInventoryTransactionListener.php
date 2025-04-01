@@ -18,15 +18,33 @@ class CreateInventoryTransactionListener
     {
         $this->inventoryCalculationService = $inventoryCalculationService;
     }
+
     //////////////////
     public function handle(InventoryTransactionCreated $event)
     {
         $data = $event->data;
         // dd(gettype($data));
-        // dd($event);
+        //  dd($event);
+        // التحقق إذا كانت المصفوفة "products" فارغة
+
+        if (empty($data['products']) || count($data['products']) == 0) {
+            session()->flash('error', 'يجب إضافة منتجات إلى الحركة المخزنية قبل الحفظ.');
+            throw new \Exception('يجب إضافة منتجات إلى الحركة المخزنية قبل الحفظ.');
+        }
 
         DB::beginTransaction();
         // dd('b',$data['transaction_type_id']);
+
+        $transactionType = DB::table('transaction_types')
+            ->select('inventory_movement_count', 'effect')
+            ->where('id', $data['transaction_type_id'])
+            ->first();
+        //اذا كانت الحركة لا تؤثؤ على المخزون تكون الحالة فعالة 2 , مالم تكون الحالة معلقة حتى يتم التوزيع
+        if ($transactionType->inventory_movement_count == 0) {
+            $inventoryStatus = 2;
+        } else {
+            $inventoryStatus = 0;
+        };
 
         try {
             // إنشاء السجل الرئيسي للحركة المخزنية
@@ -41,7 +59,7 @@ class CreateInventoryTransactionListener
                 'secondary_warehouse_id'  => $data['secondary_warehouse_id'] ?? null,
                 'notes'                   => $data['notes'] ?? null,
                 'inventory_request_id'    => $data['inventory_request_id'] ?? null,
-                'status'                  => $data['status'] ?? 0,
+                'status'                  => $inventoryStatus,
             ]);
 
             // تحقق من المصفوفات المرتبطة
@@ -61,7 +79,7 @@ class CreateInventoryTransactionListener
                 $priceTotal = $totals[$index] ?? 0;
                 $location = $locations[$index] ?? null;
                 // استدعاء دالة معالجة الحركة المخزنية
-                $this->createInventoryMovement($transaction, $data, $product, $quantity, $unitId, $pricePerUnit, $priceTotal, $location, $index);
+                $this->createInventoryMovement($transaction, $data, $product, $quantity, $unitId, $pricePerUnit, $priceTotal, $location, $index, $transactionType);
             }
             // dd($products);
             DB::commit();
@@ -70,66 +88,30 @@ class CreateInventoryTransactionListener
             // التعامل مع الأخطاء
             throw new \Exception($e->getMessage());
         }
-
-        // try {
-        //     // إنشاء السجل الرئيسي للحركة المخزنية
-        //     try {
-        //         $transaction = InventoryTransaction::create([
-        //             'transaction_type_id'  => $data['transaction_type_id'] ?? null,
-        //             'effect'               => $data['effect'] ?? null,
-        //             'transaction_date'     => $data['transaction_date'] ?? null,
-        //             'reference'            => $data['reference'] ?? null,
-        //             'partner_id'           => $data['partner_id'] ?? null,
-        //             'department_id'        => $data['department_id'] ?? null,
-        //             'warehouse_id'         => $data['warehouse_id'] ?? null,
-        //             'secondary_warehouse_id' => $data['secondary_warehouse_id'] ?? null,
-        //             'notes'                => $data['notes'] ?? null,
-        //             'inventory_request_id' => $data['inventory_request_id'] ?? null,
-        //         ]);
-        //     } catch (\Exception $e) {
-        //         // dump("خطأ أثناء إنشاء الحركة المخزنية:", $e->getMessage());
-        //         // session()->flash('error', 'خطأ أثناء إنشاء  الحركة المخزنية:' . $e->getMessage());
-        //         throw new \Exception("خطأ أثناء إنشاء  المخزنية: " . $e->getMessage());
-        //     }
-        //     //   dd($data['transactionItems']); // تحقق إذا كانت مصفوفة `transactionItems` غير فارغة.
-
-        //     foreach ($data['transactionItems'] as $index => $item) {
-        //         //   dd($item['unit_id'], $item['unit_price'], $item['total']);
-
-        //         $quantity = $item['quantity'];
-        //         $unitId = $item['unit_id'][$index] ?? null;
-        //         $productUnit = Product::find($item['product_id'])->unit_id;
-        //         $pricePerUnit = $item['unit_price'] ?: ($item['total'] / ($quantity ?: 1));
-        //         $priceTotal = $item['total'] ?: ($quantity * $pricePerUnit);
-
-        //         // dd($quantity, $unitId, $productUnit, $pricePerUnit, $priceTotal);
-
-        //         // استدعاء الدالة لمعالجة العملية
-        //         $this->createInventoryMovement($transaction, $data, $item['product_id'], $quantity, $unitId, $pricePerUnit, $priceTotal, $productUnit, $index);
-        //     }
-
-        //     DB::commit();
-        // } catch (\Exception $e) {
-        //     DB::rollBack();
-        //     // session()->flash('error', 'خطأ أثناء إنشاء الحركة المخزنية:' . $e->getMessage());
-
-        //     throw new \Exception($e->getMessage());
-        // }
     }
+
     /////////////////create Inventory Movement
-    private function createInventoryMovement($transaction, $data, $productId, $quantityInput, $unitId, $pricePerUnit, $priceTotal, $productUnit, $index)
+    private function createInventoryMovement($transaction, $data, $productId, $quantityInput, $unitId, $pricePerUnit, $priceTotal, $location, $index, $transactionType)
     {
-        $transactionType = DB::table('transaction_types')
-            ->select('inventory_movement_count', 'effect')
-            ->where('id', $data['transaction_type_id'])
-            ->first();
-        // dd($transactionType);
+
+
+        // جلب المنتج للحصول على وحدة المنتج الأساسية
+        $product = Product::findOrFail($productId);
+
+        $baseUnitId = $product->unit_id;
+
+        $priceTotal = $quantityInput * $pricePerUnit;
+
+        //transactionType->inventory_movement_count == 2 يعني ان الحركة تسجل حركة ادخال و اخراج
         if ($transactionType && $transactionType->inventory_movement_count == 2) {
             // إنشاء سجل خروج من المخزن المصدر
 
             $outQuantity = -$quantityInput;
-            $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($outQuantity, $unitId);
-            $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId);
+
+            $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($outQuantity, $unitId, $baseUnitId);
+
+            // $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId,$baseUnitId);
+
             // التحقق من توفر الكمية قبل إنشاء الحركة
             if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $outQuantity)) {
                 session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
@@ -145,9 +127,9 @@ class CreateInventoryTransactionListener
                 'total'                    => -$priceTotal,
                 'warehouse_location_id'    => $data['warehouse_locations'][$index] ?? null,
                 'converted_quantity'       => $convertedOutQuantity,
-                'unit_product_id'          => $productUnit,
-                'converted_price'          => $convertedPrice,
-                'source_warehouse_id'      => $data['warehouse_id'],
+                'unit_product_id'          => $baseUnitId,
+                'converted_price'          => -$priceTotal,
+                'source_warehouse_id'      => $data['source_warehouse_id'][$index] ?? $data['secondary_warehouse_id'],
                 'production_date' => $data['production_date'],
                 'expiration_date' => $data['expiration_date'],
 
@@ -157,8 +139,10 @@ class CreateInventoryTransactionListener
 
             // إنشاء سجل دخول في المخزن الوجهة
             $inQuantity = abs($quantityInput);
-            $convertedInQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($inQuantity, $unitId);
-            $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId);
+
+            $convertedInQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($inQuantity, $unitId, $baseUnitId);
+
+            // $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($inQuantity, $unitId,$baseUnitId);
 
             InventoryTransactionItem::create([
                 'inventory_transaction_id' => $transaction->id,
@@ -170,9 +154,9 @@ class CreateInventoryTransactionListener
                 'total'                    => abs($priceTotal),
                 'warehouse_location_id'    => $data['warehouse_locations'][$index] ?? null,
                 'converted_quantity'       => $convertedInQuantity,
-                'unit_product_id'          => $productUnit,
-                'converted_price'          => $convertedPrice,
-                'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
+                'unit_product_id'          => $baseUnitId,
+                'converted_price'          => abs($priceTotal),
+                'source_warehouse_id'      => $data['warehouse_id'][$index] ?? $data['warehouse_id'],
                 'production_date' => $data['production_date'][$index] ?? null,
                 'expiration_date' => $data['expiration_date'][$index] ?? null,
 
@@ -180,7 +164,7 @@ class CreateInventoryTransactionListener
             // تحديث الكميات في جدول المخزون
 
             // $this->updateInventoryStock($data['secondary_warehouse_id'], $productId, $inQuantity, $pricePerUnit);
-        } else if ($transactionType && $transactionType->inventory_movement_count == 1) {
+        } else if ($transactionType && $transactionType->inventory_movement_count != 2) {
             // إنشاء حركة عادية مثل بيع أو شراء
 
             if ($transactionType && $transactionType->effect != 0) {
@@ -199,8 +183,10 @@ class CreateInventoryTransactionListener
                     throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
                 }
             }
-            $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId);
-            $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($pricePerUnit, $unitId);
+            $convertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantityInput, $unitId, $baseUnitId);
+
+            // $convertedPrice = $this->inventoryCalculationService->calculateConvertedPrice($quantityInput, $unitId,$baseUnitId);
+
             // dd($convertedPrice);
 
             try {
@@ -214,9 +200,9 @@ class CreateInventoryTransactionListener
                     'total'                    => $priceTotal,
                     'warehouse_location_id'    => $data['warehouse_locations'][$index] ?? null,
                     'converted_quantity'       => $convertedQuantity,
-                    'unit_product_id'          => $productUnit,
-                    'converted_price'          => $convertedPrice,
-                    'source_warehouse_id'      => $data['warehouse_id'][$index] ?? null,
+                    'unit_product_id'          => $baseUnitId,
+                    'converted_price'          => $priceTotal,
+                    'source_warehouse_id'      => $data['source_warehouse_id'][$index] ?? $data['secondary_warehouse_id'],
                     'production_date'          => $data['production_date'][$index] ?? null,
                     'expiration_date'          => $data['expiration_date'][$index] ?? null,
 
@@ -231,6 +217,9 @@ class CreateInventoryTransactionListener
             //لا نؤثر على كميات المخزون لان جالة الحركة معلقة
         }
     }
+
+
+
     /**
      * دالة للتحقق من توفر كمية معينة من المنتج في مخزن محدد
      *

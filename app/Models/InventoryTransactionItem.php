@@ -55,7 +55,7 @@ class InventoryTransactionItem extends Model
     public function generateBatchNumber($expirationDate = null)
     {
         // الجزء الخاص بالتاريخ: yyyy-mm-dd → yymmdd
-        $datePart = $expirationDate ? date('ymd', strtotime($expirationDate)) : '000000';
+        // $datePart = $expirationDate ? date('ymd', strtotime($expirationDate)) : '000000';
         $warehouseId = $this->target_warehouse_id ?? $this->source_warehouse_id;
 
         // //  التحقق من العلاقات
@@ -69,19 +69,19 @@ class InventoryTransactionItem extends Model
         // جلب آخر دفعة لنفس المنتج والمستودع وتاريخ الانتهاء
         $lastBatch = self::where('product_id', $this->product_id)
         ->where('target_warehouse_id', $warehouseId) // البحث حسب المستودع
-        ->where('expiration_date', $expirationDate)
+        // ->where('expiration_date', $expirationDate)
         ->orderBy('id', 'desc')
         ->value('batch_code');
     
         //استخراج الرقم التسلسلي من آخر دفعة
         $lastSerial = $lastBatch ? (int)substr($lastBatch, -3) : 0;
-        $newSerial = str_pad($lastSerial + 1, 3, '0', STR_PAD_LEFT);
+        $newSerial = str_pad($lastSerial + 1, 6, '0', STR_PAD_LEFT);
     
         // تكوين رقم الدفعة
-        return sprintf('%s-%s-%s-%s',
+        return sprintf('%s-%s-%s',
             $this->warehouse->code ?? '000',
             $this->product->sku ?? '000',
-            $datePart,
+            // $datePart,
             $newSerial
         );
     }
@@ -99,7 +99,10 @@ class InventoryTransactionItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
-
+    public function unit()
+    {
+        return $this->belongsTo(unit::class);
+    }
     public function warehouseLocation()
     {
         return $this->belongsTo(WarehouseLocation::class);

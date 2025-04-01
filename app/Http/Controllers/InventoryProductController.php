@@ -14,16 +14,24 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Rules\ValidInventoryTransaction;
 use App\Services\InventoryTransaction\InventoryService;
+use App\Services\InventoryTransaction\InventoryCalculationService;
 
 class InventoryProductController extends Controller
 {
     protected $inventoryService;
+    protected $inventoryCalculationService;
+
 
     // حقن خدمة InventoryService في الـ Controller عبر الـ constructor
-    public function __construct(InventoryService $inventoryService)
+    public function __construct(InventoryService $inventoryService,InventoryCalculationService $inventoryCalculationService)
     {
         $this->inventoryService = $inventoryService;
+        $this->inventoryCalculationService = $inventoryCalculationService;
+
     }
+
+
+
     // دالة البحث: مسؤولة عن تنفيذ الاستعلام وجلب البيانات
     public function search(Request $request)
     {
@@ -246,22 +254,7 @@ class InventoryProductController extends Controller
                 });
             })
             ->unique('id'); // تجنب التكرار
-        // $transactions = InventoryTransaction::with('items.product')
-        //     ->get()
-        //     ->flatMap(function ($transaction) {
-        //         return $transaction->items->map(function ($item) use ($transaction) {
-        //             return [
-        //                 'id' => $item->id,
-        //                 'reference' => $transaction->reference,
-        //                 'product_id' => $item->product->id,
-        //                 'product_name' => $item->product->name,
-        //                 'suk' => $item->product->suk,
-        //                 'production_date' => $item->production_date,
-        //                 'expiration_date' => $item->expiration_date,
-        //             ];
-        //         });
-        //     });
-
+   
         $products = $transactions->unique('product_id')->values(); // تجنب التكرار واسترجاع القيم
 
 
@@ -324,7 +317,7 @@ class InventoryProductController extends Controller
 
     public function new(Request $request)
     {
-
+        $distributionType = $request->input('distribution_type'); // Default to '1' (توزيع)
         // جلب المنتج باستخدام inventory_transaction_item_id
         $transactionItem = InventoryTransactionItem::with([
             'inventoryTransaction',
@@ -343,7 +336,7 @@ class InventoryProductController extends Controller
         })->get()->mapWithKeys(function ($location) {
             return [$location->id => $location->rack_code];
         });
-        dump($transactionItem);
+        // dump($transactionItem);
 
         return view('inventory-products.new', compact('transactionItem', 'product', 'storageAreas', 'locations'));
     }
@@ -358,22 +351,9 @@ class InventoryProductController extends Controller
     public function store(Request $request)
     {
 
-        // التحقق من تاريخ الإنتاج والانتهاء
-        // if ($request->has('production_date') && $request->has('expiration_date')) {
-        //     $productionDate = \Carbon\Carbon::parse($request->production_date);
-        //     $expirationDate = \Carbon\Carbon::parse($request->expiration_date);
-
-        //     if ($expirationDate->lt($productionDate)) {
-        //         // إرجاع رسالة خطأ والعودة لنفس الصفحة
-        //         return redirect()->back()->withErrors([
-        //             'expiration_date' => 'تاريخ الانتهاء يجب أن يكون بعد أو يساوي تاريخ الإنتاج.'
-        //         ])->withInput();
-        //     }
-        // }
-
-
-        $distributionType = $request->input('distribution_type', 1); // Default to '1' (توزيع)
-        // dd($request->all());
+        
+        $distributionType = $request->input('distribution_type'); // Default to '1' (توزيع)
+        //  dd($distributionType);
         // التحقق من البيانات المدخلة
         $request->validate([
             'branch_id' => 'nullable|exists:branches,id',
@@ -392,33 +372,80 @@ class InventoryProductController extends Controller
 
         // جلب الكمية الأصلية من جدول inventory_transaction_items
         $transactionItem = InventoryTransactionItem::findOrFail($request->inventory_transaction_item_id);
-        $originalQuantity = $transactionItem->quantity;
+        
+        $originalQuantity = $transactionItem->converted_quantity;
+
+        /////mange distribution batch Quantity
+
+
+        $batchQuantity=$request->quantity;
+        
+        $unitId= $transactionItem->unit_id;
+        
+        $baseUnitId= $transactionItem->unit_product_id;
+        
+        $batchConvertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($batchQuantity, $unitId,$baseUnitId);
+         
+        $batchPrice = ($batchQuantity * $request->total)/$originalQuantity;
+        
         //   dump($request->inventory_transaction_item_id );
         // حساب الكمية التي تم توزيعها لهذا المنتج في نفس المستودع ونفس الحركة المخزنية
         $distributedQuantity = InventoryProduct::where('inventory_transaction_item_id', $request->inventory_transaction_item_id)
             // ->where('product_id', $transactionItem->product_id) // استخدم المنتج من الحركة المخزنية
             ->where('warehouse_id', $request->warehouse_id)
-            ->sum('quantity');
-        //  dump($distributedQuantity);
+            ->where('distribution_type',1)
+            ->sum('converted_quantity');
+        
+        $distributedOutQuantity = InventoryProduct::where('inventory_transaction_item_id', $request->inventory_transaction_item_id)
+            // ->where('product_id', $transactionItem->product_id) // استخدم المنتج من الحركة المخزنية
+            ->where('warehouse_id', $request->warehouse_id)
+            ->where('distribution_type',-1)
+            ->sum('converted_quantity');
+        //   dump($distributedQuantity);
+        // / اجمع كل الكميات المدخلة من نفس المنتج ونفس رقم الدفعة في نفس المستودع
+        $totalOutQuantity = InventoryProduct::where('product_id', $request->product_id)
+            ->where('batch_number', $request->batch_number)
+            ->where('warehouse_id', $request->warehouse_id)
+            ->where('distribution_type',-1)
+            ->sum('converted_quantity');
+        $totalInQuantity = InventoryProduct::where('product_id', $request->product_id)
+            ->where('batch_number', $request->batch_number)
+            ->where('warehouse_id', $request->warehouse_id)
+            ->where('distribution_type',1)
+            ->sum('converted_quantity');
 
+        $totalBatchQuantity= $totalInQuantity-$totalOutQuantity;
+    //  dd($totalBatchQuantity,$request->quantity);
+        // التحقق من الكمية المتبقية ومنع الإخراج الزائد
+        if ($request->distribution_type == -1) {  // إخراج من المخزون
+            if ($batchConvertedQuantity> $totalBatchQuantity) {
+                return redirect()->back()->withErrors(['quantity' => 'الكمية المطلوبة للإخراج تتجاوز الكمية المتبقية من هذه الدفعة.']);
+            }
+        }
+        // التحقق من الكمية المتبقية ومنع الإخراج الزائد
+        if ($request->distribution_type == -1) {  // إخراج من المخزون
+            if ($batchConvertedQuantity > $distributedQuantity-$distributedOutQuantity) {
+                return redirect()->back()->withErrors(['quantity' => 'الكمية المطلوبة للإخراج تتجاوز الكمية المتبقية من هذه الحركة.']);
+            }
+        }
         // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
         if ($request->distribution_type == 1) {
-            $quantityInvertory = $request->quantity;
+            $quantityInvertory = $batchConvertedQuantity;
 
             // في حالة التوزيع (إدخال)
-            if (($distributedQuantity + $request->quantity) > $originalQuantity) {
+            if (($distributedQuantity + $batchConvertedQuantity) > $originalQuantity) {
                 return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
             }
         } elseif ($request->distribution_type == -1) {
-            $quantityInvertory = -$request->quantity;
+            $quantityInvertory = -$batchConvertedQuantity;
 
-            // dd(($distributedQuantity + $request->quantity) , $originalQuantity);
+            // dd(($distributedQuantity + $request->quantity) , $originalQuantity,$quantityInvertory);
             // في حالة الإخراج (تخفيض الكمية)
-            if (- ($distributedQuantity + $request->quantity) < $originalQuantity) {
+            if ( ($distributedQuantity + $quantityInvertory) < $originalQuantity) {
                 return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات المسحوبة أكثر من الكمية المطلوبة للإخراج.']);
             }
         }
-        // dd($distributionType);
+        // dd($distributionType); 
         // إنشاء حركة مخزنية جديدة باستخدام المنتج المستخرج من العملية المخزنية
         InventoryProduct::create([
             'product_id' => $transactionItem->product_id, // استخراج المنتج من الحركة المخزنية
@@ -433,30 +460,35 @@ class InventoryProductController extends Controller
             'expiration_date' => $request->input('expiration_date'),
             'batch_number' => $request->input('batch_number'),
             'inventory_transaction_item_id' => $request->input('inventory_transaction_item_id'),
-            'distribution_type' =>  $distributionType
+            'distribution_type' =>  $distributionType,
+            'unit_id' => $unitId,
+            'unit_product_id' =>$baseUnitId,
+            'converted_quantity'=>$batchConvertedQuantity,
+            'price' => $batchPrice
 
         ]);
         // استدعاء دالة updateInventoryStock من الخدمة
+
         try {
             $this->inventoryService->updateInventoryStock(
                 $request->warehouse_id,
                 $transactionItem->product_id,
-                $quantityInvertory,
-                $transactionItem->unit_prices
+                $batchConvertedQuantity,
+                $batchPrice
             );
         } catch (\Exception $e) {
             \DB::table('inventory_update_errors')->insert([
-                'inventory_transaction_item_id' => $transactionItem->inventory_transaction_item_id,
-                'product_id' => $transactionItem->product_id,
-                'warehouse_id' => $request->warehouse_id,
-                'quantity' => $quantityOut,
+                'inventory_transaction_item_id' => $request->input('inventory_transaction_item_id'),
+                'product_id' => $request->input('product_id'),
+                'warehouse_id' => $request->input('warehouse_id'),
+                'quantity' => $quantityInvertory,
                 'error_message' => $e->getMessage(),
                 'created_at' => now(),
                 'updated_at' => now(),
             ]);
 
             return redirect()->back()->withErrors([
-                'inventory_update' => 'تمت إضافة المنتج، ولكن حدث خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
+                'inventory_update' => 'تمت إضافة حركة المنتج، ولكن هناك خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
             ])->withInput();
         }
 
@@ -665,7 +697,7 @@ class InventoryProductController extends Controller
             ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id') // ربط جدول المنتجات
             ->where('inventory_transaction_items.target_warehouse_id', $warehouse_id)
             ->where('t.status', 1) // ان تكون الحركة قابلة للتوزيع
-            ->where('inventory_transaction_items.quantity', '>', 0) // الشرط الصحيح
+            ->where('inventory_transaction_items.quantity', '>', 0)
 
             ->select('inventory_transaction_items.id', 't.reference', 'p.name as product_name') // اختيار الأعمدة المطلوبة
             ->get();
@@ -675,7 +707,7 @@ class InventoryProductController extends Controller
 
     public function getInventoryTransactionsOut($warehouse_id)
     {
-        // dump($warehouse_id);
+
         $transactions = InventoryTransactionItem::join('inventory_transactions as t', 'inventory_transaction_items.inventory_transaction_id', '=', 't.id')
             ->join('products as p', 'inventory_transaction_items.product_id', '=', 'p.id') // ربط جدول المنتجات
             ->where('inventory_transaction_items.target_warehouse_id', $warehouse_id)

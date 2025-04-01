@@ -9,7 +9,7 @@
             <form action="{{ route('inventory-products.store') }}" method="POST">
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
-                    <input type="hidden" name="distribution_type" value="-1">
+                    <input type="hidden" name="distribution_type" value="{{ request('distribution_type', '-1') }}">
 
                     <div class="mb-4">
                         <x-file-input label="المستودع" id="warehouse_name" value="{{ $product->warehouse->name }}" readonly
@@ -59,14 +59,14 @@
                     <!-- تاريخ الإنتاج -->
                     <div class="mb-4">
                         <x-file-input type="date" id="production_date" name="production_date" label="تاريخ الإنتاج"
-                            value="{{ $product->production_date }}" readonly required />
+                            value="{{ $product->production_date }}" readonly  />
                         <input type="hidden" name="production_date" value="{{ $product->production_date }}">
                     </div>
 
                     <!-- تاريخ الانتهاء -->
                     <div class="mb-4">
                         <x-file-input type="date" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء"
-                            value="{{ $product->expiration_date }}" readonly required />
+                            value="{{ $product->expiration_date }}" readonly  />
                         <input type="hidden" name="expiration_date" value="{{ $product->expiration_date }}">
                     </div>
 

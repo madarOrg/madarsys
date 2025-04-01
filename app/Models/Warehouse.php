@@ -84,7 +84,9 @@ class Warehouse extends Model
         // dump($query->get());
         return $query;
     }
+   
     
+
     
     // علاقة المستودع مع الفرع
     public function branch()

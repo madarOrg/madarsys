@@ -46,28 +46,42 @@ class InventoryTransactionController extends Controller
         }
     }
     public function index()
-{
-    try {
-        $transactions = $this->inventoryTransactionService->getAllTransactions();
-    // dd($transactions);
-        // التحقق مما إذا كان الطلب API أم صفحة عرض
-        if (request()->expectsJson()) {
-            return response()->json(['transactions' => $transactions], 200);
-        }
-    
-        return view('inventory.transactions.index', compact('transactions'));
-    } catch (\Exception $e) {
-        return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء جلب العمليات المخزنية: ' . $e->getMessage()]);
-    }
-}
+    {
+        try {
+            $transactions = $this->inventoryTransactionService->getAllTransactions();
+            // dd($transactions);
+            // التحقق مما إذا كان الطلب API أم صفحة عرض
+            if (request()->expectsJson()) {
+                return response()->json(['transactions' => $transactions], 200);
+            }
 
-    
+            return view('inventory.transactions.index', compact('transactions'));
+        } catch (\Exception $e) {
+            return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء جلب العمليات المخزنية: ' . $e->getMessage()]);
+        }
+    }
+
+
     // عرض النموذج لإنشاء عملية مخزنية جديدة
     public function create(Request $request)
     {
         try {
             // جلب البيانات اللازمة للعرض
-            $transactionTypes = TransactionType::all();
+            // استلام transaction_type_id من الطلب
+            $transactionTypeIds = $request->input('transaction_type_id', []);
+            // بناء الاستعلام
+            $transactionTypesQuery = TransactionType::query();
+
+            if (empty($transactionTypeIds)) {
+                // إذا لم يتم إرسال قيمة transaction_type_id، نعرض كل الأنواع باستثناء تلك التي يكون inventory_movement_count = 0
+                $transactionTypesQuery->where('inventory_movement_count', '>', 0);
+            } else {
+                // إذا تم إرسال قيمة أو مجموعة قيم، نعرض الأنواع المرسلة فقط بدون شرط إضافي
+                $transactionTypesQuery->whereIn('id', (array)$transactionTypeIds);
+            }
+
+            $transactionTypes = $transactionTypesQuery->get();
+
             $partners = Partner::all();
             $departments = Department::all();
             // $warehouses = Warehouse::all();
@@ -124,17 +138,20 @@ class InventoryTransactionController extends Controller
     public function edit($id)
     {
         try {
-            $transaction = InventoryTransaction::findOrFail($id);
-            $transactionTypes = TransactionType::all();
-            $partners = Partner::all();
-            $departments = Department::all();
-            // $warehouses = Warehouse::all();
+            // $transaction = InventoryTransaction::findOrFail($id);
+            // $transactionTypes = TransactionType::all();
+            // $partners = Partner::all();
+            // $departments = Department::all();
+            // // $warehouses = Warehouse::all();
             $warehouses = Warehouse::ForUserWarehouse()->get();
+            $units = Unit::all(); // جلب جميع الوحدات
 
             $products = Product::all();
-            $warehouseLocations = WarehouseLocation::all();
+            // $warehouseLocations = WarehouseLocation::all();
+            $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($id);
+            $items = $selectedTransaction->items()->paginate(6);
 
-            return view('inventory.transactions.edit', compact('transaction', 'transactionTypes', 'partners', 'departments', 'warehouses', 'products', 'warehouseLocations'));
+            return view('inventory.transactions.edit', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
         }
@@ -143,16 +160,17 @@ class InventoryTransactionController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            $transaction = InventoryTransaction::findOrFail($id);
-$transaction = $this->inventoryTransactionService->updateTransaction($id, $request->all());
-     // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
-     if ($request->expectsJson()) {
-        return response()->json([
-            'message' => 'تمت إضافة العملية المخزنية بنجاح',
-            'transaction' => $transaction
-        ], 201);
-    }
-            return redirect()->route('inventory.transactions.show', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
+            // $transaction = InventoryTransaction::findOrFail($id);
+            // dd($request);
+            $transaction = $this->inventoryTransactionService->updateTransaction($id, $request->all());
+            // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'message' => 'تمت إضافة العملية المخزنية بنجاح',
+                    'transaction' => $transaction
+                ], 201);
+            }
+            return redirect()->route('inventory.transactions.edit', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحديث العملية المخزنية: ' . $e->getMessage()]);
         }
@@ -170,7 +188,4 @@ $transaction = $this->inventoryTransactionService->updateTransaction($id, $reque
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء حذف العملية المخزنية: ' . $e->getMessage()]);
         }
     }
-
-
-    
 }

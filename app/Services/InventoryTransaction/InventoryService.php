@@ -21,7 +21,7 @@ class InventoryService
         $inventory = Inventory::where('warehouse_id', $warehouseId)
             ->where('product_id', $productId)
             ->first();
-// dd($quantity);
+ dump($quantity);
         if ($inventory) {
             // تحديث الكمية
             $newQuantity = $inventory->quantity + $quantity;
@@ -32,7 +32,10 @@ class InventoryService
             }
 
             // تحديث السعر الإجمالي
-            $newTotalValue = ($inventory->total_value + ($quantity * $pricePerUnit));
+            $newTotalValue =(float)$inventory->total_value +  (float)$pricePerUnit;
+            //  ((float)$inventory->total_value + ((float)$newQuantity * (float)$pricePerUnit));
+            dump($newTotalValue);
+
 
             // تحديث المخزون
             $inventory->update([

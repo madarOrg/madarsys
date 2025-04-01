@@ -87,6 +87,22 @@ class Product extends Model
 {
     return $this->hasMany(InventoryTransactionItem::class, 'product_id');
 }
+public function inventory()
+{
+    return $this->hasOne(Inventory::class, 'product_id');
+}
+
+public function inventoryTransactions()
+{
+    return $this->hasManyThrough(
+        InventoryTransaction::class,
+        InventoryTransactionItem::class,
+        'product_id',                // المفتاح الأجنبي في InventoryTransactionItem يشير إلى Product
+        'id',                        // المفتاح الرئيسي في InventoryTransaction
+        'id',                        // المفتاح الرئيسي في Product
+        'inventory_transaction_id'   // المفتاح الأجنبي في InventoryTransactionItem يشير إلى InventoryTransaction
+    );
+}
 
 
 }

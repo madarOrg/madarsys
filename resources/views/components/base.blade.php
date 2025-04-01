@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="user-id" content="{{ auth()->id() }}">
-        <title>{{ config('app.name') }}</title>
+        {{-- <title>{{ config('app.name') }}</title> --}}
     
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
@@ -70,8 +70,7 @@
     </head>
     <body 
     class="font-sans antialiased leading-default     bg-gray-50 dark:bg-gray-900 text-black dark:text-white" style="font-family: 'Tajawal', sans-serif;">
-    
-
+  
     {{-- <body class="m-0 font-sans antialiased font-normal text-base leading-default bg-gray-50  dark:bg-gray-900 text-black dark:text-white"> --}}
         {{-- <body class="antialiased bg-white dark:bg-gray-900 text-black dark:text-white"> --}}
 

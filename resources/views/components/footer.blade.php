@@ -1,4 +1,4 @@
-<footer class=" bg-white rounded-lg shadow-sm mb-0  dark:bg-gray-800">
+<footer class="hide-on-print bg-white rounded-lg shadow-sm mb-0  dark:bg-gray-800">
     <div class="w-full mx-auto max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
         <span class="text-sm text-center text-gray-500 sm:text-base dark:text-gray-400">
             © {{ now()->year }} 

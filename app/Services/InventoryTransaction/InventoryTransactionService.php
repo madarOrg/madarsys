@@ -19,7 +19,7 @@ class InventoryTransactionService
         try {
             $transaction = InventoryTransaction::findOrFail($id);
             $oldData = $transaction->toArray();
-
+            // dd(request()->all());
             $transaction->update($data);
 
             event(new InventoryTransactionUpdated($transaction, $oldData, $data));
