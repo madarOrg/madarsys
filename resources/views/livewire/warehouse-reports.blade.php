@@ -22,8 +22,8 @@
                     <label class="block text-sm font-medium  mb-2">نوع التقرير</label>
                     <select wire:model.live="report_type" class="tom-select  mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="details">بيانات المستودع</option>
-                        <option value="inventory">تقرير المخزون</option>
-                        <option value="movement">تقرير الحركة</option>
+                        <option value="companies">بيانات الشركة</option>
+                        <option value="branches">بيانات الفروع</option>
                     </select>
                 </div>
 
@@ -49,7 +49,7 @@
             <div class="p-6">
                 @if($reports->isEmpty())
                     <div class="text-center">
-                        لا توجد تقارير متاحة. الرجاء اختيار مستودع وإنشاء تقرير
+                        لا توجد تقارير متاحة. الرجاء اختيار نوع التقرير وإنشاء تقرير
                     </div>
                 @else
                     <div class="overflow-x-auto">
@@ -108,15 +108,13 @@
 
                                     @endif
 
-                                    @if($this->selectedReport->report_type === 'inventory')
-                                             @include('reports.inventory') <!-- تقرير المخزون -->
-
-                                    @endif
-
-                                    @if($this->selectedReport->report_type === 'movement')
-                                              @include('reports.movement') <!-- تقرير الحركة -->
-
-                                    @endif
+                                    @if($this->selectedReport->report_type === 'companies')
+                                    @include('reports.companies') <!-- تقرير الشركة -->
+                                @endif
+                                
+                                @if($this->selectedReport->report_type === 'branches')
+                                    @include('reports.branches') <!-- تقرير الفروع -->
+                                @endif
                                 </div>
                             </div>
 

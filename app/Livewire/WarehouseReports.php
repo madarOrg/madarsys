@@ -9,6 +9,8 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Maatwebsite\Excel\Facades\Excel;
 use \Mpdf\Mpdf;
+use App\Models\Company;
+
 
 class WarehouseReports extends Component
 {
@@ -205,10 +207,16 @@ class WarehouseReports extends Component
                 ->latest('report_date')
                 ->paginate(10);
 
+            // return view('livewire.warehouse-reports', [
+            //     'warehouses' => $warehouses,
+            //     'reports' => $reports,
+            // ]);
             return view('livewire.warehouse-reports', [
                 'warehouses' => $warehouses,
                 'reports' => $reports,
+                'companyReports' => $this->companyReports,
             ]);
+            
         } catch (\Exception $e) {
             session()->flash('error', 'حدث خطأ أثناء تحميل البيانات');
             return view('livewire.warehouse-reports', [
@@ -217,4 +225,15 @@ class WarehouseReports extends Component
             ]);
         }
     }
+
+
+
+// تقرير الشركات
+
+    public function getCompanyReportsProperty()
+    {
+        return Company::all();
+    }
+    
+
 }

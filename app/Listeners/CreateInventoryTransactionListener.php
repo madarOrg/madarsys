@@ -24,7 +24,7 @@ class CreateInventoryTransactionListener
     {
         $data = $event->data;
         // dd(gettype($data));
-         dd($event);
+        //  dd($event);
         // التحقق إذا كانت المصفوفة "products" فارغة
 
         if (empty($data['products']) || count($data['products']) == 0) {
