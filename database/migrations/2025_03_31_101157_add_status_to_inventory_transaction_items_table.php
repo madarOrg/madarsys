@@ -15,7 +15,7 @@ class AddStatusToInventoryTransactionItemsTable extends Migration
 
             $table->unsignedTinyInteger('result')
                 ->default(1)
-                ->comment('نتيجة الجرد: 1 = مطابقة، 2 = تلف، 3 = فقدان، 4 = نقل');
+                ->comment('نتيجة الجرد: 1 = مطابقة، 2 = تلف، 3 = فقدان، 4 = نقل 0= لم تبدا');
 
             $table->integer('expected_audit_quantity')
                 ->nullable()

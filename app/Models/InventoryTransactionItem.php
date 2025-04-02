@@ -32,8 +32,10 @@ class InventoryTransactionItem extends Model
         'production_date',
         'expiration_date',
         'source_warehouse_id',
-    
-
+        'status',
+        'result',
+        'expected_audit_quantity',
+        'batch_number'
 
     ];
     protected static function boot()
@@ -57,9 +59,10 @@ class InventoryTransactionItem extends Model
         // الجزء الخاص بالتاريخ: yyyy-mm-dd → yymmdd
         // $datePart = $expirationDate ? date('ymd', strtotime($expirationDate)) : '000000';
         $warehouseId = $this->target_warehouse_id ?? $this->source_warehouse_id;
+        // $this->load('warehouse');  // تحميل العلاقة مع warehouse قبل الوصول إلى الخاصية
 
         // //  التحقق من العلاقات
-        // if (!$this->$warehouseId) {
+        // if (!$this->$warehouse) {
         //     throw new \Exception('Warehouse relationship is not loaded');
         // }
         // if (!$this->product) {
