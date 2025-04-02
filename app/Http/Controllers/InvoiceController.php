@@ -12,6 +12,9 @@ use App\Models\PaymentType;
 use App\Models\Warehouse;
 use App\Models\Unit;
 use App\Models\Currency;
+use App\Models\InventoryTransaction;
+use App\Models\InventoryTransactionItem;
+use App\Events\InventoryTransactionCreated;
 use Illuminate\Support\Facades\DB;
 
 class InvoiceController extends Controller
@@ -68,6 +71,9 @@ class InvoiceController extends Controller
 
         return view("invoices.$viewFolder.create", compact('partners', 'products', 'paymentTypes', 'type','Branchs','Warehouses','units','currencies'));
     }
+
+
+
     public function store(Request $request, $type)
     {
         $request->validate([
@@ -87,8 +93,8 @@ class InvoiceController extends Controller
         
         DB::beginTransaction();
         try {
+            // تحديد نوع الفاتورة (بيع أو شراء)
             $typeNumber = ($type === 'sale') ? 1 : 2;
-    
             $prefix = $typeNumber === 1 ? 'Sa-Inv-' : 'Pu-Inv-';
             $lastInvoice = Invoice::where('type', $typeNumber)->latest('id')->first();
             $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_code, strlen($prefix))) + 1 : 1;
@@ -103,6 +109,7 @@ class InvoiceController extends Controller
             $inventoryId = 0;
             $departmentId = 0;
     
+            // إنشاء الفاتورة
             $invoice = Invoice::create([
                 'invoice_code' => $invoiceCode,
                 'partner_id' => (int) $request->partner_id,
@@ -122,15 +129,33 @@ class InvoiceController extends Controller
                 'department_id' => $departmentId, // Set to 0 if not provided
             ]);
     
-            foreach ($request->items as $item) {
-                $invoice->items()->create([
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'subtotal' => $item['quantity'] * $item['price'],
-                    'unit_id' => $item['unit_id'], 
-                ]);
-            }
+            // حفظ الأصناف في الفاتورة
+    // حفظ الأصناف وربطها بالفاتورة
+    foreach ($request->items as $item) {
+        $invoice->items()->create([
+            'product_id' => $item['product_id'],
+            'quantity' => $item['quantity'],
+            'price' => $item['price'],
+            'subtotal' => $item['quantity'] * $item['price'],
+            'unit_id' => $item['unit_id'], 
+        ]);
+    }
+    
+    // جلب الأصناف التي تم تخزينها للتو
+    $items = $invoice->items()->get();
+
+    
+            // إنشاء الحركة المخزنية بعد حفظ الفاتورة
+            $transactionNote = ($type === 'sale') 
+                ? "تمت إضافة هذه العملية ديناميكيًا بناءً على فاتورة مبيعات رقم: $invoiceCode" 
+                : "تمت إضافة هذه العملية ديناميكيًا بناءً على فاتورة مشتريات رقم: $invoiceCode";
+    
+  
+            // إنشاء الحركة المخزنية
+            $inventoryTransaction = $this->storeInventoryTransaction($request, $invoiceCode,$items, $type, $transactionNote);
+    
+            // تحديث inventory_transaction_id في الفاتورة
+            $invoice->update(['inventory_transaction_id' => $inventoryTransaction->id]);
     
             DB::commit();
             $type = $type === 'sale' ? 'sale' : 'purchase';
@@ -157,7 +182,7 @@ class InvoiceController extends Controller
         $Warehouses = Warehouse::all();
         $units = Unit::all();
         $currencies = Currency::all();
-        // dd($invoice);
+        //  dd($invoice);
         return view("invoices.$viewFolder.edit",compact( 'invoice','partners', 'products', 'paymentTypes', 'type','Branchs','Warehouses','units','currencies'));
     }
 
@@ -177,16 +202,34 @@ class InvoiceController extends Controller
             'discount_type' => 'required|integer|in:1,2',
             'discount_value' => 'required|numeric|min:0',
         ]);
-        
+    
         DB::beginTransaction();
         try {
+            // Find the invoice or fail
             $invoice = Invoice::findOrFail($id);
     
+            // Calculate the discount
             $discountType = (int) $request->discount_type;
             $discountValue = (float) $request->discount_value;
             $discountAmount = (float) ($request->discount_amount ?? 0);
             $discountPercentage = ($discountType === 2) ? $discountValue : 0;
     
+            // Check for items that need to be deleted
+            $existingItemIds = collect($request->items)
+                ->pluck('item_id') // استخراج جميع المعرفات
+                ->map(fn($id) => (int) $id) // تحويل القيم إلى أرقام صحيحة
+                ->values(); // إعادة ترتيب الفهارس
+    
+            $deletedItems = $invoice->items()->whereNotIn('id', $existingItemIds)->get();
+    
+            foreach ($deletedItems as $deletedItem) {
+                \Log::info('Deleting item', ['item_id' => $deletedItem->id]);
+                $deletedItem->delete();
+                // حذف العنصر من الحركة المخزنية
+                InventoryTransactionItem::where('reference_item_id', $deletedItem->id)->delete();
+            }
+    
+            // Update the invoice details
             $invoice->update([
                 'partner_id' => (int) $request->partner_id,
                 'invoice_date' => $request->invoice_date,
@@ -202,28 +245,76 @@ class InvoiceController extends Controller
                 'exchange_rate' => $request->exchange_rate, 
             ]);
     
-            // Delete old items and insert new ones
-            $invoice->items()->delete();
+            // Process each item from the request
             foreach ($request->items as $item) {
-                $invoice->items()->create([
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'subtotal' => $item['quantity'] * $item['price'],
-                    'unit_id' => $item['unit_id'], 
-                ]);
+                if ($item['item_id'] == 0) {
+
+                    // Create the new item
+                    $newItem = $invoice->items()->create([
+                        'product_id' => $item['product_id'],
+                        'quantity' => $item['quantity'],
+                        'price' => $item['price'],
+                        'subtotal' => $item['quantity'] * $item['price'],
+                        'unit_id' => $item['unit_id'], 
+                        'converted_price' => $item['price'],
+                        'unit_product_id' => $item['unit_id'],
+                        'converted_quantity' => 0,
+                    ]);
+    
+                    // Add the new item to the inventory transaction
+                    InventoryTransactionItem::create([
+                        'inventory_transaction_id' => $invoice->inventory_transaction_id,
+                        'unit_id' => $item['unit_id'],
+                        'product_id' => $item['product_id'],
+                        'unit_prices' => $item['price'],
+                        'quantity' => $item['quantity'],
+                        'total' => $item['quantity'] * $item['price'],
+                        'converted_price' => $item['price'],
+                        'unit_product_id' => $item['unit_id'],
+                        'converted_quantity' => 0,
+                        'reference_item_id' => $newItem->id,
+                    ]);
+    
+                } else {
+                    // If the item_id is provided, update the existing item
+                    $invoiceItem = $invoice->items()->where('id', $item['item_id'])->first();
+    
+                    if ($invoiceItem) {
+
+                        // Update the existing invoice item
+                        $invoiceItem->update([
+                            'product_id' => $item['product_id'],
+                            'quantity' => $item['quantity'],
+                            'price' => $item['price'],
+                            'subtotal' => $item['quantity'] * $item['price'],
+                            'unit_id' => $item['unit_id'],
+                        ]);
+    
+                        // Update the item in the inventory transaction
+                        InventoryTransactionItem::where('reference_item_id', $invoiceItem->id)
+                            ->update([
+                                'unit_id' => $item['unit_id'],
+                                'product_id' => $item['product_id'],
+                                'unit_prices' => $item['price'],
+                                'quantity' => $item['quantity'],
+                                'total' => $item['quantity'] * $item['price'],
+                                'converted_price' => $item['price'],
+                                'unit_product_id' => $item['unit_id'],
+                            ]);
+                    }
+                }
             }
     
             DB::commit();
     
             $type = $type == 1 ? 'sale' : 'purchase';
-    
             return redirect()->route('invoices.index', ['type' => $type])
-                ->with('success', 'تم تعديل الفاتورة بنجاح!');
+                ->with('success', 'تم تعديل الفاتورة والحركة المخزنية بنجاح!');
     
         } catch (\Exception $e) {
+            // Rollback the transaction in case of error
             DB::rollBack();
-            return redirect()->back()->with('error', 'خطاء في تعديل الفاتورة! ' . $e->getMessage());
+            return redirect()->back()->with('error', 'خطأ في تعديل الفاتورة! ' . $e->getMessage());
         }
     }
     
@@ -243,5 +334,46 @@ class InvoiceController extends Controller
             return redirect()->back()->with('error', 'Error deleting invoice!');
         }
     }
+
+
+    private function storeInventoryTransaction($request, $invoiceCode,$items, $type, $transactionNote)
+{
+    $inventoryTransaction = InventoryTransaction::create([
+        'transaction_type_id' => ($type === 'sale') ? 7 : 1, 
+        'effect' => ($type === 'sale')  ? -1 : 1,
+        'transaction_date' => now(),
+        'reference' => $invoiceCode,
+        'partner_id' => $request->partner_id,
+        'warehouse_id' => $request->warehouse_id,
+        'branch_id' => $request->branch_id,
+        'department_id' => null,
+        'inventory_request_id' => null,
+        'secondary_warehouse_id' => null,
+        'notes' => $transactionNote,
+        'status' => 1
+    ]);
+
+        // حفظ عناصر الحركة المخزنية باستخدام العناصر المخزنة في الفاتورة
+        foreach ($items as $item) {
+            InventoryTransactionItem::create([
+                'inventory_transaction_id' => $inventoryTransaction->id,
+                'unit_id' => $item->unit_id,
+                'unit_product_id' => $item->unit_id,
+                'converted_quantity' => 0,
+                'product_id' => $item->product_id,
+                'unit_prices' => $item->price,
+                'quantity' => $item->quantity,
+                'total' => $item->quantity * $item->price,
+                'converted_price' => $item->price,
+                'branch_id' => $request->branch_id,
+                'reference_item_id' => $item->id, // استخدام الـ id الصحيح من الفاتورة
+            ]);
+        }
+
+    return $inventoryTransaction;
+}
+
+
+
 }
 
