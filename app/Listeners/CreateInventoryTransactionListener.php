@@ -137,8 +137,8 @@ class CreateInventoryTransactionListener
                 'source_warehouse_id'      => $data['source_warehouse_id'][$index] ?? $data['secondary_warehouse_id'],
                 'production_date' => $data['production_date'][$index] ?? null,
                 'expiration_date' => $data['expiration_date'][$index] ?? null,
-                'status' => $data['status'][$index] ?? null,
-                'result' => $data['result'][$index] ?? null,
+                'status' => $data['status'][$index] ?? 0,
+                'result' => $data['result'][$index] ?? 0,
                 'expected_audit_quantity' => $data['expected_audit_quantity'][$index] ?? null,
                 'batch_number' => $data['batch_number'][$index] ?? null,
 
@@ -170,8 +170,8 @@ class CreateInventoryTransactionListener
                 'source_warehouse_id'      => $data['warehouse_id'][$index] ?? $data['warehouse_id'],
                 'production_date' => $data['production_date'][$index] ?? null,
                 'expiration_date' => $data['expiration_date'][$index] ?? null,
-                'status' => $data['status'][$index] ?? null,
-                'result' => $data['result'][$index] ?? null,
+                'status' => $data['status'][$index] ?? 0,
+                'result' => $data['result'][$index] ?? 0,
                 'expected_audit_quantity' => $data['expected_audit_quantity'][$index] ?? null,
                 'batch_number' => $data['batch_number'][$index] ?? null,
 
@@ -208,7 +208,7 @@ class CreateInventoryTransactionListener
 
             // dd($convertedPrice);
 
-            try {
+            // try {
                 InventoryTransactionItem::create([
                     'inventory_transaction_id' => $transaction->id,
                     'target_warehouse_id'      => $data['warehouse_id'],
@@ -224,18 +224,18 @@ class CreateInventoryTransactionListener
                     'source_warehouse_id'      => $data['source_warehouse_id'][$index] ?? $data['secondary_warehouse_id'],
                     'production_date'          => $data['production_date'][$index] ?? null,
                     'expiration_date'          => $data['expiration_date'][$index] ?? null,
-                    'status' => $data['status'][$index] ?? null,
-                    'result' => $data['result'][$index] ?? null,
+                    'status' => $data['status'][$index] ?? 0,
+                    'result' => $data['result'][$index] ?? 0,
                     'expected_audit_quantity' => $data['expected_audit_quantity'][$index] ?? null,
                     'batch_number' => $data['batch_number'][$index] ?? null,
                 ]);
                 // dd($data['warehouse_locations'][$index] );
                 // تحديث الكميات في جدول المخزون
-            } catch (\Exception $e) {
-                // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:", $e->getMessage());
-                session()->flash('error', 'خطأ أثناء إنشاء تفاصيل الحركة المخزنية:' . $e->getMessage());
-                throw new \Exception("خطأ أثناء إنشاء  تفاصيل الحركة المخزنية: " . $e->getMessage());
-            }
+            // } catch (\Exception $e) {
+            //     // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:", $e->getMessage());
+            //     session()->flash('error', 'خطأ أثناء إنشاء تفاصيل الحركة المخزنية:' . $e->getMessage());
+            //     throw new \Exception("خطأ أثناء إنشاء  تفاصيل الحركة المخزنية: " . $e->getMessage());
+            // }
             //لا نؤثر على كميات المخزون لان جالة الحركة معلقة
         } else if ($transactionType && $transactionType->inventory_movement_count == 0) {
             // إنشاء حركة الجردء
