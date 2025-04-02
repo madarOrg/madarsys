@@ -32,7 +32,7 @@ class InventoryTransactionItem extends Model
         'production_date',
         'expiration_date',
         'source_warehouse_id',
-    
+        'reference_item_id',
 
 
     ];

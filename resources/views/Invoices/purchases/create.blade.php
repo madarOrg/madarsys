@@ -4,7 +4,7 @@
             @csrf
             <div class="space-y-12  dark:bg-gray-900 mb-24">
                 <div class="col-span-1">
-                    <x-title :title="'إنشاء فاتورة مبيعات جديدة'"></x-title>
+                    <x-title :title="'إنشاء فاتورة مشتريات جديدة'"></x-title>
                 </div>
                 <div class="mt-0 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-full">
                     <div class="col-span-1">

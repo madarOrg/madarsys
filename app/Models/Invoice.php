@@ -14,7 +14,7 @@ class Invoice extends Model
         'branch_id', 'total_amount', 'check_number', 'discount_type', 
         'discount_amount', 'discount_percentage', 'type', 
         'inventory_id', 'warehouse_id', 'currency_id', 
-        'exchange_rate', 'department_id'
+        'exchange_rate', 'department_id','inventory_transaction_id',
     ];
     
 
@@ -54,5 +54,9 @@ class Invoice extends Model
     public function department()
     {
         return $this->belongsTo(Department::class);
+    }
+    public function inventoryTransaction()
+    {
+        return $this->belongsTo(InventoryTransaction::class);
     }
 }
