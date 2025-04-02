@@ -35,7 +35,9 @@ class InventoryTransactionItem extends Model
         'status',
         'result',
         'expected_audit_quantity',
-        'batch_number'
+        'batch_number',
+        'reference_item_id',
+
 
     ];
     protected static function boot()
