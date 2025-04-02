@@ -9,13 +9,25 @@ use App\Models\Warehouse;
 use App\Models\InventoryAudit;
 use App\Models\InventoryAuditUser;
 use App\Models\InventoryAuditWarehouse;
+use App\Models\InventoryTransaction;
+use App\Models\InventoryTransactionItem;
+
 use Illuminate\Support\Facades\DB;
 
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use App\Services\InventoryTransaction\InventoryTransactionService;
 
 class InventoryAuditController extends Controller
 {
+    protected $inventoryTransactionService;
+    public $warehouse = null;
+
+    // حقن الخدمة في الـ constructor
+    public function __construct(InventoryTransactionService $inventoryTransactionService)
+    {
+        $this->inventoryTransactionService = $inventoryTransactionService;
+    }
 
     public function report(Request $request)
     {
@@ -164,6 +176,90 @@ class InventoryAuditController extends Controller
         // تمرير النتائج إلى العرض
         return view('inventory.audit.index', compact('audits'));
     }
+    public function createInventoryAuditTransaction($auditId, int $warehouseId, $groupByBatch = true)
+    {
+
+        // try {
+        $query = DB::table('inventory_products')
+            ->where('warehouse_id', $warehouseId)
+            ->select(
+                'product_id',
+                'unit_product_id',
+                'price',
+                'production_date',
+                'expiration_date',
+
+                DB::raw('SUM(converted_quantity * distribution_type) as total_quantity')
+            )
+            ->groupBy('product_id')
+            ->orderBy('created_at','ASC'); 
+
+        // تطبيق التجميع بناءً على قيمة groupByBatch
+        if ($groupByBatch) {
+            $query->addSelect('batch_number')->groupBy('product_id', 'batch_number', 'unit_product_id', 'price', 'production_date', 'expiration_date');
+        } else {
+            $query->groupBy('product_id', 'unit_product_id', 'price', 'production_date', 'expiration_date');
+        }
+
+        //  dd($query);  
+
+        $products = $query->get();
+        // dd($products);
+        // 2. تجهيز بيانات الحركة الرئيسية
+        // تجهيز بيانات الحركة الرئيسية
+        $transactionData = [
+            '_token'             => csrf_token(),
+            'transaction_type_id' => 8, // نوع الحركة (الجرد)
+            'transaction_date'   => now()->toDateTimeString(), // تأكد من تنسيق التاريخ
+            'effect'             => 0,
+            'reference'          => 'audt-' . $warehouseId . '-' . $auditId, // المرجع بناءً على ID المستودع وID الجرد
+            'partner_id'         => 36, // ID الشريك (يمكن تعديله بناءً على الحاجة)
+            'warehouse_id'       => $warehouseId,
+            'secondary_warehouse_id' => null, // إذا كان لديك مستودع ثانوي، يمكنك تحديده هنا
+            'notes'              => 'عملية جرد تلقائية ',
+            'products'           => [],
+            'units'              => [],
+            'quantities'         => [],
+            'batchs'         => [],
+            'unit_prices'        => [],
+            'totals'             => [],
+            'warehouse_locations' => [],
+            'production_date'    => [],
+            'expiration_date'    => []
+        ];
+
+        // دمج بيانات المنتجات مع الحركة
+        foreach ($products as $product) {
+            $transactionData['products'][]           = $product->product_id;
+            $transactionData['units'][]              = $product->unit_product_id;
+            $transactionData['quantities'][]         = $product->total_quantity; // الكمية الإجمالية التي تم حسابها
+            $transactionData['batchs'][]         = $product->batch_number ?? null; // الكمية الإجمالية التي تم حسابها
+            $transactionData['unit_prices'][]        = $product->price;
+            $transactionData['totals'][]             = $product->total_quantity * $product->price; // حساب الإجمالي
+            $transactionData['warehouse_locations'][] = null; // يمكنك إضافة الموقع إذا كان لديك بيانات عنه
+            $transactionData['production_date'][]    = $product->production_date;
+            $transactionData['expiration_date'][]    = $product->expiration_date;
+        }
+        // dd($transactionData);
+        // استدعاء الخدمة لإنشاء العملية المخزنية وإطلاق الحدث
+        $transaction = $this->inventoryTransactionService->createTransaction($transactionData);
+
+        // إرجاع استجابة JSON إذا كان الطلب من نوع JSON
+        if (request()->expectsJson()) {
+            return response()->json([
+                'message' => 'تمت إضافة العملية المخزنية بنجاح',
+                'transaction' => $transaction
+            ], 201);
+        }
+
+        return $transaction;
+        // } catch (\Exception $e) {
+        //     return redirect()->back()
+        //         ->withInput()
+        //         ->withErrors(['error' => 'حدث خطأ أثناء إضافة العملية المخزنية: ' . $e->getMessage()]);
+        // }
+    }
+
 
     public function create()
     {

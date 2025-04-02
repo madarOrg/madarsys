@@ -151,39 +151,42 @@
                         </thead>
                         <tbody>
                             @foreach ($invoice->items as $index => $item)
-                                <tr>
-                                    <input type="hidden" name="items[{{ $index }}][id]" value="{{ $item->id }}">
-                                    <td class="py-2 px-4">
-                                        <select name="items[{{ $index }}][product_id]" class="product-select w-full p-2 border rounded-lg focus:ring focus:ring-blue-500"  required>
-                                            <option value="">اختر المنتج</option>
-                                            @foreach($products as $product)
-                                                <option value="{{ $product->id }}" 
-                                                    data-price="{{ $product->selling_price }}" 
-                                                    {{ $product->id == $item->product_id ? 'selected' : '' }}>
-                                                    {{ $product->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="py-2 px-4">
-                                        <input type="number" step="any" min="0" name="items[{{ $index }}][price]" class="price-input w-full py-2 px-4 border rounded" value="{{ $item->price }}" required>
-                                    </td>
-                                    <td class="py-2 px-4">
-                                        <select name="items[{{ $index }}][unit_id]" class="unit-select w-full p-2 border rounded-lg focus:ring focus:ring-blue-500" required>
-                                            <option value="">اختر الوحدة</option>
-                                            @foreach($units as $unit)
-                                                <option value="{{ $unit->id }}" {{ $unit->id == $item->unit_id ? 'selected' : '' }}>{{ $unit->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                                    <td class="py-2 px-4">
-                                        <input type="number" name="items[{{ $index }}][quantity]" class="quantity-input w-full py-2 px-4 border rounded" value="{{ $item->quantity }}" required>
-                                    </td>
-                                    <td class="py-2 px-4">
-                                        <button type="button" class="remove-item text-red-600 hover:text-red-800">إزالة</button>
-                                    </td>
-                                </tr>
-                            @endforeach
+                            <tr>
+                                <!-- Change the field name to item_id -->
+                                <input type="hidden" name="items[{{ $index }}][item_id]" value="{{ $item->id }}"> <!-- item_id -->
+                                
+                                <td class="py-2 px-4">
+                                    <select name="items[{{ $index }}][product_id]" class="product-select w-full p-2 border rounded-lg focus:ring focus:ring-blue-500"  required>
+                                        <option value="">اختر المنتج</option>
+                                        @foreach($products as $product)
+                                            <option value="{{ $product->id }}" 
+                                                data-price="{{ $product->selling_price }}" 
+                                                {{ $product->id == $item->product_id ? 'selected' : '' }}>
+                                                {{ $product->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="py-2 px-4">
+                                    <input type="number" step="any" min="0" name="items[{{ $index }}][price]" class="price-input w-full py-2 px-4 border rounded" value="{{ $item->price }}" required>
+                                </td>
+                                <td class="py-2 px-4">
+                                    <select name="items[{{ $index }}][unit_id]" class="unit-select w-full p-2 border rounded-lg focus:ring focus:ring-blue-500" required>
+                                        <option value="">اختر الوحدة</option>
+                                        @foreach($units as $unit)
+                                            <option value="{{ $unit->id }}" {{ $unit->id == $item->unit_id ? 'selected' : '' }}>{{ $unit->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </td>
+                                <td class="py-2 px-4">
+                                    <input type="number" name="items[{{ $index }}][quantity]" class="quantity-input w-full py-2 px-4 border rounded" value="{{ $item->quantity }}" required>
+                                </td>
+                                <td class="py-2 px-4">
+                                    <button type="button" class="remove-item text-red-600 hover:text-red-800">إزالة</button>
+                                </td>
+                            </tr>
+                        @endforeach
+                        
                         </tbody>
                     </table>
                 </div>
@@ -225,7 +228,6 @@
         </form>
     </section>
 
-
     <script>
         let products = @json($products);
         let units = @json($units);
@@ -243,21 +245,23 @@
             }
         });
 
-        document.getElementById('add-item').addEventListener('click', function () {
-            let index = document.querySelectorAll('#invoice-items-table tbody tr').length;
+    document.getElementById('add-item').addEventListener('click', function () {
+    let index = document.querySelectorAll('#invoice-items-table tbody tr').length;
 
-            let productOptions = products.map(product =>
-                `<option value="${product.id}" data-price="${product.selling_price}" data-unit-id="${product.unit_id}">
+    let productOptions = products.map(product =>
+        `<option value="${product.id}" data-price="${product.selling_price}" data-unit-id="${product.unit_id}">
             ${product.name}
         </option>`
-            ).join('');
+    ).join('');
 
-            let UnitOptions = units.map(Unit =>
-                `<option value="${Unit.id}" data-id="${Unit.id}">${Unit.name}</option>`
-            ).join('');
+    let UnitOptions = units.map(Unit =>
+        `<option value="${Unit.id}" data-id="${Unit.id}">${Unit.name}</option>`
+    ).join('');
 
-            let newRow = `
+    // Create the new row with a null value for item_id for new items
+    let newRow = `
         <tr>
+            <input type="hidden" name="items[${index}][item_id]" value="0"> <!-- 0 value for new item -->
             <td class="py-2 px-4">
                 <select name="items[${index}][product_id]" class="product-select w-full p-2 border rounded-lg focus:ring focus:ring-blue-500" required>
                     <option value="">اختر المنتج</option>
@@ -281,9 +285,10 @@
             </td>
         </tr>`;
 
-            document.querySelector('#invoice-items-table tbody').insertAdjacentHTML('beforeend', newRow);
-            updateTotalPrice();
-        });
+    document.querySelector('#invoice-items-table tbody').insertAdjacentHTML('beforeend', newRow);
+    updateTotalPrice();
+});
+
 
         document.querySelector('#invoice-items-table').addEventListener('change', function (e) {
             if (e.target.classList.contains('product-select')) {

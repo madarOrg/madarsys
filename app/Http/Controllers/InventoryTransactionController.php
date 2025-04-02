@@ -100,7 +100,7 @@ class InventoryTransactionController extends Controller
 
     public function store(StoreInventoryTransactionRequest $request)
     {
-        try {
+        // try {
             // dd($request->all());
             // استدعاء الخدمة لإنشاء العملية المخزنية
             $transaction = $this->inventoryTransactionService->createTransaction($request->all());
@@ -114,11 +114,11 @@ class InventoryTransactionController extends Controller
             }
 
             return redirect()->route('inventory.transactions.create')->with('success', 'تمت إضافة العملية المخزنية بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()
-                ->withInput()
-                ->withErrors(['error' => 'حدث خطأ أثناء إضافة العملية المخزنية: ' . $e->getMessage()]);
-        }
+        // } catch (\Exception $e) {
+        //     return redirect()->back()
+        //         ->withInput()
+        //         ->withErrors(['error' => 'حدث خطأ أثناء إضافة العملية المخزنية: ' . $e->getMessage()]);
+        // }
     }
 
     // عرض تفاصيل العملية المخزنية

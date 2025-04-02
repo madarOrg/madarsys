@@ -104,10 +104,10 @@
                         <td class="px-6 py-4">{{ optional($invoice->paymentType)->name ?? 'غير محدد' }}</td>
                         <td class="px-6 py-4">{{ optional($invoice->warehouse)->name ?? 'غير محدد' }}</td>
                         <td class="px-6 py-4 flex space-x-2">
-                            <x-button href="{{ route('invoices.edit', ['type' => 'sale', 'invoice' => $invoice->id]) }}" class="text-blue-600 hover:underline dark:text-blue-500">
+                            <x-button href="{{ route('invoices.edit', ['type' => 'purchase', 'invoice' => $invoice->id]) }}" class="text-blue-600 hover:underline dark:text-blue-500">
                                 <i class="fa-solid fa-pen"></i>
                             </x-button>
-                            <form action="{{ route('invoices.destroy', ['type' => 'sale', 'invoice' => $invoice->id]) }}" method="POST" class="inline-block">
+                            <form action="{{ route('invoices.destroy', ['type' => 'purchase', 'invoice' => $invoice->id]) }}" method="POST" class="inline-block">
                                 @csrf
                                 @method('DELETE')
                                 <x-button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('هل أنت متأكد من حذف الفاتورة؟')">
