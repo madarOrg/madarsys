@@ -32,14 +32,16 @@
                     <!-- اختيار الحركة المخزنية -->
                     <div class="mb-4">
                         <div class="mb-4">
+                            
                             <select id="inventory_transaction_item_id" name="inventory_transaction_item_id"
                                 class="tom-select w-full"
                                 data-route="{{ url('/get-inventory-transactions/${warehouseId}') }}">
                                 @foreach ($transactions as $transaction)
                                     {{-- <option value="{{ $transaction->id }}" --}}
+
                                     data-product-id="{{ $transaction->product_id }}">
-                                    {{ $transaction->reference }} - {{ $transaction->batch_number }} -{{ $transaction->product_name }} -
-                                    {{ $transaction->suk }}
+                                    {{ $transaction->reference }} - {{ $transaction->batch_number }} - {{ $transaction->product_name }} -
+                                    {{ $transaction->sku }} -  {{ $transaction->barcode }}
                                     </option>
                                 @endforeach
                             </select>
@@ -73,8 +75,11 @@
                             label="تاريخ الانتهاء" />
                     </div> --}}
                     <div class="mb-4">
-                        <x-file-input type="number" id="quantity" name="quantity" label="الكمية" required
-                            min="1" />
+                    </div>
+                    <div class="mb-4 flex items-center gap-2">
+                        <x-file-input type="number" id="quantity" name="quantity" label="الكمية" required min="1" />
+                        <span class="text-lg font-semibold">/</span>
+                        <span id="quantityOfProduct" class="px-3 py-2-200 rounded-md text-center min-w-[50px]">0</span>
                     </div>
 
                     <!-- اختيار المنطقة التخزينية -->
@@ -123,6 +128,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const productIdInput = document.getElementById('product_id');
     const productionDateInput = document.getElementById('production_date');
     const expirationDateInput = document.getElementById('expiration_date');
+    const quantityInput = document.getElementById('quantityOfProduct'); // إضافة الكمية
 
     // دالة لجلب الحركات المخزنية بناءً على المستودع المحدد
     async function loadTransactions(warehouseId) {
@@ -153,8 +159,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 data.forEach(item => {
                     inventoryTransactionSelect.addOption({
                         value: item.id,
-                        text: `${item.reference} - ${item.product_name}`
+                        text: `${item.reference} - ${item.product_name}- ${item.sku}- ${item.barcode}`
                     });
+                    // quantityInput.value = item.quantity || ''; 
+                    // console.log('fetching product:',   item.quantity )
+
                 });
             } else {
                 console.log('No transactions found for this warehouse');
@@ -163,6 +172,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.error('Error loading transactions:', error);
         }
     }
+
 
     // عند تغيير المستودع
     warehouseSelect.on('change', (value) => loadTransactions(value));
@@ -173,17 +183,21 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 console.log('fetching product:', transactionId);
 
-                const response = await fetch(`/get-product/${transactionId}`);
+                const response = await fetch(`/get-product-inventory/${transactionId}`);
 
                 if (!response.ok) throw new Error('Failed to fetch product');
 
                 const product = await response.json();
                 if (product) {
-                    console.log('fetching product:',  product.production_date);
 
                     productIdInput.value = product.product_id || '';
                     productionDateInput.value = product.production_date || '';
                     expirationDateInput.value = product.expiration_date || '';
+                    quantityInput.innerText = product.quantity || '';
+                    // document.getElementById('quantityOfProduct').innerText = product.quantity || '0';
+
+                    console.log('fetching product:', product.quantity );
+
                 }
             } catch (error) {
                 console.error('Error fetching product:', error);
@@ -192,6 +206,8 @@ document.addEventListener('DOMContentLoaded', function () {
             productIdInput.value = '';
             productionDateInput.value = '';
             expirationDateInput.value = '';
+            quantityInput.value = ''; // إعادة تعيين الكمية عند إلغاء التحديد
+
         }
     });
 });

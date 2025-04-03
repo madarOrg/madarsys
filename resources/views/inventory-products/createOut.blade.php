@@ -1,5 +1,4 @@
 <x-layout>
-    sdsd
     <section>
         <div>
             <x-title :title="'سحب منتج إمن المستودع '"></x-title>
@@ -12,35 +11,20 @@
                     <input type="hidden" name="distribution_type" value="{{ request('distribution_type', '-1') }}">
 
                     <div class="mb-4">
-                        <x-file-input label="المستودع" id="warehouse_name" value="{{ $product->warehouse->name }}" readonly
-                            :model="null" name="warehouse_id" type="text" />
-                        <input type="hidden" id="warehouse_id" name="warehouse_id" value="{{ $product->warehouse->id }}">
+                        <x-file-input label="المستودع" id="warehouse_name" value="{{ $product->warehouse->name }}"
+                            readonly :model="null" name="warehouse_id" type="text" />
+                        <input type="hidden" id="warehouse_id" name="warehouse_id"
+                            value="{{ $product->warehouse->id }}">
                     </div>
-                    
 
-                    {{-- <!-- الحركة المخزنية -->
+
+                    <!-- الحركة المخزنية -->
                     <div class="mb-4">
                         <x-file-input label="الحركة المخزنية" id="inventory_transaction_item_id"
-                            value="{{ $transactionItem->inventoryTransaction->reference }}" readonly :model="null"
-                            name="inventory_transaction_item_id" type="text" />
+                            value="{{ $transactionItem->id }}-{{ $transactionItem->inventoryTransaction->reference }}"
+                            readonly :model="null" name="inventory_transaction_item_id" type="text" />
                         <input type="hidden" name="inventory_transaction_item_id" value="{{ $transactionItem->id }}">
-                    </div> --}}
-                    <!-- اختيار الحركة المخزنية -->
-                    <!-- اختيار الحركة المخزنية -->
-<div class="mb-4">
-    <div class="mb-4">
-        <select id="inventory_transaction_item_id" name="inventory_transaction_item_id"
-            class="tom-select w-full">
-            @foreach ($transactions as $transaction)
-                <option value="{{ $transaction->id }}" data-product-id="{{ $transaction->product_id }}">
-                    {{ $transaction->reference }} - {{ $transaction->product_name }} - {{ $transaction->suk }}
-                </option>
-            @endforeach
-        </select>
-    </div>
-</div>
-
-
+                    </div>
 
                     <!-- المنتج -->
                     <div class="mb-4">
@@ -59,14 +43,14 @@
                     <!-- تاريخ الإنتاج -->
                     <div class="mb-4">
                         <x-file-input type="date" id="production_date" name="production_date" label="تاريخ الإنتاج"
-                            value="{{ $product->production_date }}" readonly  />
+                            value="{{ $product->production_date }}" readonly />
                         <input type="hidden" name="production_date" value="{{ $product->production_date }}">
                     </div>
 
                     <!-- تاريخ الانتهاء -->
                     <div class="mb-4">
                         <x-file-input type="date" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء"
-                            value="{{ $product->expiration_date }}" readonly  />
+                            value="{{ $product->expiration_date }}" readonly />
                         <input type="hidden" name="expiration_date" value="{{ $product->expiration_date }}">
                     </div>
 
@@ -125,7 +109,7 @@
     });
 </script> --}}
 
-<script>
+{{-- <script>
 document.addEventListener('DOMContentLoaded', function () {
     const warehouseHiddenInput = document.getElementById('warehouse_id');
     const transactionSelect = document.getElementById('inventory_transaction_item_id');
@@ -196,4 +180,4 @@ document.addEventListener('DOMContentLoaded', function () {
             productSelect.value = productId; // تعيين القيمة للـ product_id
         });
     });
-</script>
+</script> --}}

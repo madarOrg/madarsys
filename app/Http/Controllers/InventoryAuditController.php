@@ -180,20 +180,7 @@ class InventoryAuditController extends Controller
     {
 
         // try {
-        $query = DB::table('inventory_products')
-            ->where('warehouse_id', $warehouseId)
-            ->select(
-                'product_id',
-                'unit_product_id',
-                'price',
-                'production_date',
-                'expiration_date',
-
-                DB::raw('SUM(converted_quantity * distribution_type) as total_quantity')
-            )
-            ->groupBy('product_id')
-            ->orderBy('created_at','ASC'); 
-
+        ا
         // تطبيق التجميع بناءً على قيمة groupByBatch
         if ($groupByBatch) {
             $query->addSelect('batch_number')->groupBy('product_id', 'batch_number', 'unit_product_id', 'price', 'production_date', 'expiration_date');

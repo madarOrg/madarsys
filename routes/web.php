@@ -375,6 +375,8 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/get-inventory-transactions-out/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactionsOut']);
 
     Route::get('/get-product/{transaction_id}', [InventoryProductController::class, 'getProduct']);
+    Route::get('/get-product-inventory/{transaction_id}', [InventoryProductController::class, 'getProductInventory']);
+
     Route::get('/get-products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
     // التقارير
     Route::get('/inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
