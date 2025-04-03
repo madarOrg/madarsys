@@ -21,10 +21,11 @@ class InventoryService
         $inventory = Inventory::where('warehouse_id', $warehouseId)
             ->where('product_id', $productId)
             ->first();
-//  dump($quantity);
+            //  dd($quantity);
         if ($inventory) {
             // تحديث الكمية
             $newQuantity = $inventory->quantity + $quantity;
+            // dd($newQuantity);
 
             // التأكد من عدم أن تكون الكمية سالبة
             if ($newQuantity < 0) {

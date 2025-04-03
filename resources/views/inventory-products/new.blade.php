@@ -20,11 +20,11 @@
                     <!-- الحركة المخزنية -->
                     <div class="mb-4">
                         <x-file-input label="الحركة المخزنية" id="inventory_transaction_item_id"
-                            value="{{ $transactionItem->inventoryTransaction->reference }}" readonly :model="null"
+                            value="{{ $transactionItem->id }}-{{ $transactionItem->inventoryTransaction->reference }}" readonly :model="null"
                             name="inventory_transaction_item_id" type="text" />
                         <input type="hidden" name="inventory_transaction_item_id" value="{{ $transactionItem->id }}">
                     </div>
-
+  
 
                     <!-- المنتج -->
                     <div class="mb-4">
