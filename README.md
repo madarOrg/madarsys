@@ -156,3 +156,24 @@ git status
 - **تسهيل إعداد بيئة العمل والتطوير للفريق.**
 - **تقديم خطوات واضحة لضمان تنفيذ جميع الأعضاء للمراحل بشكل صحيح ومنظم.**
 
+errors:
+C:\madarsys>npm run dev
+
+> dev
+> vite
+
+X [ERROR] Cannot start service: Host version "0.25.2" does not match binary version "0.24.2"
+
+1 error
+failed to load config from C:\madarsys\vite.config.js
+error when starting dev server:
+Error: The service was stopped
+    at C:\madarsys\node_modules\esbuild\lib\main.js:969:34
+    at responseCallbacks.<computed> (C:\madarsys\node_modules\esbuild\lib\main.js:623:9)
+    at Socket.afterClose (C:\madarsys\node_modules\esbuild\lib\main.js:614:28)
+    at Socket.emit (node:events:525:35)
+    at endReadableNT (node:internal/streams/readable:1696:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:90:21)
+
+C:\madarsys>npm update esbuild --save-dev
+nmp install

@@ -95,7 +95,7 @@
                     class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
                     التقرير</button>
             </div>
-            <x-reportHeader :company="$company" :warehouse="$warehouse">
+            <x-reportHeader >
                 <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300">تقرير الحركات 
                     المخزنية</h1>
             </x-reportHeader>

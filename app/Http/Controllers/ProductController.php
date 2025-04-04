@@ -160,7 +160,6 @@ class ProductController extends Controller
     {
         // تحميل المنتج مع جميع مستويات الوحدات المتداخلة
         $product = Product::with(['unit.childrenRecursive', 'unit.parentRecursive'])->find($productId);
-    
         // التحقق من وجود المنتج والوحدة
         if (!$product || !$product->unit) {
             return response()->json(['units' => []]);
@@ -179,24 +178,38 @@ class ProductController extends Controller
         $this->getAllParents($product->unit, $units);
     
         // إزالة التكرار باستخدام unique() وتحويل النتيجة لمصفوفة
-        $uniqueUnits = $units->unique('id')->values()->all();
-    
+        // $uniqueUnits = $units->unique('id')->values()->all();
+        $uniqueUnits = $units->unique('id')->values()->map(function ($unit) {
+            return [
+                'id' => $unit->id,
+                'name' => $unit->name,
+            ];
+        })->all();    
         return response()->json(['units' => $uniqueUnits]);
     }
     
     /**
      * جلب جميع الوحدات الأبناء بشكل متداخل مع تجنب التكرار
      */
-    private function getAllChildren($unit, &$units)
-    {
-        foreach ($unit->children as $child) {
-            if (!$units->contains('id', $child->id)) {
-                $units->push($child);
-                $this->getAllChildren($child, $units);
-            }
+    private function getAllChildren($unit, &$units, &$visited = [])
+{
+    // إذا تمت زيارة الوحدة بالفعل، نتجنب تكرارها
+    if (in_array($unit->id, $visited)) {
+        return;
+    }
+    // نضيف الـ ID إلى المصفوفة التي تم زيارتها
+    $visited[] = $unit->id;
+
+    // استدعاء الأطفال
+    foreach ($unit->children as $child) {
+        // إذا لم تمت زيارة الطفل بعد، نضيفه
+        if (!in_array($child->id, $visited)) {
+            $units->push($child);
+            $this->getAllChildren($child, $units, $visited);
         }
     }
-    
+}
+
     /**
      * جلب جميع الوحدات الآباء بشكل متداخل مع تجنب التكرار
      */

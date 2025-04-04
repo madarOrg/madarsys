@@ -1,16 +1,18 @@
 <x-layout>
 
     <div class="container">
-        <div class=" mb-4  flex justify-start mt-4">
-
-        <x-title :title="'سجل عمليات الجرد'"></x-title>
-            <a href="{{ route('inventory.audit.create') }}"
-                class=" sm:w-auto h-12 shadow-sm rounded-lg text-base font-semibold leading-7 transition-all duration-300  text-gray-700 bg-green-600 hover:bg-green-700 px-6 py-2 flex items-center justify-center"> 
-                
-             إضافة جرد جديد</a>
-        </div>
+      
         <!-- فلترة البحث -->
         <form action="{{ route('inventory.audit.index') }}" method="GET" class="mb-4">
+            <div x-data="{ open: true }">
+                <!-- زر لفتح أو إغلاق القسم -->
+                <button type="button" @click="open = !open" class="text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
+                    <span
+                        x-html="open ? '<i class=\'fa-solid fa-magnifying-glass-minus fa-lg\'></i>' :'<i class=\'fa-solid fa-magnifying-glass-plus fa-lg\'></i>'">
+                    </span>
+                </button>
+                 <!-- الحقول القابلة للطي -->
+            <div x-show="open" x-transition>
             <div class="flex flex-wrap md:flex-nowrap gap-4 items-end w-full">
                 <div class="flex-1 min-w-[200px]">
                     @include('components.file-input', [
@@ -74,48 +76,64 @@
                 </div>
 
             </div>
-            <div class="hide-on-print  mb-4 mt-1">
+            {{-- <div class="hide-on-print  mb-4 mt-1">
                 <button type="submit" class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
+            </div> --}}
+            <div class="flex justify-end mt-2">
+                <x-button>
+                    بحث
+                </x-button>
             </div>
+        </div>
         </form>
-
+        {{-- <a href="{{ route('inventory.audit.create') }}"
+        class=" sm:w-auto h-12 shadow-sm rounded-lg text-base font-semibold leading-7 transition-all duration-300  text-gray-700 bg-green-600 hover:bg-green-700 px-6 py-2 flex items-center justify-center"> 
+        
+     إضافة جرد جديد</a> --}}
+     <div class=" flex justify-start ">
+        <x-title :title="'سجل عمليات الجرد'"></x-title>
+     <x-button :href="route('inventory.audit.create')" type="button" class="ml-4">
+        <i class="fas fa-plus mr-2"></i> إضافة جرد جديد
+    </x-button>
+</div>
         <!-- عرض قائمة الجرد -->
         <div class="overflow-x-auto">
-            <table class="w-full border-collapse border border-gray-300 text-sm">
-                <thead>
-                    <tr class="bg-gray-100">
-                        <th>كود الجرد</th>
-                        <th>نوع الجرد</th>
-                        <th>تاريخ البدء</th>
-                        <th>تاريخ الانتهاء</th>
-                        <th>الحالة</th>
-                        <th>المستخدمين</th>
-                        <th>المستودعات</th>
-                        <th>العمليات</th>
+            <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                <thead class="px-6 py-3 text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                   
+                    <tr class="">
+                        <th class="px-6 py-3">كود الجرد</th>
+                        <th class="px-6 py-3">نوع الجرد</th>
+                        <th class="px-6 py-3">تاريخ البدء</th>
+                        <th class="px-6 py-3">تاريخ الانتهاء</th>
+                        <th class="px-6 py-3">الحالة</th>
+                        <th class="px-6 py-3">المستخدمين</th>
+                        <th class="px-6 py-3">المستودعات</th>
+                        <th class="px-6 py-3">العمليات</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class=" p-2 w-auto min-w-[50px] whitespace-nowrap">
                     @foreach ($audits as $audit)
-                        <tr>
-                            <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $audit->inventory_code }}
+                        <tr  class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                            <td class="px-6 py-4">{{ $audit->inventory_code }}
                             </td>
-                            <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 {{ $audit->inventory_type == 1 ? 'جرد دوري' : 'جرد مفاجئ' }}</td>
-                            <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $audit->start_date }}</td>
-                            <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $audit->end_date }}</td>
-                            <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
+                            <td class="px-6 py-4">{{ $audit->start_date }}</td>
+                            <td class="px-6 py-4">{{ $audit->end_date }}</td>
+                            <td class="px-6 py-4">
                                 {{ $audit->status == 1 ? 'معلق' : 'مكتمل' }}</td>
-                            <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 @foreach ($audit->users as $user)
                                     <span>{{ $user->name }}</span><br>
                                 @endforeach
                             </td>
-                            <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 @foreach ($audit->warehouses as $warehouse)
                                     <span>{{ $warehouse->name }}</span><br>
                                 @endforeach
                             </td>
-                            <td class="border p-2   whitespace-nowrap">
+                            <td class="px-6 py-4">
                                 <a href="{{ route('inventory.audit.edit', $audit->id) }}"
                                     class="text-blue-600 hover:underline dark:text-blue-500 mx-2">
                                     <i class="fa-solid fa-pen"></i>

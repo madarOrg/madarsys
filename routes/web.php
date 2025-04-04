@@ -379,40 +379,65 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     Route::get('/get-products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
     // التقارير
-    Route::get('/inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
-    Route::get('/products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
-    Route::prefix('reports')->name('reports.')->group(function () {
+
+    Route::middleware([\App\Http\Middleware\GlobalVariablesMiddleware::class])->group(function () {
+        Route::get('/inventory-transactions/{warehouse_id}', [InventoryProductController::class, 'getInventoryTransactions']);
+        Route::get('/products/{transaction_id}', [InventoryProductController::class, 'getProducts']);
+        Route::prefix('reports')->name('reports.')->group(function () {
+            // تقرير المنتجات التي وصلت لحد إعادة الطلب
+            Route::get('/purchase', [InventoryReportController::class, 'reorderReport'])->name('reorder');
+            Route::get('/search-products', [InventoryReportController::class, 'searchProducts'])->name('search-products');
+
+            //المنتج و الموردين
+            Route::get('/reorder', [InventoryReportController::class, 'purchaseReport'])->name('purchaseReport');
+            Route::get('/search-partners', [InventoryReportController::class, 'searchPartners'])->name('search-partners');
+
+
+            // تقرير المنتجات المقاربه المنتهية صلاحيتها
+            Route::get('/expired-products', [InventoryReportController::class, 'expirationReport'])->name('expired-products');
+
+            // تقرير المنتحات المنتهيه
+            Route::get('/get-expired-products', [InventoryReportController::class, 'getExpiredProducts'])->name('get-expired-products');
+            // تقرير الحركات المخزنية
+            Route::get('/inventory-transactions', [InventoryReportController::class, 'inventoryTransactions'])
+                ->name('inventory-transactions');
+        });
+        // Route::prefix('reports')->name('reports.')
+        // ->middleware([\App\Http\Middleware\GlobalVariablesMiddleware::class])
+        // ->group(function () {
 
         // تقرير المنتجات التي وصلت لحد إعادة الطلب
         Route::get('/purchase', [InventoryReportController::class, 'reorderReport'])->name('reorder');
         Route::get('/search-products', [InventoryReportController::class, 'searchProducts'])->name('search-products');
 
-        //المنتج و الموردين
+        // المنتج و الموردين
         Route::get('/reorder', [InventoryReportController::class, 'purchaseReport'])->name('purchaseReport');
         Route::get('/search-partners', [InventoryReportController::class, 'searchPartners'])->name('search-partners');
-
 
         // تقرير المنتجات المقاربه المنتهية صلاحيتها
         Route::get('/expired-products', [InventoryReportController::class, 'expirationReport'])->name('expired-products');
 
         // تقرير المنتحات المنتهيه
         Route::get('/get-expired-products', [InventoryReportController::class, 'getExpiredProducts'])->name('get-expired-products');
+
         // تقرير الحركات المخزنية
         Route::get('/inventory-transactions', [InventoryReportController::class, 'inventoryTransactions'])
             ->name('inventory-transactions');
     });
-// Auditing
-Route::prefix('/inventory/audit')->name('inventory.audit.')->group(function () {
-    Route::get('/', [InventoryAuditController::class, 'index'])->name('index');
-    Route::get('/create', [InventoryAuditController::class, 'create'])->name('create');
-    Route::post('/store', [InventoryAuditController::class, 'store'])->name('store');
-    Route::get('/edit/{id}', [InventoryAuditController::class, 'edit'])->name('edit');
-    Route::post('/update/{id}', [InventoryAuditController::class, 'update'])->name('update');
-    Route::delete('/destroy/{id}', [InventoryAuditController::class, 'destroy'])->name('destroy'); 
-    Route::get('/warehouse-report', [InventoryAuditController::class, 'warehouseReport'])->name('warehouseReport');
-    Route::get('/report', [InventoryAuditController::class, 'report'])->name('report');
 
-});
+    // Auditing
+    Route::prefix('/inventory/audit')->name('inventory.audit.')->group(function () {
+        Route::get('/', [InventoryAuditController::class, 'index'])->name('index');
+        Route::get('/create', [InventoryAuditController::class, 'create'])->name('create');
+        Route::post('/store', [InventoryAuditController::class, 'store'])->name('store');
+        Route::get('/edit/{id}', [InventoryAuditController::class, 'edit'])->name('edit');
+        Route::post('/update/{id}', [InventoryAuditController::class, 'update'])->name('update');
+        Route::delete('/destroy/{id}', [InventoryAuditController::class, 'destroy'])->name('destroy');
+        Route::middleware([\App\Http\Middleware\GlobalVariablesMiddleware::class])->group(function () {
+            Route::get('/warehouse-report', [InventoryAuditController::class, 'warehouseReport'])->name('warehouseReport');
+            Route::get('/report', [InventoryAuditController::class, 'report'])->name('report');
+        });
+    });
 
 
 

@@ -84,7 +84,8 @@
             </div>
 
             <!-- رأس التقرير -->
-            <x-reportHeader :company="$company" :warehouse="$warehouse">
+            {{-- <x-reportHeader :company="$company" :warehouse="$arehouse"> --}}
+            <x-reportHeader>
                 <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المنتهية
                     الصلاحية </h1>
             </x-reportHeader>
