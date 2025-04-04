@@ -109,7 +109,7 @@
                 <div class="overflow-x-auto mt-6">
                     <h2 class="text-lg font-semibold">المنتجات في المستودع المحدد</h2>
                     <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
-                        <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400 p-2 w-auto min-w-[50px] whitespace-nowrap">
                             <tr class="">
                                 {{-- <th class="py-4">الرقم</th> --}}
                                 <th class="py-4">النوع</th>
@@ -144,13 +144,13 @@
                                     </td>
                                     
                                     
-                                    <td class="px-6 py-4">
+                                    <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">
                                         <a href="{{ route('products.show', $product->product->id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
-                                            {{ $product->product->name }}
+                                            {{ $product->product->name }}  {{ $product->product->sku }}
                                         </a>
                                     </td>
                                     <td class="px-6 py-4">{{ $product->productQuantity ?? 'غير محدد' }}</td>
-                                    <td class="px-6 py-4">{{ $product->location->rack_code ?? 'غير محدد' }}</td>
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->location->rack_code ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">{{ $product->storageArea->area_name ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">{{ $product->production_date ?? 'غير محدد' }}</td>
                                     <td class="px-6 py-4">{{ $product->expiration_date ?? 'غير محدد' }}</td>

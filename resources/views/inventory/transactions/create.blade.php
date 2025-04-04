@@ -236,28 +236,48 @@
             tableBody.insertAdjacentHTML('beforeend', newRow);
 
 
-            const newSelect = tableBody.querySelector('.product-row:last-child .product-select');
-            if (newSelect) {
-                new TomSelect(newSelect, {
-                    create: false,
-                    sortField: {
-                        field: "text",
-                        direction: "asc"
-                    },
-                    placeholder: "اختر منتج",
-                });
-            }
-            localStorage.removeItem('currentTransactionId');
-            generateTransactionId();
-            document.querySelector('#productRows').innerHTML = ''; // مسح الصفوف السابقة
+const newSelect = tableBody.querySelector('.product-row:last-child .product-select');
+if (newSelect) {
+    new TomSelect(newSelect, {
+        create: false,
+        sortField: {
+            field: "text",
+            direction: "asc"
+        },
+        placeholder: "اختر منتج",
+    });
+}
 
-        }
+// ربط أحداث التغيير لحساب السعر الإجمالي
+const quantityInput = tableBody.querySelector('.product-row:last-child .quantity-input');
+const unitPriceInput = tableBody.querySelector('.product-row:last-child .unit-price-input');
+const totalInput = tableBody.querySelector('.product-row:last-child .total-input');
 
-        // دالة لحذف صف منتج
-        function removeProductRow(button) {
-            const row = button.closest('tr');
-            row.remove();
-        }
+quantityInput.addEventListener('input', calculateTotal);
+unitPriceInput.addEventListener('input', calculateTotal);
+
+// دالة لحساب السعر الإجمالي
+function calculateTotal() {
+    const quantity = parseFloat(quantityInput.value) || 0;
+    const unitPrice = parseFloat(unitPriceInput.value) || 0;
+    const total = quantity * unitPrice;
+    totalInput.value = total.toFixed(2); // عرض النتيجة بصيغة رقمية مع 2 خانات عشرية
+}
+
+localStorage.removeItem('currentTransactionId');
+generateTransactionId();
+document.querySelector('#productRows').innerHTML = ''; // مسح الصفوف السابقة
+}
+
+// دالة لحذف صف منتج
+function removeProductRow(button) {
+const row = button.closest('tr');
+row.remove();
+}
+            
+          
+        
+
 
         // دالة لتحديث بيانات صف منتج معين باستخدام AJAX
         function updateRow(button) {
@@ -362,6 +382,8 @@
                             const option = document.createElement('option');
                             option.value = unit.id;
                             option.textContent = unit.name;
+                            console.log(data.units);
+
                             // إذا كانت الوحدة هي الافتراضية، نجعلها المختارة
                             if (unit.id == defaultUnitId) {
                                 option.selected = true;
@@ -403,15 +425,7 @@
         //     });
         // });
 
-        // الاستماع لتغيير اختيار المنتج وتعبئة الوحدات بناءً عليه
-        document.addEventListener('change', function(event) {
-            if (event.target.classList.contains('product-select')) {
-                const productId = event.target.value;
-                const row = event.target.closest('.product-row');
-                if (!row) return;
-                populateUnits(row, productId);
-            }
-        });
+    
 
 
         /////effect/////////////////////////////////////////////

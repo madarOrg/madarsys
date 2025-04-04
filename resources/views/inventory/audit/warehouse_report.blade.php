@@ -1,27 +1,23 @@
 <x-layout>
     <div class="container">
-        <x-title :title="'عرض قوائم الجرد'"></x-title>
+       
 
 
         <form method="GET" action="{{ route('inventory.audit.warehouseReport') }}" class="mb-3">
-            <div class="flex flex-wrap md:flex-nowrap gap-2 items-end w-full">
-                {{-- <div class="col-md-3">
-                                <label for="start_date">من تاريخ</label>
-                                <input type="date" name="start_date" id="start_date" class="form-control" value="{{ request('start_date', $startDate) }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="end_date">إلى تاريخ</label>
-                                <input type="date" name="end_date" id="end_date" class="form-control" value="{{ request('end_date', $endDate) }}">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="inventory_code">كود الجرد</label>
-                                <input type="text" name="inventory_code" id="inventory_code" class="form-control" value="{{ request('inventory_code') }}">
-                            </div>
-                            <div class="col-md-3 d-flex align-items-end"> --}}
+            <div x-data="{ open: true }">
+                <!-- زر لفتح أو إغلاق القسم -->
+                <button type="button" @click="open = !open" class="hide-on-print text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
+                    <span
+                        x-html="open ? '<i class=\'fa-solid fa-magnifying-glass-minus fa-lg\'></i>' :'<i class=\'fa-solid fa-magnifying-glass-plus fa-lg\'></i>'">
+                    </span>
+                </button>
 
-                <!-- حقل "من تاريخ" -->
+                   <!-- الحقول القابلة للطي -->
+            <div x-show="open" x-transition>
 
-                <div class="flex-1 min-w-[250px]">
+            <div class=" flex flex-wrap md:flex-nowrap gap-2 items-end w-full">
+            
+            <div class="flex-1 min-w-[250px]">
                     <x-file-input label="من تاريخ" id="start_date" name="start_date" type="date"
                         value="{{ request('start_date', $startDate) }}" />
                 </div>
@@ -47,36 +43,64 @@
                 label="تجميع حسب الدفعة" 
             />
             
-                <div class="hide-on-print  mb-4 mt-1">
-                    <button type="submit" class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
-                </div>
                 
             </div>
-
+            
+            <div class="hide-on-print  mb-4 mt-1">
+                <button type="submit" class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
+            </div>
+           
+  </div>
     </div>
 
     </form>
+    <div class="container mx-auto p-4">
+        <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
+        <div class="hide-on-print text-right mb-4">
+            <button onclick="window.print()"
+                class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
+                 التقرير
+            </button>
+        </div>
+         <!-- رأس التقرير -->
+         <x-reportHeader>
+            <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> عرض قوائم الجرد</h1>
+        </x-reportHeader>
+
+    <div class=" flex items-center space-x-2">
     @foreach ($warehouseReports->groupBy('warehouse_id') as $warehouseId => $products)
-        <h3 class="mt-4 text-xl font-semibold">{{ $products->first()->warehouse_name }}</h3>
-        <div class="overflow-x-auto">
+        <h3 class="dark:text-gray-100 text-xl font-semibold"> ({{ $products->first()->warehouse_name }} )</h3>
+    </div>
+        <div class="">
             <table class="w-full border-collapse border border-gray-300 text-sm">
                 <thead>
                     <tr class="bg-gray-100">
-                    <th>المنتج</th>
+                  
+                    <th  class="border p-2">المنتج</th>
                     @if ($groupByBatch)
-                        <th>رقم الدفعة</th>
+                        <th  class="border p-2">رقم الدفعة</th>
+                    
+                    <th  class="border p-2">المنطقة التخزينية </th>
+                    <th  class="border p-2">موقع المنتج</th>
                     @endif
-                    <th>إجمالي الكمية</th>
+                    <th  class="border p-2">إجمالي الكمية</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody class=" p-2 w-auto min-w-[50px] whitespace-nowrap">
                 @foreach ($products as $product)
-                    <tr>
-                        <td  class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->product_name }}</td>
+                <tr>
+                    <td class="border p-2"><a href="{{ route('products.show', $product->product_id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
+                        {{ $product->product_name }}  {{ $product->sku }}
+                    </a>
+                </td>
                         @if ($groupByBatch)
-                            <td  class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->batch_number }}</td>
-                        @endif
-                        <td  class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ number_format($product->total_quantity, 2) }}</td>
+                            <td  class="border p-2">{{ $product->batch_number }}</td>
+                       
+                        <td  class="border p-2"> {{ $product->rack_code }}</td>
+                        <td  class="border p-2"> {{ $product->area_name }}</td>
+                        @endif 
+                        <td  class="border p-2">{{ number_format($product->total_quantity, 2) }}</td>
+
                     </tr>
                 @endforeach
             </tbody>

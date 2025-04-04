@@ -9,6 +9,8 @@ use App\Models\Warehouse;
 use App\Models\InventoryAudit;
 use App\Models\InventoryAuditUser;
 use App\Models\InventoryAuditWarehouse;
+use App\Models\Company;
+
 use App\Models\InventoryTransaction;
 use App\Models\InventoryTransactionItem;
 
@@ -100,6 +102,8 @@ class InventoryAuditController extends Controller
         $endDate   = $request->input('end_date', Carbon::now()->format('Y-m-d'));
         $inventoryCode = $request->input('inventory_code'); // إذا لم يُرسل سيظل null
         $groupByBatch = $request->input('group_by_batch', false); // إذا تم تمرير القيمة (مثلاً 1)، فسيتم التجميع حسب الدفعة
+        $warehouses = Warehouse::ForUserWarehouse()->get();
+        $company = Company::forUserCompany()->first();
 
         $query = DB::table('inventory_products as ip')
             ->join('products as p', 'ip.product_id', '=', 'p.id')
@@ -108,6 +112,9 @@ class InventoryAuditController extends Controller
             ->join('inventory_transactions as it', 'iti.inventory_transaction_id', '=', 'it.id')
             ->join('inventory_audit_warehouses as iaw', 'w.id', '=', 'iaw.warehouse_id')
             ->join('inventory_audits as ia', 'iaw.inventory_audit_id', '=', 'ia.id')
+            ->join('warehouse_storage_areas as ws', 'ip.storage_area_id', '=', 'ws.id')
+            ->join('warehouse_locations as wl', 'ip.location_id', '=', 'wl.id')
+
             ->when($startDate && $endDate, function ($query) use ($startDate, $endDate) {
                 // استخدام تواريخ إدخال المنتجات بين الفترة المحددة
                 $query->whereBetween('ip.created_at', [$startDate, $endDate]);
@@ -124,8 +131,12 @@ class InventoryAuditController extends Controller
                 'p.id as product_id',
                 'p.name as product_name',
                 'ip.batch_number',
+                'p.sku',
+                'wl.rack_code',
+                'ws.area_name',
                 DB::raw('SUM(ip.converted_quantity * ip.distribution_type) as total_quantity')
-            )->groupBy('w.id', 'w.name', 'p.id', 'p.name', 'ip.batch_number');
+            )->groupBy('w.id', 'w.name', 'p.id', 'p.name', 'p.sku','wl.rack_code',
+                'ws.area_name','ip.batch_number');
         } else {
             // الحالة الافتراضية، التجميع حسب المستودع والمنتج فقط
             $query->select(
@@ -133,8 +144,11 @@ class InventoryAuditController extends Controller
                 'w.name as warehouse_name',
                 'p.id as product_id',
                 'p.name as product_name',
+                'p.sku',
+                
+                
                 DB::raw('SUM(ip.converted_quantity * ip.distribution_type) as total_quantity')
-            )->groupBy('w.id', 'w.name', 'p.id', 'p.name');
+            )->groupBy('w.id', 'w.name', 'p.id', 'p.sku', 'p.name' );
         }
 
         $warehouseReports = $query->orderBy('w.id')->get();
@@ -180,7 +194,20 @@ class InventoryAuditController extends Controller
     {
 
         // try {
-        ا
+            $query = DB::table('inventory_products')
+            ->where('warehouse_id', $warehouseId)
+            ->select(
+                'product_id',
+                'unit_product_id',
+                'price',
+                'production_date',
+                'expiration_date',
+
+                DB::raw('SUM(converted_quantity * distribution_type) as total_quantity')
+            )
+            ->groupBy('product_id')
+            ->orderBy('created_at','ASC'); 
+
         // تطبيق التجميع بناءً على قيمة groupByBatch
         if ($groupByBatch) {
             $query->addSelect('batch_number')->groupBy('product_id', 'batch_number', 'unit_product_id', 'price', 'production_date', 'expiration_date');
