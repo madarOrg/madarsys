@@ -12,7 +12,8 @@
 
                     <div class="mb-2">
                         <!-- كود الجرد -->
-                        <x-file-input label="كود الجرد" id="inventory_code" name="inventory_code" type="text" value="{{ old('inventory_code', 'AUTO_GENERATED_CODE') }}" readonly />
+                        <x-file-input label="كود الجرد" id="inventory_code" name="inventory_code" type="text"
+                            value="{{ old('inventory_code', 'AUTO_GENERATED_CODE') }}" readonly />
                     </div>
                     {{-- <div>
                        
@@ -22,10 +23,18 @@
                             value="{{ old('inventory_code', 'AUTO_GENERATED_CODE') }}" readonly>
                     </div> --}}
                     <!-- نوع الجرد -->
-                    <div class="">
-                        <!-- نوع الجرد -->
-                        <x-select-dropdown id="inventory_type" name="inventory_type" label="نوع الجرد" :options="[1 => 'دوري', 2 => 'مفاجئ', 3 => 'سنوي', 4 => 'شهري']" selected="{{ old('inventory_type') }}" />
-                    </div>
+
+                    <!-- الأنواع الفرعية لعنصر النوع 8 -->
+                    @if ($subTypes->isNotEmpty())
+                        <div class="mb-4">
+                            <label for="inventory_type" class="block">الأنواع الفرعية</label>
+                            <select name="inventory_type" id="inventory_type" class="form-select mt-1 block w-full">
+                                @foreach ($subTypes as $subType)
+                                    <option value="{{ $subType->id }}">{{ $subType->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    @endif
                     <!-- تاريخ بدء الجرد -->
                     {{-- <div>
                        
@@ -48,7 +57,7 @@
                         <!-- تاريخ بدء الجرد -->
                         <x-file-input label="تاريخ بدء الجرد" id="start_date" name="start_date" type="datetime-local" />
                     </div>
-                    
+
                     <div class="">
                         <!-- تاريخ انتهاء الجرد -->
                         <x-file-input label="تاريخ انتهاء الجرد" id="end_date" name="end_date" type="datetime-local" />
@@ -57,7 +66,7 @@
                         <!-- الملاحظات -->
                         <x-textarea label="ملاحظات" id="notes" name="notes" rows="3" />
                     </div>
-                    
+
                 </div>
             </div>
 
@@ -87,16 +96,17 @@
                         </select>
                     </div>
                 </div> --}}
- 
- 
+
+
             <div class=" p-6 rounded-lg shadow mb-6">
                 <h2 class="text-xl font-semibold mb-4">اختيار المستخدمين المسؤولين وتحديد صلاحياتهم</h2>
                 <div class="flex  justify-center gap-2">
                     <!-- قائمة المستخدمين المتاحين -->
                     <div class="w-1/2">
                         <label class="block  mb-2">المستخدمون المتاحون</label>
-                        <select id="available_users" 
-                        class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 " multiple size="10">
+                        <select id="available_users"
+                            class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 "
+                            multiple size="10">
                             @foreach ($users as $user)
                                 <option value="{{ $user->id }}">{{ $user->name }}</option>
                             @endforeach
@@ -117,7 +127,8 @@
                     <div class="w-1/2">
                         <label class="block  mb-2">المستخدمون المختارون</label>
                         <select id="selected_users" name="users[]"
-                        class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 " multiple size="10">
+                            class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 "
+                            multiple size="10">
                             <!-- العناصر المضافة هنا عبر النقل -->
                         </select>
                     </div>
@@ -140,7 +151,8 @@
                     <div class="w-1/2">
                         <label class="block  mb-2">المستودعات المتاحة</label>
                         <select id="available_warehouses"
-                        class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 " multiple size="10">
+                            class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 "
+                            multiple size="10">
                             @foreach ($warehouses as $warehouse)
                                 <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
                             @endforeach
@@ -158,9 +170,9 @@
                     <!-- قائمة المستودعات المختارة -->
                     <div class="w-1/2"> <label class="block mb-2">المستودعات المختارة</label>
                         <select id="selected_warehouses" name="warehouses[]"
-                        class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 "  multiple
-                        size="10" >
-                         
+                            class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1 "
+                            multiple size="10">
+
                             <!-- العناصر المضافة هنا عبر النقل -->
                         </select>
                     </div>
@@ -168,7 +180,7 @@
             </div>
 
             <div class="mt-6 flex justify-end">
-                <x-button type="submit" >حفظ
+                <x-button type="submit">حفظ
                     العملية</x-button>
             </div>
     </div>

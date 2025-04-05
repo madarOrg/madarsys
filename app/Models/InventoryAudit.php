@@ -28,17 +28,17 @@ class InventoryAudit extends Model
         $date = now()->format('Ymd'); // تاريخ اليوم بصيغة YYYYMMDD
         $latestAudit = self::latest()->first(); // آخر جرد مضاف
         $nextId = $latestAudit ? $latestAudit->id + 1 : 1; // تحديد الـ ID التالي
-    
+
         return "audit-{$date}-{$nextId}";
     }
-    
+
     /**
      * العلاقة مع المستخدمين المسؤولين عن الجرد (عدة مستخدمين).
      */
     public function users()
     {
         return $this->belongsToMany(User::class, 'inventory_audit_users')
-                    ->withPivot('created_user', 'updated_user', 'branch_id');
+            ->withPivot('created_user', 'updated_user', 'branch_id');
     }
 
     /**
@@ -47,6 +47,12 @@ class InventoryAudit extends Model
     public function warehouses()
     {
         return $this->belongsToMany(Warehouse::class, 'inventory_audit_warehouses')
-                    ->withPivot('created_user', 'updated_user', 'branch_id');
+            ->withPivot('created_user', 'updated_user', 'branch_id');
     }
+    
+public function subType()
+{
+    return $this->belongsTo(InventoryTransactionSubtype::class, 'inventory_type','id');
+}
+
 }

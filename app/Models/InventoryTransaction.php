@@ -18,6 +18,7 @@ class InventoryTransaction extends Model
 
     protected $fillable = [
         'transaction_type_id',
+        'sub_type_id',
         'effect',
         'transaction_date', 
         'reference',
@@ -67,6 +68,12 @@ class InventoryTransaction extends Model
     {
         return $this->belongsTo(TransactionType::class, 'transaction_type_id');
     }
+
+public function subType()
+{
+    return $this->belongsTo(InventoryTransactionSubtype::class, 'sub_type_id');
+}
+
     public function warehouse()
     {
         return $this->belongsTo(Warehouse::class);

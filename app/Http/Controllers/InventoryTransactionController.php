@@ -61,42 +61,44 @@ class InventoryTransactionController extends Controller
         }
     }
 
-
-    // عرض النموذج لإنشاء عملية مخزنية جديدة
     public function create(Request $request)
-    {
-        try {
-            // جلب البيانات اللازمة للعرض
-            // استلام transaction_type_id من الطلب
-            $transactionTypeIds = $request->input('transaction_type_id', []);
-            // بناء الاستعلام
-            $transactionTypesQuery = TransactionType::query();
+{
+    try {
+        // استلام transaction_type_id من الطلب
+        $transactionTypeIds = $request->input('transaction_type_id', []);
+        
+        // بناء الاستعلام
+        $transactionTypesQuery = TransactionType::with('subtypes'); // جلب الأنواع مع الأنواع الفرعية
 
-            if (empty($transactionTypeIds)) {
-                // إذا لم يتم إرسال قيمة transaction_type_id، نعرض كل الأنواع باستثناء تلك التي يكون inventory_movement_count = 0
-                $transactionTypesQuery->where('inventory_movement_count', '>', 0);
-            } else {
-                // إذا تم إرسال قيمة أو مجموعة قيم، نعرض الأنواع المرسلة فقط بدون شرط إضافي
-                $transactionTypesQuery->whereIn('id', (array)$transactionTypeIds);
-            }
-
-            $transactionTypes = $transactionTypesQuery->get();
-
-            $partners = Partner::all();
-            $departments = Department::all();
-            // $warehouses = Warehouse::all();
-            $warehouses = Warehouse::ForUserWarehouse()->get();
-
-            $products = Product::with('unit')->get(); // جلب المنتجات مع الوحدات
-            $units = Unit::all(); // جلب جميع الوحدات
-            $warehouseLocations = WarehouseLocation::all();
-            session()->flash('products', $request->products);
-
-            return view('inventory.transactions.create', compact('transactionTypes', 'partners', 'departments', 'warehouses', 'products', 'warehouseLocations'));
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'حدث خطأ أثناء تحميل البيانات: ' . $e->getMessage()]);
+        // إذا لم يتم إرسال transaction_type_id، نعرض الأنواع التي inventory_movement_count > 0
+        if (empty($transactionTypeIds)) {
+            $transactionTypesQuery->where('inventory_movement_count', '>', 0);
+        } else {
+            // إذا تم إرسال transaction_type_id، نعرض الأنواع المرسلة فقط
+            $transactionTypesQuery->whereIn('id', (array)$transactionTypeIds);
         }
+
+        // تنفيذ الاستعلام وجلب البيانات
+        $transactionTypes = $transactionTypesQuery->get();
+
+        // باقي البيانات الأخرى
+        $partners = Partner::all();
+        $departments = Department::all();
+        $warehouses = Warehouse::ForUserWarehouse()->get();
+        $products = Product::with('unit')->get(); // جلب المنتجات مع الوحدات
+        $units = Unit::all(); // جلب جميع الوحدات
+        $warehouseLocations = WarehouseLocation::all();
+        
+        // تخزين المنتجات في الجلسة
+        session()->flash('products', $request->products);
+
+        // عرض النموذج
+        return view('inventory.transactions.create', compact('transactionTypes', 'partners', 'departments', 'warehouses', 'products', 'warehouseLocations'));
+    } catch (\Exception $e) {
+        return back()->withErrors(['error' => 'حدث خطأ أثناء تحميل البيانات: ' . $e->getMessage()]);
     }
+}
+
 
     public function store(StoreInventoryTransactionRequest $request)
     {
@@ -135,28 +137,44 @@ class InventoryTransactionController extends Controller
     }
 
     // عرض صفحة تعديل العملية المخزنية
+    // public function edit($id)
+    // {
+    //     try {
+    //         // $transaction = InventoryTransaction::findOrFail($id);
+    //         // $transactionTypes = TransactionType::all();
+    //         // $partners = Partner::all();
+    //         // $departments = Department::all();
+    //         // // $warehouses = Warehouse::all();
+    //         $warehouses = Warehouse::ForUserWarehouse()->get();
+    //         $units = Unit::all(); // جلب جميع الوحدات
+
+    //         $products = Product::all();
+    //         // $warehouseLocations = WarehouseLocation::all();
+    //         $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($id);
+    //         $items = $selectedTransaction->items()->paginate(6);
+
+    //         return view('inventory.transactions.edit', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
+    //     } catch (\Exception $e) {
+    //         return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
+    //     }
+    // }
     public function edit($id)
     {
         try {
-            // $transaction = InventoryTransaction::findOrFail($id);
-            // $transactionTypes = TransactionType::all();
-            // $partners = Partner::all();
-            // $departments = Department::all();
-            // // $warehouses = Warehouse::all();
             $warehouses = Warehouse::ForUserWarehouse()->get();
             $units = Unit::all(); // جلب جميع الوحدات
-
             $products = Product::all();
-            // $warehouseLocations = WarehouseLocation::all();
-            $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($id);
+            
+            // جلب العملية المخزنية مع تفاصيل النوع والفرعي
+            $selectedTransaction = InventoryTransaction::with(['transactionType', 'subtype', 'items.product', 'items.unit'])->find($id);
             $items = $selectedTransaction->items()->paginate(6);
-
+    
             return view('inventory.transactions.edit', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
         } catch (\Exception $e) {
             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
         }
     }
-
+    
     public function update(Request $request, $id)
     {
         try {

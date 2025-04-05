@@ -50,6 +50,7 @@ class CreateInventoryTransactionListener
         // إنشاء السجل الرئيسي للحركة المخزنية
         $transaction = InventoryTransaction::create([
             'transaction_type_id'     => $data['transaction_type_id'] ?? null,
+            'sub_type_id         '     => $data['sub_type_id'] ?? null,
             'effect'                  => $data['effect'] ?? null,
             'transaction_date'        => date('Y-m-d H:i:s', strtotime($data['transaction_date'])),
             'reference'               => $data['reference'] ?? null,

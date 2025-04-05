@@ -432,6 +432,8 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::post('/store', [InventoryAuditController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [InventoryAuditController::class, 'edit'])->name('edit');
         Route::post('/update/{id}', [InventoryAuditController::class, 'update'])->name('update');
+        Route::get('/editTrans/{id}', [InventoryAuditController::class, 'editTrans'])->name('editTrans');
+        Route::post('/updateTrans/{id}', [InventoryAuditController::class, 'updateTrans'])->name('updateTrans');
         Route::delete('/destroy/{id}', [InventoryAuditController::class, 'destroy'])->name('destroy');
         Route::middleware([\App\Http\Middleware\GlobalVariablesMiddleware::class])->group(function () {
             Route::get('/warehouse-report', [InventoryAuditController::class, 'warehouseReport'])->name('warehouseReport');
@@ -464,6 +466,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
     Route::post('/reports/get-fields', [ReportController::class, 'getFields'])->name('reports.get-fields');
+    
     Route::prefix('returns/process')->name('returns_process.')->group(function () {
 
         Route::get('/', [ReturnOrderController::class, 'index'])->name('index'); // قائمة المرتجعات
