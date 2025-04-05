@@ -25,7 +25,12 @@ class TransactionType extends Model
         'effect',
         'created_user', 'updated_user'
     ];
-
+    public function subtypes()
+    {
+        return $this->hasMany(InventoryTransactionSubtype::class, 'transaction_type_id');
+    }
+    
+    
     // للحصول على علاقة مع العمليات المخزنية
     public function inventoryTransactions()
     {

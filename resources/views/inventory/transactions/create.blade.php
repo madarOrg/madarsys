@@ -11,14 +11,22 @@
                     <x-title :title="'بيانات الحركة'" />
 
                     <!-- نوع العملية -->
-                    <label for="transaction_type_id" class="">نوع العملية</label>
-                    <select name="transaction_type_id" id="transaction_type_id" class="form-select tom-select  ">
+                    <label for="transaction_type_id">نوع العملية</label>
+                    <select name="transaction_type_id" id="transaction_type_id" class="form-select tom-select ">
                         <option value="">اختر نوع العملية</option>
                         @foreach ($transactionTypes as $transactionType)
                             <option value="{{ $transactionType->id }}" data-effect="{{ $transactionType->effect }}">
-                                {{ $transactionType->name }}</option>
+                                {{ $transactionType->name }}
+                            </option>
                         @endforeach
+                    
                     </select>
+                    <label for="sub_type_id">نوع العملية الفرعي    </label>
+                    <select name="sub_type_id" id="sub_type_id" class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1">
+                        <option value="">اختر نوع العملية الفرعي</option>
+                    </select>
+                    
+
 
                     <!-- تاريخ العملية -->
                     <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية"
@@ -115,9 +123,9 @@
                                             @endforeach
                                         </select>
                                     </td>
-                                    
-                                   
-                                    
+
+
+
                                     <td class="px-6 py-4">
                                         <select name="units[]"
                                             class="w-full units-select tom-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
@@ -236,47 +244,47 @@
             tableBody.insertAdjacentHTML('beforeend', newRow);
 
 
-const newSelect = tableBody.querySelector('.product-row:last-child .product-select');
-if (newSelect) {
-    new TomSelect(newSelect, {
-        create: false,
-        sortField: {
-            field: "text",
-            direction: "asc"
-        },
-        placeholder: "اختر منتج",
-    });
-}
+            const newSelect = tableBody.querySelector('.product-row:last-child .product-select');
+            if (newSelect) {
+                new TomSelect(newSelect, {
+                    create: false,
+                    sortField: {
+                        field: "text",
+                        direction: "asc"
+                    },
+                    placeholder: "اختر منتج",
+                });
+            }
 
-// ربط أحداث التغيير لحساب السعر الإجمالي
-const quantityInput = tableBody.querySelector('.product-row:last-child .quantity-input');
-const unitPriceInput = tableBody.querySelector('.product-row:last-child .unit-price-input');
-const totalInput = tableBody.querySelector('.product-row:last-child .total-input');
+            // ربط أحداث التغيير لحساب السعر الإجمالي
+            const quantityInput = tableBody.querySelector('.product-row:last-child .quantity-input');
+            const unitPriceInput = tableBody.querySelector('.product-row:last-child .unit-price-input');
+            const totalInput = tableBody.querySelector('.product-row:last-child .total-input');
 
-quantityInput.addEventListener('input', calculateTotal);
-unitPriceInput.addEventListener('input', calculateTotal);
+            quantityInput.addEventListener('input', calculateTotal);
+            unitPriceInput.addEventListener('input', calculateTotal);
 
-// دالة لحساب السعر الإجمالي
-function calculateTotal() {
-    const quantity = parseFloat(quantityInput.value) || 0;
-    const unitPrice = parseFloat(unitPriceInput.value) || 0;
-    const total = quantity * unitPrice;
-    totalInput.value = total.toFixed(2); // عرض النتيجة بصيغة رقمية مع 2 خانات عشرية
-}
+            // دالة لحساب السعر الإجمالي
+            function calculateTotal() {
+                const quantity = parseFloat(quantityInput.value) || 0;
+                const unitPrice = parseFloat(unitPriceInput.value) || 0;
+                const total = quantity * unitPrice;
+                totalInput.value = total.toFixed(2); // عرض النتيجة بصيغة رقمية مع 2 خانات عشرية
+            }
 
-localStorage.removeItem('currentTransactionId');
-generateTransactionId();
-document.querySelector('#productRows').innerHTML = ''; // مسح الصفوف السابقة
-}
+            localStorage.removeItem('currentTransactionId');
+            generateTransactionId();
+            document.querySelector('#productRows').innerHTML = ''; // مسح الصفوف السابقة
+        }
 
-// دالة لحذف صف منتج
-function removeProductRow(button) {
-const row = button.closest('tr');
-row.remove();
-}
-            
-          
-        
+        // دالة لحذف صف منتج
+        function removeProductRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+        }
+
+
+
 
 
         // دالة لتحديث بيانات صف منتج معين باستخدام AJAX
@@ -342,6 +350,34 @@ row.remove();
         document.addEventListener("DOMContentLoaded", function() {
             const transactionTypeSelect = document.getElementById("transaction_type_id");
             const secondaryWarehouseContainer = document.getElementById("secondary_warehouse_container");
+
+            document.getElementById('transaction_type_id').addEventListener('change', function() {
+                const transactionTypeId = this.value;
+                const subTypeSelect = document.getElementById('sub_type_id');
+                subTypeSelect.innerHTML =
+                '<option value="">اختر نوع العملية الفرعي</option>'; // مسح الخيارات القديمة
+
+                if (transactionTypeId) {
+                    // العثور على نوع العملية المحددة باستخدام JSON البيانات المرسلة
+                    const selectedTransactionType = @json($transactionTypes).find(type => type.id ==
+                        transactionTypeId);
+
+                    // طباعة selectedTransactionType للتحقق من البيانات
+                    // console.log(selectedTransactionType);
+
+                    if (selectedTransactionType && selectedTransactionType.subtypes) {
+                        selectedTransactionType.subtypes.forEach(subtype => {
+                            // console.log(subTypeSelect);  // طباعة اسم النوع الفرعي في الكونسول
+
+                            const option = document.createElement('option');
+                            option.value = subtype.id;
+                            option.textContent = subtype.name;
+                            subTypeSelect.appendChild(option);
+                        });
+                    }
+                }
+            });
+
 
             function toggleSecondaryWarehouse() {
                 const selectedTransaction = transactionTypeSelect.options[transactionTypeSelect.selectedIndex];
@@ -425,7 +461,7 @@ row.remove();
         //     });
         // });
 
-    
+
 
 
         /////effect/////////////////////////////////////////////

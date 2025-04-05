@@ -10,9 +10,8 @@ use App\Models\InventoryAudit;
 use App\Models\InventoryAuditUser;
 use App\Models\InventoryAuditWarehouse;
 use App\Models\Company;
-
+use App\Models\InventoryTransactionSubtype;
 use App\Models\InventoryTransaction;
-use App\Models\InventoryTransactionItem;
 
 use Illuminate\Support\Facades\DB;
 
@@ -185,10 +184,20 @@ class InventoryAuditController extends Controller
         }
 
         // استرجاع النتائج بناءً على الفلاتر
-        $audits = $query->with(['users', 'warehouses'])->get();
+        $audits = $query->with(['users', 'warehouses', 'subType'])->get();
+       
+        
+        // استخراج الأنواع المستخدمة في الجرد (distinct)
+        $usedTypeIds = InventoryAudit::distinct()->pluck('inventory_type');
+        
+        $subTypes = InventoryTransactionSubtype::where('transaction_type_id', 8)
+        ->whereIn('id', $usedTypeIds)
+        ->get();
+    
+        $subTypeOptions = $subTypes->pluck('name', 'id'); // [id => name]
 
-        // تمرير النتائج إلى العرض
-        return view('inventory.audit.index', compact('audits'));
+        return view('inventory.audit.index', compact('audits', 'subTypeOptions'));
+        
     }
     public function createInventoryAuditTransaction($auditId, int $warehouseId, $groupByBatch = true)
     {
@@ -205,7 +214,7 @@ class InventoryAuditController extends Controller
 
                 DB::raw('SUM(converted_quantity * distribution_type) as total_quantity')
             )
-            ->groupBy('product_id')
+            ->groupBy('created_at' ,'product_id')
             ->orderBy('created_at','ASC'); 
 
         // تطبيق التجميع بناءً على قيمة groupByBatch
@@ -276,11 +285,13 @@ class InventoryAuditController extends Controller
 
 
     public function create()
-    {
-        $users = User::all();
-        $warehouses = Warehouse::all();
-        return view('inventory.audit.create', compact('users', 'warehouses'));
-    }
+{
+    $users = User::all();
+    $warehouses = Warehouse::all();
+    $subTypes = InventoryTransactionSubtype::where('transaction_type_id', 8)->get();
+
+    return view('inventory.audit.create', compact('users', 'warehouses', 'subTypes'));
+}
 
     public function store(Request $request)
     {
@@ -399,4 +410,47 @@ class InventoryAuditController extends Controller
         $date = now()->format('Y-m-d');
         return 'audit-' . $date . '-' . $id;
     }
+
+     // عرض صفحة تعديل العملية المخزنية
+     public function editTrans($id)
+     {
+         try {
+             // $transaction = InventoryTransaction::findOrFail($id);
+             // $transactionTypes = TransactionType::all();
+             // $partners = Partner::all();
+             // $departments = Department::all();
+             // // $warehouses = Warehouse::all();
+             $warehouses = Warehouse::ForUserWarehouse()->get();
+             $units = Unit::all(); // جلب جميع الوحدات
+ 
+             $products = Product::all();
+             // $warehouseLocations = WarehouseLocation::all();
+             $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($id);
+             $items = $selectedTransaction->items()->paginate(6);
+ 
+             return view('inventory.transactions.editTrans', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
+         } catch (\Exception $e) {
+             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
+         }
+     }
+     public function updateTrans(Request $request, $id)
+     {
+         try {
+             // $transaction = InventoryTransaction::findOrFail($id);
+             // dd($request);
+             $transaction = $this->inventoryTransactionService->updateTransaction($id, $request->all());
+             // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
+             if ($request->expectsJson()) {
+                 return response()->json([
+                     'message' => 'تمت إضافة العملية المخزنية بنجاح',
+                     'transaction' => $transaction
+                 ], 201);
+             }
+             return redirect()->route('inventory.transactions.editTrans', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
+         } catch (\Exception $e) {
+             return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحديث العملية المخزنية: ' . $e->getMessage()]);
+         }
+     }
+ 
+ 
 }

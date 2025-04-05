@@ -5,18 +5,30 @@
             @csrf
             @method('PUT')
 
-            <div class="p-4 rounded-lg shadow w-full overflow-x-auto">
-                <x-title :title="'تعديل الحركات المخزنية'" />
-               
+            <div class="p-2 rounded-lg shadow w-full overflow-x-auto">
+                <div class="flex items-center justify-between mb-2">
+                    <x-title :title="'تعديل الحركات المخزنية'" class="text-lg font-semibold" />
+                    
+                    <x-search-input id="custom-id" name="search"
+                        placeholder="ابحث برقم المرجع، الشريك، القسم، أو المستودع..." :value="request()->input('search')"
+                        class="w-64" />
+                </div>
+                
+                
+
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                     <div class="col-span-1 p-4 rounded-lg shadow w-full overflow-x-auto">
-                        <div class="relative">
-                            <x-search-input id="custom-id" name="search"
-                                placeholder="ابحث برقم المرجع، الشريك، القسم، أو المستودع..." :value="request()->input('search')" />
-                        </div>
                         <x-title :title="'تفاصيل الحركة'" />
-                        
+
                         @isset($selectedTransaction)
+                            <!-- نوع العملية -->
+                            <x-file-input id="transaction_type_name" name="transaction_type_name" label="نوع العملية"
+                                type="text" value="{{ $selectedTransaction->transactionType->name ?? '' }}"
+                                disabled="true" />
+
+                            <!-- النوع الفرعي -->
+                            <x-file-input id="sub_type_name" name="sub_type_name" label="النوع الفرعي" type="text"
+                                value="{{ $selectedTransaction->subtype->name ?? '' }}" disabled="true" />
                             <x-file-input id="transaction_date" name="transaction_date" label="تاريخ العملية"
                                 type="datetime-local"
                                 value="{{ optional($selectedTransaction->transaction_date)->format('Y-m-d\TH:i') }}"
@@ -24,15 +36,15 @@
                             <x-file-input id="reference" name="reference" label="الرقم المرجعي" type="text"
                                 value="{{ $selectedTransaction->reference }}" readonly="true" />
 
-                                <x-file-input id="partner_name" name="partner_name" label="الشريك" type="text"
+                            <x-file-input id="partner_name" name="partner_name" label="الشريك" type="text"
                                 value="{{ $selectedTransaction->partner->name ?? '' }}" disabled />
-                            
+
                             <input type="hidden" name="partner_id"
                                 value="{{ old('partner_id', $selectedTransaction->partner_id ?? request('partner_id')) }}">
 
                             <x-file-input id="department_name" name="department_name" label="القسم" type="text"
                                 value="{{ $selectedTransaction->department->name ?? '' }}" disabled="true" />
-                            <x-file-input id="warehouse_name" type="text" name="warehouse_name" label="المستودع" 
+                            <x-file-input id="warehouse_name" type="text" name="warehouse_name" label="المستودع"
                                 value="{{ $selectedTransaction->warehouse->name ?? '' }}" disabled />
                             <input type="hidden" name="warehouse_id"
                                 value="{{ old('warehouse_id', $selectedTransaction->warehouse_id ?? request('warehouse_id')) }}" />
@@ -51,7 +63,7 @@
                     </div>
                     <div class="col-span-1 md:col-span-3 p-4 rounded-lg shadow w-full overflow-x-auto">
                         <x-title :title="'تفاصيل المنتجات'" />
-                        
+
                         <div class="overflow-auto">
                             <table id="transaction-items"
                                 class="w-full text-sm text-right text-gray-500 dark:text-gray-400 mt-4">
@@ -75,13 +87,15 @@
                                                 <!-- حقل الكمية -->
                                                 <td class="px-6 py-3">
                                                     <input type="number" name="quantities[]" value="{{ $item->quantity }}"
-                                                        class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1" onchange="updateTotal(this)" />
+                                                        class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1"
+                                                        onchange="updateTotal(this)" />
                                                 </td>
 
                                                 <!-- حقل سعر الوحدة -->
                                                 <td class="px-6 py-3">
                                                     <input type="number" name="unit_prices[]"
-                                                        value="{{ $item->unit_prices }}" class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1"
+                                                        value="{{ $item->unit_prices }}"
+                                                        class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1"
                                                         onchange="updateTotal(this)" />
                                                 </td>
 
@@ -91,11 +105,12 @@
                                                 <!-- حقل مخفي لحفظ القيمة -->
                                                 <input type="hidden" name="totals[]" value="{{ $item->total }}" />
 
-                                               
+
                                                 <!-- زر التحديث -->
                                                 <td class="px-6 py-3">
                                                     <button type="button" class="text-red-600 hover:text-red-800"
-                                                        onclick="removeProductRow(this)"> <i class="fas fa-trash-alt"></i></button>
+                                                        onclick="removeProductRow(this)"> <i
+                                                            class="fas fa-trash-alt"></i></button>
                                                     <a href="javascript:void(0);"
                                                         class="text-blue-600 hover:underline dark:text-blue-500"
                                                         data-item-id="{{ $item->id }}"
@@ -114,12 +129,13 @@
                         <div class="mt-4 flex gap-2">
                             <x-pagination-links :paginator="$items" />
 
-                            <button type="button" class="w-52 h-12 shadow-sm rounded-lg border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 text-gray-700 dark:text-gray-400 text-base font-semibold leading-7"
+                            <button type="button"
+                                class="w-52 h-12 shadow-sm rounded-lg border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 text-gray-700 dark:text-gray-400 text-base font-semibold leading-7"
                                 onclick="addProductRow()">إضافة منتج جديد</button>
-                        
+
                             <x-button type="submit">حفظ</x-button>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
@@ -227,8 +243,6 @@
             totalField.textContent = totalValue;
             totalInput.value = totalValue; // تحديث الحقل المخفي للإجمالي
         }
-
-        
     </script>
 
 </x-layout>
