@@ -28,4 +28,5 @@ class ReturnOrderItem extends Model
     {
         return $this->belongsTo(ReturnOrder::class, 'return_order_id'); // تأكد من أن المفتاح الأجنبي هو 'return_order_id'
     }
+        
 }

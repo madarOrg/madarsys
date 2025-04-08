@@ -49,8 +49,8 @@
                                     class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <td> <span class="inline-block {{ $statusColor }} w-4 h-4 rounded-full mr-2"></span></td>
                                     <td class="px-6 py-4">{{ $order->id  }}</td>
-                                    <td class="px-6 py-4">{{ $order->supplier->name }}</td>
-                                    <td class="px-6 py-4">{{ $order->product->name }}</td>
+                                    <td class="px-6 py-4">{{ $order->returnSuppliersOrder->supplier->name ?? 'غير معروف' }}</td>
+                                    <td class="px-6 py-4">{{ $order->product->name ?? 'غير معروف'}}</td>
                                     <td class="px-6 py-4">{{ $order->status }}</td>
                                     <td class="px-6 py-4">{{ \Carbon\Carbon::parse($order->return_date)->format('Y-m-d') }}</td>
                                 </tr>

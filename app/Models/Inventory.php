@@ -40,11 +40,4 @@ class Inventory extends Model
         return $this->belongsTo(Product::class);
     }
 
-    /**
-     * تخصيص الوصول إلى الكميات التراكمية (total_value)
-     */
-    // public function getTotalValueAttribute($value)
-    // {
-    //     return number_format($value, 2);
-    // }
 }

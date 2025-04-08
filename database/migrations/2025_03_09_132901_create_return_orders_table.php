@@ -13,9 +13,9 @@ return new class extends Migration {
         Schema::create('return_orders', function (Blueprint $table) {
             $table->id();
             $table->string('return_number')->unique(); // رقم المرتجع
-            $table->unsignedBigInteger('customer_id'); //  العميل
+            $table->unsignedBigInteger('customer_id'); // العميل
             $table->text('return_reason')->nullable(); // سبب الإرجاع
-            $table->date('return_date')->default(DB::raw('CURRENT_DATE'));
+            $table->date('return_date'); // بدون تعيين قيمة افتراضية
             $table->timestamps();
         });
     }

@@ -21,7 +21,8 @@
         <!-- Tom Select -->
         <link href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-    
+        <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+
         <!-- Popper.js -->
         <script src="https://unpkg.com/@popperjs/core@2"></script>
     
@@ -76,6 +77,7 @@
 
         {{ $slot }}
         @livewireScripts
+        @stack('scripts')
 
     </body>
 

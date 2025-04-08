@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('shipment_number');  // رقم الشحنة
             $table->date('shipment_date');  // تاريخ الشحنة
+            $table->integer('quantity');
             $table->enum('status', ['pending', 'shipped', 'delivered']);  // حالة الشحنة
             $table->foreignId('product_id')->constrained('products');  // رابطة مع جدول المنتجات
             $table->timestamps();  // تاريخ الإنشاء والتعديل

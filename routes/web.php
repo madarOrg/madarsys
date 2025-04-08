@@ -37,7 +37,9 @@ use App\Http\Controllers\{
     ShipmentController,
     InventoryReportController,
     InventoryAuditController,
-    InventoryTransactionItemsController
+    InventoryTransactionItemsController,
+    DashboardController,
+    UnitController
 };
 use App\Services\UnitService;
 
@@ -81,8 +83,10 @@ Route::middleware(['web', 'auth'])->group(function () {
 
     // عرض لوحة التحكم (dashboard)
 
-    Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
+    // Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
 
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    
     Route::get('/warehouse-reports', WarehouseReports::class)->name('warehouse.reports');
     // مجموعة مسارات لإدارة الأدوار
     Route::prefix('roles')->name('roles.')->group(function () {
@@ -101,8 +105,11 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('/', [RoleWarehouseController::class, 'index'])->name('index');
         Route::post('/store', [RoleWarehouseController::class, 'store'])->name('store');
         Route::put('/update/{id}', [RoleWarehouseController::class, 'update'])->name('update');
-        Route::delete('/delete/{id}', [RoleWarehouseController::class, 'destroy'])->name('destroy');
+        // Route::delete('/delete/{id}', [RoleWarehouseController::class, 'destroy'])->name('destroy');
+        
     });
+    Route::delete('role-warehouse/{id}', [RoleWarehouseController::class, 'destroy'])->name('role-warehouse.destroy');
+
 
 
     //role primissions 
@@ -280,7 +287,10 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::delete('/{category}', [CategoryController::class, 'destroy'])->name('destroy');
     });
 
-
+    Route::get('/units', [UnitController::class, 'index'])->name('units.index');
+    Route::post('/units', [UnitController::class, 'store'])->name('units.store');
+    Route::post('/units/{unit}', [UnitController::class, 'update'])->name('units.update');
+    
     // مجموعة مسارات إدارة الشركاء
     Route::prefix('partners')->name('partners.')->group(function () {
         Route::get('/', [PartnerController::class, 'index'])->name('index'); // عرض قائمة الشركاء

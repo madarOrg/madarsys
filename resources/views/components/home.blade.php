@@ -6,7 +6,7 @@
 
         <!-- المحتوى الرئيسي -->
         <main 
-        class=" p-10 pt-10  dark:bg-gray-900 dark:text-white overflow-y-auto
+        class="   dark:bg-gray-900 dark:text-white overflow-y-auto
         bg-linear-to-r/srgb from-indigo-500 to-teal-400
         "
         >
@@ -14,8 +14,8 @@
         </main>
 
         <!-- الفوتر -->
-        <x-footer 
+        {{-- <x-footer  --}}
         {{-- class=" row-span-full col-span-full bg-gray-800 text-white text-center dark:bg-gray-900 dark:text-white " --}}
-         />
+         {{-- /> --}}
     </div>
 </x-base>
