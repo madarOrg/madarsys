@@ -18,7 +18,7 @@
     }
 
     .bg-hero {
-      background: url('/images/dashboard.jpg') no-repeat center center/cover;
+      background: url('/storage/images/dashboard.jpg') no-repeat center center/cover;
       height: 60vh;
       position: relative;
     }
@@ -112,7 +112,7 @@ footer .text-center {
   <body class="font-['Montserrat'] bg-gray-50">
             <!-- الشعار في الشريط العلوي -->
             <div class="full-width-bar">
-              <img src="/images/logo.svg" alt="شعار" class="logo-animation w-[70px]" id="logo" />
+              <img src="/storage/images/logo.svg" alt="شعار" class="logo-animation w-[70px]" id="logo" />
               <a href="/login" class="register-btn">التسجيل</a>
             </div>
         {{-- <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 p-6"> --}}
@@ -144,7 +144,7 @@ footer .text-center {
         <section id="features" class="py-16 bg-gray-100">
             <div class="max-w-6xl mx-auto px-4 grid md:grid-cols-3 gap-8">
                 <div class="bg-white shadow-lg rounded-2xl overflow-hidden hover-card shadow-custom">
-                    <img src="/images/warehouse.jpg" alt="مستودع" class="w-full h-48 object-cover" />
+                    <img src="/storage/images/warehouse.jpg" alt="مستودع" class="w-full h-48 object-cover" />
                     <div class="p-6">
                         <h3 class="text-xl font-bold mb-2 text-gray-800">نظرة عامة على المستودع</h3>
                         <p class="text-gray-600">احصل على صورة كاملة لمستويات المخزون، واستخدام المساحة، والمقاييس
@@ -152,14 +152,14 @@ footer .text-center {
                     </div>
                 </div>
                 <div class="bg-white shadow-lg rounded-2xl overflow-hidden hover-card shadow-custom">
-                    <img src="/images/tracking.jpg" alt="تتبع" class="w-full h-48 object-cover" />
+                    <img src="/storage/images/tracking.jpg" alt="تتبع" class="w-full h-48 object-cover" />
                     <div class="p-6">
                         <h3 class="text-xl font-bold mb-2 text-gray-800">التتبع الفوري</h3>
                         <p class="text-gray-600">راقب حركة العناصر والكميات والأقسام في الوقت الفعلي.</p>
                     </div>
                 </div>
                 <div class="bg-white shadow-lg rounded-2xl overflow-hidden hover-card shadow-custom">
-                    <img src="/images/analytics.jpg" alt="تحليلات" class="w-full h-48 object-cover" />
+                    <img src="/storage/images/analytics.jpg" alt="تحليلات" class="w-full h-48 object-cover" />
                     <div class="p-6">
                         <h3 class="text-xl font-bold mb-2 text-gray-800">لوحة تحكم التحليلات</h3>
                         <p class="text-gray-600">تصوّر عملياتك مع تقارير ورسوم بيانية قابلة للتخصيص.</p>
@@ -183,7 +183,7 @@ footer .text-center {
               <div class="md:flex md:justify-between">
                   <div class="mb-6 md:mb-0">
                       <a href="/" class="flex items-center">
-                          <img src="/images/logo.svg" class="h-8 me-3" alt="Madar Logo" />
+                          <img src="/storage/images/logo.svg" class="h-8 me-3" alt="Madar Logo" />
                           <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">مدار</span>
                       </a>
                   </div>
@@ -214,7 +214,7 @@ footer .text-center {
                   </div>
               </div>
               <div class="text-center mt-0">
-                  <img src="/images/azal_university_logo.svg" alt="شعار جامعة أزال" class="mx-auto w-28 mb-4">
+                  <img src="/storage/images/azal_university_logo.svg" alt="شعار جامعة أزال" class="mx-auto w-28 mb-4">
                   <p class="text-sm text-gray-600 dark:text-gray-400">
                       هذا المشروع تم إنجازه كجزء من متطلبات التخرج من كلية تكنولوجيا المعلومات  (CIS,MIS,CS)،<br>
                       تحت إشراف جامعة أزال للعلوم والتكنولوجيا. 

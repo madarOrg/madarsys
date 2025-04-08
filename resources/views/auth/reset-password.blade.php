@@ -3,7 +3,7 @@
      
      <!-- الصورة الجانبية - في المنتصف -->
      <div class="flex justify-center items-center p-6">
-       <img src="/images/reset.jpg" alt="تغيير كلمة الدخول" class="w-full h-auto max-w-md rounded-lg shadow-lg">
+       <img src="/storage/images/reset.jpg" alt="تغيير كلمة الدخول" class="w-full h-auto max-w-md rounded-lg shadow-lg">
      </div>
  
      <!-- نموذج تغيير كلمة المرور -->

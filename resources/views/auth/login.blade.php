@@ -2,7 +2,7 @@
     <section class="bg-gray-50 dark:bg-gray-900 min-h-screen grid grid-cols-1 md:grid-cols-2 gap-6">
         <!-- صورة جانبية -->
         <div class="w-full h-full flex justify-center items-center">
-            <img src="/images/login-image.jpg" alt="تسجيل الدخول" class="w-full h-auto rounded-lg shadow-lg">
+            <img src="/storage/images/login-image.jpg" alt="تسجيل الدخول" class="w-full h-auto rounded-lg shadow-lg">
         </div>
         
         <!-- نموذج تسجيل الدخول -->
