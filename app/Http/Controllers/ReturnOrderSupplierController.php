@@ -18,8 +18,7 @@ class ReturnOrderSupplierController extends Controller
      */
     public function index(Request $request)
     {
-        $returnOrders = ReturnSuppliers::with('supplier', 'product') // جلب بيانات المورد والمنتج
-            ->where('Is_Send', 1)
+        $returnOrders = ReturnSuppliersOrderItem::with('returnSuppliersOrder.supplier', 'product')
             ->when($request->search, function ($query) use ($request) {
                 $search = $request->search;
 
@@ -38,9 +37,12 @@ class ReturnOrderSupplierController extends Controller
                     $q->where('name', 'like', '%' . $search . '%');
                 });
             })
-            ->paginate(10);  // تحديد عدد العناصر لكل صفحة
+            ->paginate(5);  // تحديد عدد العناصر لكل صفحة
 
-        return view('returns-suppliers.index', compact('returnOrders')); // تمرير البيانات إلى العرض
+            $returnOrders1 = ReturnSuppliersOrderItem::with('returnSuppliersOrder', 'product')->paginate(10);
+            // dd($returnOrders);
+
+        return view('returns-suppliers.index', compact(['returnOrders1','returnOrders'])); // تمرير البيانات إلى العرض
     }
 
     /**
@@ -97,8 +99,8 @@ class ReturnOrderSupplierController extends Controller
                 'status' => $item['status'], // الحالة التي اختارها المستخدم
             ]);
 
-            $returnSupplierProduct = ReturnSuppliers::where('product_id', $item['product_id'])->first();
-            $returnSupplierProduct->status = 'تم ارسال المنتج في طلب ارجاع';
+            $returnSupplierProduct = ReturnSuppliersOrderItem::where('product_id', $item['product_id'])->first();
+            $returnSupplierProduct->status = 'قبول الإرجاع';
             $returnSupplierProduct->save();
         }
 

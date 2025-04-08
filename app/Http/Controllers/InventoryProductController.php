@@ -420,8 +420,8 @@ class InventoryProductController extends Controller
         $batchConvertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($batchQuantity, $unitId, $baseUnitId);
 
         $batchPrice = ($batchQuantity * $request->total) / $originalQuantity;
-
-        //   dump($request->inventory_transaction_item_id );
+// dd($batchConvertedQuantity);
+        //   dd($request->inventory_transaction_item_id );
         // حساب الكمية التي تم توزيعها لهذا المنتج في نفس المستودع ونفس الحركة المخزنية
         $distributedQuantity = InventoryProduct::where('inventory_transaction_item_id', $request->inventory_transaction_item_id)
             // ->where('product_id', $transactionItem->product_id) // استخدم المنتج من الحركة المخزنية
@@ -472,9 +472,11 @@ class InventoryProductController extends Controller
         } elseif ($request->distribution_type == -1) {
             $quantityInvertory = -$batchConvertedQuantity;
 
-            // dd(($distributedQuantity + $request->quantity) , $originalQuantity,$quantityInvertory);
-            // في حالة الإخراج (تخفيض الكمية)
-            if (($distributedQuantity + $quantityInvertory) < $originalQuantity) {
+            // dd($distributedQuantity ,$request->quantity ,($distributedQuantity + $quantityInvertory), $originalQuantity,$quantityInvertory);
+            // في حالة الإخراج (تخفيض الكمية
+            if (($distributedQuantity + $quantityInvertory) > $distributedQuantity) {
+                // dd(($distributedQuantity + $quantityInvertory), $originalQuantity);
+
                 return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات المسحوبة أكثر من الكمية المطلوبة للإخراج.']);
             }
         }

@@ -82,8 +82,10 @@
                     <tr>
                         <td class="py-2 px-4">
                             <select name="items[${index}][product_id]" class="w-full p-2 border rounded-lg" required>
-                                <option value="">اختر المنتج</option>
-                                ${productOptions}
+                                <option value="">اختر منتجًا</option>
+                        @foreach (\App\Models\Product::all() as $product)
+                            <option value="{{ $product->id }}">{{ $product->name }}</option>
+                        @endforeach
                             </select>
                         </td>
                         <td class="p-3">
@@ -91,6 +93,7 @@
                         </td>
                         <td class="p-3">
                             <select name="items[${index}][status]" class="w-full p-2 border rounded-lg" required>
+                         
                                 <option value="1">منتج تالف</option>
                                 <option value="2">إرسال صيانة</option>
                                 <option value="3">منتهي الصلاحية</option>

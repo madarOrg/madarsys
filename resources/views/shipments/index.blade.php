@@ -18,25 +18,29 @@
             <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                     <th class="p-4">رقم الشحنة</th>
-                    <th class="px-6 py-3">الشركة\الفرع</th>
+                    <th class="px-6 py-3">الشركة\المنتج</th>
                     <th class="px-6 py-3">حالة الشحنة</th>
+                    <th class="px-6 py-3">الكمية</th>
                     <th class="px-6 py-3">تاريخ الشحنة</th>
-                    <th class="px-6 py-3">تاريخ تسليم الشحنة</th>
-                    <th class="px-6 py-3">شركة الشحنة</th>
-                    <th class="px-6 py-3">عنوان الشحنة</th>
+
+                    {{-- <th class="px-6 py-3">تاريخ تسليم الشحنة</th> --}}
+                    {{-- <th class="px-6 py-3">شركة الشحنة</th>
+                    <th class="px-6 py-3">عنوان الشحنة</th> --}}
                     <th class="px-6 py-3">الإجراءات</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach ($shipments as $shipment)
                     <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
-                        <td class="p-4">{{ $shipment->tracking_number }}</td>
-                        <td class="px-6 py-4">{{ $shipment->recipient_name }}</td>
+                        <td class="p-4">{{ $shipment->shipment_number }}</td>
+                        <td class="px-6 py-4">{{ $shipment->product->name }}</td>
                         <td class="px-6 py-4">{{ $shipment->status }}</td>
+                        <td class="px-6 py-4">{{ $shipment->quantity }}</td>
+
                         <td class="px-6 py-4">{{ $shipment->shipment_date }}</td>
-                        <td class="px-6 py-4">{{ $shipment->delivery_date }}</td> <!-- إضافة تاريخ التسليم -->
-                        <td class="px-6 py-4">{{ $shipment->company_name }}</td> <!-- إذا كانت هناك شركة -->
-                        <td class="px-6 py-4">{{ $shipment->address }}</td>
+                        {{-- <td class="px-6 py-4">{{ $shipment->delivery_date }}</td> <!-- إضافة تاريخ التسليم --> --}}
+                        {{-- <td class="px-6 py-4">{{ $shipment->company_name }}</td> <!-- إذا كانت هناك شركة --> --}}
+                        {{-- <td class="px-6 py-4">{{ $shipment->address }}</td> --}}
                         <td class="px-6 py-4 flex space-x-2">
                             <!-- زر التعديل -->
                             <x-button href="{{ route('shipments.edit', $shipment->id) }}" class="text-yellow-600 hover:underline">

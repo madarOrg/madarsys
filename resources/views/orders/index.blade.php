@@ -16,6 +16,9 @@
                         <th class="p-4">رقم الطلب</th>
                         <th class="px-6 py-3">نوع الطلب</th>
                         <th class="px-6 py-3">حالة الطلب</th>
+                        <th class="px-6 py-3">المنتج</th>
+                        <th class="px-6 py-3">طريقة الدفع</th>
+                        <th class="px-6 py-3">الفرع</th>
                         <th class="px-6 py-3">الإجراءات</th>
                     </tr>
                 </thead>
@@ -25,13 +28,18 @@
                             <td class="p-4">{{ $order->id }}</td>
                             <td class="px-6 py-4">{{ $order->type == 'buy' ? 'شراء' : 'بيع' }}</td>
                             <td class="px-6 py-4">{{ $order->status }}</td>
+                            @foreach($order->order_details as $detail)
+                            <td class="px-6 py-4">{{ $detail->product->name ?? 'لايوجد' }}</td>
+                            @endforeach
+                            <td class="px-6 py-4">{{ $order->paymentType->name ?? 'لايوجد' }}</td>
+                            <td class="px-6 py-4">{{ $order->branch->name ?? 'لايوجد' }}</td>
                             <td class="px-6 py-4">
                                 <a href="{{ route('orders.edit', $order->id) }}" class="text-yellow-600">تعديل</a>
-                                <form action="{{ route('orders.destroy', $order->id) }}" method="POST" class="inline-block">
+                                {{-- <form action="{{ route('orders.destroy', $order->id) }}" method="POST" class="inline-block">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600">حذف</button>
-                                </form>
+                                </form> --}}
                             </td>
                         </tr>
                     @endforeach

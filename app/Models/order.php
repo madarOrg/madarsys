@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+
 class Order extends Model
 {
     use HasFactory;
@@ -14,14 +15,31 @@ class Order extends Model
         'type',
         'status',
         'branch_id',
+        'payment_type_id',
+        // 'inventory_transaction_id',
     ];
-
+ 
     // علاقة مع تفاصيل الطلب
-    public function orderDetails()
+    // public function orderDetails()
+    // {
+    //     return $this->hasMany(OrderDetail::class);
+    // }
+    
+    public function branch()
     {
-        return $this->hasMany(OrderDetail::class);
+        return $this->belongsTo(Branch::class, 'branch_id');
     }
     
+    public function paymentType()
+    {
+        return $this->belongsTo(PaymentType::class, 'payment_type_id');
+    }
+
+    public function order_details() 
+    {
+        return $this->hasmany(OrderDetail::class);
+    }
+
     // علاقة مع الفاتورة
     public function inventoryTransactions()
     {

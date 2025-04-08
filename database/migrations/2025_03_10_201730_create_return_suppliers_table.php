@@ -8,6 +8,7 @@ return new class extends Migration {
     /**
      * Run the migrations.
      */
+    
     public function up(): void
     {
         Schema::create('return_suppliers', function (Blueprint $table) {
@@ -16,7 +17,13 @@ return new class extends Migration {
             $table->foreignId('product_id')->constrained('products')->onDelete('cascade');
             $table->foreignId('supplier_id')->constrained('partners')->onDelete('cascade'); // علاقة مع الشركاء
             $table->integer('quantity');
-            $table->string('status')->default('معلق');
+            $table->enum('status', [
+                'قبول الإرجاع',
+                'إرجاع للمخزون',
+                'إرسال للصيانة',
+                'تصنيف كمنتج تالف',
+                'منتهي الصلاحية'
+            ])->default('تصنيف كمنتج تالف');
             $table->integer('Is_Send')->default(0);
             $table->string('return_reason');
             $table->timestamps();

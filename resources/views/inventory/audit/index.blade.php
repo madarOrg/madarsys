@@ -33,22 +33,22 @@
                                 'attributes' => 'value="' . request()->input('end_date') . '"',
                             ])
                         </div>
-                        {{-- <div class="">
-                        <label for="inventory_type">نوع الجرد</label>
-                        <select name="inventory_type" id="inventory_type" class="form-control">
-                            <option value="">الكل</option>
-                            <option value="1" {{ request()->input('inventory_type') == 1 ? 'selected' : '' }}>جرد دوري</option>
-                            <option value="2" {{ request()->input('inventory_type') == 2 ? 'selected' : '' }}>جرد مفاجئ</option>
-                        </select>
-                    </div>
-                    <div class="">
-                        <label for="status">الحالة</label>
-                        <select name="status" id="status" class="form-control">
-                            <option value="">الكل</option>
-                            <option value="1" {{ request()->input('status') == 1 ? 'selected' : '' }}>معلق</option>
-                            <option value="0" {{ request()->input('status') == 0 ? 'selected' : '' }}>مكتمل</option>
-                        </select>
-                    </div> --}}
+                                {{-- <div class="">
+                                <label for="inventory_type">نوع الجرد</label>
+                                <select name="inventory_type" id="inventory_type" class="form-control">
+                                    <option value="">الكل</option>
+                                    <option value="1" {{ request()->input('inventory_type') == 1 ? 'selected' : '' }}>جرد دوري</option>
+                                    <option value="2" {{ request()->input('inventory_type') == 2 ? 'selected' : '' }}>جرد مفاجئ</option>
+                                </select>
+                            </div>
+                                <div class="">
+                                    <label for="status">الحالة</label>
+                                    <select name="status" id="status" class="form-control">
+                                        <option value="">الكل</option>
+                                        <option value="1" {{ request()->input('status') == 1 ? 'selected' : '' }}>معلق</option>
+                                        <option value="0" {{ request()->input('status') == 0 ? 'selected' : '' }}>مكتمل</option>
+                                    </select>
+                                </div> --}}
                         <div class="flex-1 min-w-[200px]">
                             @include('components.select-dropdown', [
                                 'id' => 'inventory_type',
@@ -73,9 +73,9 @@
                         </div>
 
                     </div>
-                    {{-- <div class="hide-on-print  mb-4 mt-1">
-                <button type="submit" class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
-            </div> --}}
+                                {{-- <div class="hide-on-print  mb-4 mt-1">
+                            <button type="submit" class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
+                        </div> --}}
                     <div class="flex justify-end mt-2">
                         <x-button>
                             بحث

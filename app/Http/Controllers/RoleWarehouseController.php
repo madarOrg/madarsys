@@ -13,7 +13,7 @@ class RoleWarehouseController extends Controller
     public function index()
     {
         try {
-            $roleWarehouses = RoleWarehouse::with(['role', 'warehouse', 'branch'])->get();
+            $roleWarehouses = RoleWarehouse::with(['role', 'warehouse', 'branch'])->paginate(10); // مثلاً 10 عناصر في كل صفحة
             $roles = Role::all();
             $warehouses = Warehouse::all();
             $branches = Branch::all();
@@ -67,4 +67,6 @@ class RoleWarehouseController extends Controller
             return response()->json(['error' => 'حدث خطأ أثناء حذف البيانات: ' . $e->getMessage()]);
         }
     }
+   
+
 }

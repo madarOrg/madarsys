@@ -45,25 +45,29 @@ class Warehouse extends Model
 
     public function scopeForUserWarehouse($query)
     {
+        // إذا فيه مستودع محفوظ في الجلسة نستخدمه مباشرة
+        if (session()->has('selected_warehouse_id')) {
+            return $query->where('id', session('selected_warehouse_id'));
+        }
+    
+        // إذا المستخدم مسجل دخول
         if (auth()->check()) {
             $user = auth()->user();
-            
-            // جلب المستودعات المتاحة بناءً على الأدوار المرتبطة بالمستخدم
-            $accessibleWarehouses = $user->roles() // الأدوار المرتبطة بالمستخدم
-                ->with('warehouses') // تحميل المستودعات المرتبطة بكل دور
-                ->get()
-                ->flatMap(function ($role) {
-                    return $role->warehouses; // جلب المستودعات المرتبطة بكل دور
-                })
-                ->unique('id'); // التأكد من أن المستودعات فريدة
     
-            // إذا كانت هناك مستودعات، إضافة شرط التصفية
+            // جلب المستودعات المتاحة بناءً على الأدوار المرتبطة بالمستخدم
+            $accessibleWarehouses = $user->roles()
+                ->with('warehouses')
+                ->get()
+                ->flatMap(fn($role) => $role->warehouses)
+                ->unique('id');
+    
+            // إذا فيه مستودعات متاحة
             if ($accessibleWarehouses->isNotEmpty()) {
-                return $query->whereIn('id', $accessibleWarehouses->pluck('id')); // تصفية المستودعات المرتبطة بالمستخدم
+                return $query->whereIn('id', $accessibleWarehouses->pluck('id'));
             }
         }
     
-        // إذا لم يكن هناك مستودعات متاحة للمستخدم، العودة بالاستعلام بدون تعديل
+        // إذا ما فيه مستودع في الجلسة ولا مستودعات للمستخدم
         return $query;
     }
     

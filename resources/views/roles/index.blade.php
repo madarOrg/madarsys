@@ -17,11 +17,14 @@
     <x-button :href="route('roles.create')" type="button">
         <i class="fas fa-plus mr-2"></i> إضافة دور جديد
     </x-button>
+    <x-button :href="route('role-warehouse.index')" type="button">
+        <i class="fas fa-plus mr-2"></i> ربط الأدوار بالمستودعات 
+    </x-button>
     
     <!-- جدول الأدوار -->
     <div class="overflow-x-auto mt-1">
-        <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400 border border-gray-300 rounded-lg">
-            <thead class="text-xs text-gray-700 uppercase bg-gray-200 dark:bg-gray-700 dark:text-gray-300">
+        <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                     <th class="px-4 py-3">اسم الدور</th>
                     <th class="px-4 py-3">عدد المستخدمين</th>
@@ -33,8 +36,8 @@
             </thead>
             <tbody>
                 @foreach($roles as $role)
-                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600">
-                    <td class="px-4 py-3 font-medium text-gray-900 dark:text-gray-300">{{ $role->name }}</td>
+                <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                    <td class="px-4 py-3 ">{{ $role->name }}</td>
                     <td class="px-4 py-3 text-center">{{ $role->users->count() }}</td>
                     <td class="px-4 py-3">{{ $role->updated_at->format('Y-m-d H:i') }}</td>
                     <td class="px-4 py-3">

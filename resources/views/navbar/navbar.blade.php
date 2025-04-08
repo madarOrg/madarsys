@@ -4,7 +4,7 @@
     <div class="flex justify-end items-center">
       <a href="/" class="flex items-center">
         <div class="mr-3 h-6 sm:h-9 rotate" alt="مدار">
-          <x-logo href="/" showText="true" />
+          <x-logo href="/dashboard" showText="true" />
         </div>
         <span class="self-center text-xl font-semibold whitespace-nowrap dark:text-white">مدار</span>
       </a>
