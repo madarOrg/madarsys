@@ -10,16 +10,34 @@ use Exception;
 class CategoryController extends Controller
 {
     // عرض قائمة الفئات
-    public function index()
+    // public function index()
+    // {
+    //     try {
+    //         $categories = Category::paginate(7);
+    //     return view('categories.index', compact('categories'));
+    //     } catch (Exception $e) {
+    //         return redirect()->route('categories.index')->with('error', 'حدث خطأ أثناء تحميل الفئات: ' . $e->getMessage());
+    //     }
+    // }
+    public function index(Request $request)
     {
         try {
-            $categories = Category::paginate(7);
-        return view('categories.index', compact('categories'));
+            $query = Category::query();
+    
+            if ($request->has('search') && $request->search != '') {
+                $search = $request->search;
+                $query->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('code', 'like', '%' . $search . '%') // لو عندك حقل code
+                      ->orWhere('description', 'like', '%' . $search . '%');
+            }
+    
+            $categories = $query->paginate(7);
+            return view('categories.index', compact('categories'));
         } catch (Exception $e) {
             return redirect()->route('categories.index')->with('error', 'حدث خطأ أثناء تحميل الفئات: ' . $e->getMessage());
         }
     }
-
+    
     // عرض نموذج إضافة فئة جديدة
     public function create()
     {

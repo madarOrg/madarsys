@@ -5,9 +5,11 @@
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 يمكنك تعديل بيانات المنتج وحفظ التغييرات.
             </p>
-            <form action="{{ route('products.update', $product->id) }}" method="POST">
+            <form action="{{ route('products.update', $product->id) }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @method('PUT')
+               
+                 
 
                 <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-6 min-h-full">
                     
@@ -110,14 +112,13 @@
                             type="date" value="{{ old('expirationDate', $product->expiration_date) }}" />
                     </div>
 
-                
                     <div class="">
                         <x-file-input id="image" name="image" type="file" label="صورة المنتج" />
                         <p class="text-sm mt-2 text-gray-600 dark:text-gray-400">
                             الصورة الحالية: <a href="{{ asset($product->image) }}" target="_blank" class="text-blue-500">عرض</a>
                         </p>
                     </div>
-
+{{-- 
                     <div class="">
                         <x-file-input id="Attachments" name="Attachments" type="file" label="مرفقات إضافية" />
                         <p class="text-sm mt-2 text-gray-600 dark:text-gray-400">
@@ -127,7 +128,7 @@
                     <div class="">
                         <x-textarea id="notes" name="notes" label="ملاحظات" type="textarea" 
                             value="{{ old('notes', $product->notes) }}" />
-                    </div>
+                    </div> --}}
                     
                     <div class="flex items-center">
                         <input type="checkbox" id="is_active" name="is_active" value="1" 

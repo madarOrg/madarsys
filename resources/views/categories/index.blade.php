@@ -21,6 +21,7 @@
         <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
             <tr>
                 <th class="px-6 py-3">اسم الفئة</th>
+                <th class="px-6 py-3">رمز الفئة</th>
                 <th class="px-6 py-3">الوصف</th>
                 <th class="px-6 py-3">الإجراءات</th>
             </tr>
@@ -31,8 +32,10 @@
                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-gray-300">
                     {{ $category->name }}
                 </td>
+                <td class="px-6 py-4">{{ $category->code ?? 'لا يوجد' }}</td>
                 <td class="px-6 py-4">{{ $category->description ?? 'لا يوجد' }}</td>
                 <td class="px-6 py-4 flex space-x-2">
+                    <div class="flex items-center space-x-3 rtl:space-x-reverse">
                     <a href="{{ route('categories.edit', $category->id) }}" class="text-blue-600 hover:underline dark:text-blue-500">
                         <i class="fa-solid fa-pen"></i>
                     </a>
@@ -43,6 +46,7 @@
                             <i class="fas fa-trash-alt"></i>
                         </button>
                     </form>
+                </div>
                 </td>
             </tr>
             @endforeach

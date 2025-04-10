@@ -8,6 +8,12 @@
                         <img src="{{ asset('storage/' . $product->image) }}"
                             class="w-full max-w-xs max-h-96 rounded-lg object-contain" alt="{{ $product->name }}">
                     </div>
+                    {{-- <div class="w-full h-96 overflow-hidden bg-gray-200">
+                        <img id="imagePreview" src="{{ asset('storage/' . $product->image) }}" 
+                             alt="{{ $product->name }}"
+                             class="w-full h-full object-cover rounded-md shadow">
+                      </div> --}}
+                      
 
                     <!-- بيانات المنتج -->
                     <div class="md:col-span-3">
@@ -16,22 +22,29 @@
 
                         <!-- القسم الأول من بيانات المنتج -->
                         <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <p class="text-gray-700 dark:text-gray-300"><strong>التصنيف:</strong>
-                                {{ optional($product->category)->name ?? 'غير متوفر' }}</p>
-                            <p class="text-gray-700 dark:text-gray-300"><strong>المورد:</strong>
-                                {{ optional($product->supplier)->name ?? 'غير متوفر' }}</p>
-                            <p class="text-gray-700 dark:text-gray-300"><strong>العلامة التجارية:</strong>
-                                {{ $product->brand ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>الباركود:</strong>
                                 {{ $product->barcode ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>كود التخزين (SKU):</strong>
                                 {{ $product->sku ?? 'غير متوفر' }}</p>
+
+                            <p class="text-gray-700 dark:text-gray-300"><strong>التصنيف:</strong>
+                                {{ optional($product->category)->name ?? 'غير متوفر' }}</p>
+
+                            <p class="text-gray-700 dark:text-gray-300"><strong>العلامة التجارية:</strong>
+                                {{ $product->brand->name ?? 'غير متوفر' }}</p>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>بلد الصنع:</strong>
+                                {{ $product->manufacturingCountry->name ?? 'غير متوفر' }}</p>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>المكونات:</strong>
+                                {{ $product->ingredients ?? 'غير متوفر' }}</p>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>المورد:</strong>
+                                {{ optional($product->supplier)->name ?? 'غير متوفر' }}</p>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>الكمية المتوفرة:</strong>
+                                {{ $product->stock_quantity }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>سعر الشراء:</strong>
                                 ${{ number_format($product->purchase_price, 2) }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>سعر البيع:</strong>
                                 ${{ number_format($product->selling_price, 2) }}</p>
-                            <p class="text-gray-700 dark:text-gray-300"><strong>الكمية المتوفرة:</strong>
-                                {{ $product->stock_quantity }}</p>
+
                             <p class="text-gray-700 dark:text-gray-300"><strong>الحد الأدنى للمخزون:</strong>
                                 {{ $product->min_stock_level }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>الحد الأقصى للمخزون:</strong>
@@ -46,16 +59,17 @@
                                 {{ $product->tax ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>التخفيض (%):</strong>
                                 {{ $product->discount ?? 'غير متوفر' }}</p>
-                            <p class="text-gray-700 dark:text-gray-300"><strong>رقم المورد:</strong>
-                                {{ $product->supplier_contact ?? 'غير متوفر' }}</p>
+
                             <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الشراء:</strong>
-                                {{ optional($product->purchase_date)->format('Y-m-d') ?? 'غير متوفر' }}</p>
+                                {{ $product->purchase_date ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ التصنيع:</strong>
-                                {{ optional($product->manufacturing_date)->format('Y-m-d') ?? 'غير متوفر' }}</p>
+                                {{ $product->manufacturing_date ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الانتهاء:</strong>
-                                {{ optional($product->expiration_date)->format('Y-m-d') ?? 'غير متوفر' }}</p>
+                                {{ $product->expiration_date ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>آخر تحديث:</strong>
-                                {{ optional($product->last_updated)->format('Y-m-d H:i:s') ?? 'غير متوفر' }}</p>
+                                {{ $product->last_updated ?? 'غير متوفر' }}</p>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>الملاحظات :</strong>
+                                {{ $product->notes ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300">
                                 <strong>الحالة:</strong>
                                 <span
@@ -67,10 +81,10 @@
 
                         <div class="mt-6">
                             <a href="javascript:void(0)"
-                            class="py-2 px-4 rounded-lg bg-gray-700 text-white hover:bg-gray-600"
-                            onclick="closeModalAndGoBack()">
-                            إغلاق
-                        </a>
+                                class="py-2 px-4 rounded-lg bg-gray-700 text-white hover:bg-gray-600"
+                                onclick="closeModalAndGoBack()">
+                                إغلاق
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -86,4 +100,18 @@
         }
         window.history.back(); // العودة إلى الصفحة السابقة
     }
+    function previewImage(event) {
+    var output = document.getElementById('imagePreview');
+    if (event.target.files && event.target.files[0]) {
+        output.src = URL.createObjectURL(event.target.files[0]);
+        output.style.display = 'block';  // تأكد من أن القيمة تغيرت لـ block
+        output.onload = function() {
+            URL.revokeObjectURL(output.src); // تحرير الذاكرة
+        }
+    } else {
+        output.src = '';
+        output.style.display = 'none';
+    }
+}
+
 </script>
