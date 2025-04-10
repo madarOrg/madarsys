@@ -5,6 +5,7 @@ use App\Livewire\WarehouseReports;
 use App\Models\Product;
 use App\Http\Controllers\NotificationController;
 
+
 use App\Http\Controllers\{
     AuthController,
     SignupController,

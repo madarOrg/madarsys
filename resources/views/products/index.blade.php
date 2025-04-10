@@ -88,6 +88,8 @@
 
                                     
                                     <td class="px-6 py-4">
+                                        <div class="flex items-center space-x-3 rtl:space-x-reverse">
+
                                         <a href="{{ route('products.show', $product->id) }}"
                                             class="font-medium text-blue-600 dark:text-blue-500 hover:underline"> <i
                                                 class="fas fa-eye"></i></a>
@@ -105,6 +107,8 @@
                                             class="text-red-600 hover:text-red-800">
                                             <i class="fas fa-trash-alt"></i>
                                         </button>
+                                    </div>
+            
                                     </td>
                                 </tr>
                             @endforeach

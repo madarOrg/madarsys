@@ -1,5 +1,5 @@
 <x-layout>
-    <section class="bg-gray-50 dark:bg-gray-900">
+    <section class="">
         <form action="{{ route('categories.store') }}" method="POST">
             @csrf
 
@@ -10,25 +10,25 @@
                         يرجى إدخال بيانات الفئة الجديدة بدقة لضمان تنظيم المنتجات.
                     </p>
 
-                    <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 min-h-full">
-                        <div class="col-span-1">
-                            <x-file-input id="category-name" name="name" label="اسم الفئة" type="text"
+                    <div class="mt-6 space-y-6 ">
+                        <div class="w-1/2 mx-auto">
+                            <x-file-input id="name" name="name" label="اسم الفئة" type="text"
                                 placeholder="اسم الفئة" required="true" />
                             @error('name')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="col-span-1">
-                            <x-file-input id="category-code" name="code" label="رمز الفئة" type="text"
+                        <div class="w-1/2 mx-auto">
+                            <x-file-input id="code" name="code" label="رمز الفئة" type="text"
                                 placeholder="رمز الفئة" required="true" />
                             @error('code')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                             @enderror
                         </div>
 
-                        <div class="col-span-1">
-                            <x-file-input id="category-description" name="description" label="وصف الفئة" type="text"
+                        <div class="w-1/2 mx-auto">
+                            <x-file-input id="description" name="description" label="وصف الفئة" type="text"
                                 placeholder="وصف مختصر" required="true" />
                             @error('description')
                                 <p class="text-red-500 text-xs mt-1">{{ $message }}</p>

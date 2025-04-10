@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 use App\Traits\{
     HasBranch,
     HasUser
@@ -18,11 +19,14 @@ class Product extends Model
         'branch_id',
         'image',
         'description',
-        'brand',
+        'brand_id',
         'category_id',
         'supplier_id',
         'barcode',
         'sku',
+        'ingredients',
+        'notes',
+        'manufacturing_country_id',
         'purchase_price',
         'selling_price',
         'stock_quantity',
@@ -102,6 +106,17 @@ public function inventoryTransactions()
         'id',                        // المفتاح الرئيسي في Product
         'inventory_transaction_id'   // المفتاح الأجنبي في InventoryTransactionItem يشير إلى InventoryTransaction
     );
+}
+protected $dates = ['purchase_date', 'manufacturing_date', 'expiration_date', 'last_updated'];
+
+public function brand()
+{
+    return $this->belongsTo(Brand::class);
+}
+
+public function manufacturingCountry()
+{
+    return $this->belongsTo(ManufacturingCountry::class);
 }
 
 

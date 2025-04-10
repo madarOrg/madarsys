@@ -5,36 +5,72 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Unit;
-
+use App\Models\ManufacturingCountry;
+use App\Models\Brand;
 use App\Models\Partner; // الموردين
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+   
+
     // عرض جميع المنتجات
+    // public function index(Request $request)
+    // {
+    //     $query = Product::query()->with('category', 'supplier');
+    
+    //     if ($request->has('search')) {
+    //         $search = $request->input('search');
+    //         $query->where('name', 'like', "%$search%")
+    //               ->orWhere('sku', 'like', "%$search%")
+    //               ->orWhere('barcode', 'like', "%$search%")
+    //               ->orWhereHas('category', function ($q) use ($search) {
+    //                   $q->where('name', 'like', "%$search%");
+    //               })
+    //               ->orWhereHas('supplier', function ($q) use ($search) {
+    //                   $q->where('name', 'like', "%$search%");
+    //               });
+    //     }
+    
+    //     // تصحيح استدعاء `paginate` ليتم تطبيقه على `$query`
+    //     $products = $query->paginate(7);
+    
+    //     return view('products.index', compact('products')); // تأكد من أن `return` في النهاية وليس داخل `if`
+    // }
     public function index(Request $request)
-    {
-        $query = Product::query()->with('category', 'supplier');
-    
-        if ($request->has('search')) {
-            $search = $request->input('search');
-            $query->where('name', 'like', "%$search%")
-                  ->orWhere('sku', 'like', "%$search%")
-                  ->orWhere('barcode', 'like', "%$search%")
-                  ->orWhereHas('category', function ($q) use ($search) {
-                      $q->where('name', 'like', "%$search%");
-                  })
-                  ->orWhereHas('supplier', function ($q) use ($search) {
-                      $q->where('name', 'like', "%$search%");
-                  });
-        }
-    
-        // تصحيح استدعاء `paginate` ليتم تطبيقه على `$query`
-        $products = $query->paginate(7);
-    
-        return view('products.index', compact('products')); // تأكد من أن `return` في النهاية وليس داخل `if`
+{
+    $query = Product::query()
+                    ->with('category', 'supplier', 'brand', 'manufacturingCountry'); // إضافة العلاقات 'brand' و 'manufacturingCountry'
+
+    // البحث بناءً على الحقول المختلفة
+    if ($request->has('search')) {
+        $search = $request->input('search');
+        $query->where('name', 'like', "%$search%")
+              ->orWhere('sku', 'like', "%$search%")
+              ->orWhere('barcode', 'like', "%$search%")
+              ->orWhereHas('category', function ($q) use ($search) {
+                  $q->where('name', 'like', "%$search%");
+              })
+              ->orWhereHas('supplier', function ($q) use ($search) {
+                  $q->where('name', 'like', "%$search%");
+              })
+              ->orWhereHas('brand', function ($q) use ($search) { // البحث في العلامة التجارية
+                  $q->where('name', 'like', "%$search%");
+              })
+              ->orWhereHas('manufacturingCountry', function ($q) use ($search) { // البحث في بلد التصنيع
+                  $q->where('name', 'like', "%$search%");
+              });
     }
-    
+
+    // تطبيق pagination على الاستعلام
+    $products = $query->paginate(7);
+
+    // إرجاع المنتجات مع البيانات المربوطة
+    return view('products.index', compact('products'));
+}
+
 
     // عرض نموذج إضافة منتج جديد
     public function create()
@@ -44,8 +80,10 @@ class ProductController extends Controller
             $query->where('name', 'مورد'); // تعديل للبحث عن الشركاء من نوع "مورد"
         })->get(); // جلب الموردين فقط بناءً على نوع الشريك
         $units = Unit::all(); // جلب الوحدات
+        $brands = Brand::all(); // جلب العلامات التجارية
+        $manufacturingCountries = ManufacturingCountry::all();
 
-        return view('products.create', compact('categories', 'suppliers', 'units'));
+        return view('products.create', compact('categories', 'suppliers', 'units', 'brands', 'manufacturingCountries'));
     }
 
 
@@ -57,7 +95,7 @@ class ProductController extends Controller
     {
         // التحقق من البيانات المدخلة
         $request->validate([
-            'name' => 'required|string|max:255',
+        'name' => 'required|string|max:255',
         'category_id' => 'required|exists:categories,id',
         'purchase_price' => 'required|numeric',
         'selling_price' => 'required|numeric',
@@ -65,8 +103,9 @@ class ProductController extends Controller
         'barcode' => 'nullable|string|unique:products,barcode',
         'unit_id' => 'required|exists:units,id',
         'is_active' => 'nullable|in:0,1',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // إذا كان هناك صورة للمنتج
-        'brand' => 'nullable|string|max:255',
+        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // إذا كان هناك صورة للمنتج      
+        'brand_id' => 'nullable|exists:brands,id',
+        'manufacturing_country_id' => 'nullable|exists:manufacturing_countries,id',
         'tax' => 'nullable|numeric|max:100', // الضريبة
         'discount' => 'nullable|numeric|max:100', // التخفيضات
         'supplier_contact' => 'nullable|string',
@@ -80,9 +119,17 @@ class ProductController extends Controller
 
         ]);
 
-        // إنشاء المنتج
-        Product::create($request->all());
+        $data = $request->except('image');
 
+        // معالجة رفع الصورة
+        if ($request->hasFile('image')) {
+            // استخدام دالة store لنقل الصورة إلى مجلد "products" داخل التخزين العام
+            $imagePath = $request->file('image')->store('products', 'public');
+            $data['image'] = $imagePath; // ستكون القيمة على شكل "products/your_image.jpg"
+        }
+    
+        // إنشاء السجل في قاعدة البيانات باستخدام نموذج Product
+        Product::create($data);
         // إعادة التوجيه مع رسالة نجاح
         return redirect()->route('products.index')->with('success', 'تم إضافة المنتج بنجاح');
     }
@@ -102,44 +149,72 @@ class ProductController extends Controller
 
 
 
-    // تحديث المنتج في قاعدة البيانات
     public function update(Request $request, Product $product)
     {
         // التحقق من البيانات المدخلة
         $request->validate([
-           
             'name' => 'required|string|max:255',
-        'category_id' => 'required|exists:categories,id',
-        'purchase_price' => 'required|numeric',
-        'selling_price' => 'required|numeric',
-        'stock_quantity' => 'required|integer',
-        'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
-        'sku' => 'required|string|unique:products,sku,' . $product->id,
-        'unit_id' => 'required|exists:units,id',
-        'is_active' => 'nullable|in:0,1',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // إذا كان هناك صورة للمنتج
-        'brand' => 'nullable|string|max:255',
-        'tax' => 'nullable|numeric|max:100', // الضريبة
-        'discount' => 'nullable|numeric|max:100', // التخفيضات
-        'supplier_contact' => 'nullable|string',
-        'purchase_date' => 'nullable|date',
-        'manufacturing_date' => 'nullable|date',
-        'expiration_date' => 'nullable|date',
-        'last_updated' => 'nullable|date',
-        'max_stock_level' => 'nullable|integer|min:1',  // إضافة التحقق
-        'min_stock_level' => 'nullable|integer|min:1',  // إضافة التحقق
-
+            'category_id' => 'required|exists:categories,id',
+            'purchase_price' => 'required|numeric',
+            'selling_price' => 'required|numeric',
+            'stock_quantity' => 'required|integer',
+            'barcode' => 'nullable|string|unique:products,barcode,' . $product->id,
+            'sku' => 'required|string|unique:products,sku,' . $product->id,
+            'unit_id' => 'required|exists:units,id',
+            'is_active' => 'nullable|in:0,1',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048', // التحقق من الصورة
+            'brand' => 'nullable|string|max:255',
+            'tax' => 'nullable|numeric|max:100',
+            'discount' => 'nullable|numeric|max:100',
+            'supplier_contact' => 'nullable|string',
+            'purchase_date' => 'nullable|date',
+            'manufacturing_date' => 'nullable|date',
+            'expiration_date' => 'nullable|date',
+            'last_updated' => 'nullable|date',
+            'max_stock_level' => 'nullable|integer|min:1',
+            'min_stock_level' => 'nullable|integer|min:1',
         ]);
-
+    
+        // تجميع البيانات من الطلب باستثناء الصورة
+        $data = $request->except('image');
+    
+        // التحقق من وجود صورة في الطلب
+        if ($request->hasFile('image')) {
+            // التحقق من أن الصورة فعلاً هي صورة
+            $image = $request->file('image');
+            if (!$image->isValid()) {
+                return redirect()->back()->with('error', 'الصورة غير صالحة.');
+            }
+    
+            // في حال رغبت بحذف الصورة القديمة (إن وُجدت)
+            if ($product->image && \Illuminate\Support\Facades\Storage::disk('public')->exists($product->image)) {
+                // حذف الصورة القديمة
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($product->image);
+            }
+    
+            // تخزين الصورة في مجلد "products" باستخدام الـ disk "public"
+            $imagePath = $image->store('products', 'public');
+    
+            // التحقق من أن الصورة تم تخزينها بنجاح
+            if ($imagePath) {
+                $data['image'] = $imagePath;
+            } else {
+                return redirect()->back()->with('error', 'حدث خطأ أثناء تحميل الصورة.');
+            }
+        }
+    
         // تحديث المنتج
-        $product->update($request->all());
-
+        $product->update($data);
+    
         // إعادة التوجيه مع رسالة نجاح
         return redirect()->route('products.index')->with('success', 'تم تحديث المنتج بنجاح');
     }
+    
     public function show($id)
     {
-        $product = Product::with('category', 'supplier')->findOrFail($id);
+        $product = Product::with('category', 'supplier', 'brand', 'manufacturingCountry')->findOrFail($id);
+        // dd($product); // تحقق من البيانات
+
         return view('products.show', compact('product'));
     }
 
