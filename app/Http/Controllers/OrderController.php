@@ -73,7 +73,7 @@ class OrderController extends Controller
             }
     
             DB::commit();
-            return redirect()->route('orders.index')->with('success', 'Order created successfully');
+            return redirect()->route('orders.index')->with('success', 'تم إضافة الطلب بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Error creating order: ' . $e->getMessage());
@@ -133,7 +133,7 @@ class OrderController extends Controller
             }
     
             DB::commit();
-            return redirect()->route('orders.index')->with('success', 'Order updated successfully');
+            return redirect()->route('orders.index')->with('success', 'تم تحديث الطلب بنجاح');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->withInput()->with('error', 'Error updating order: ' . $e->getMessage());
