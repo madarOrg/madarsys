@@ -12,4 +12,4 @@ Livewire.hook('message.processed', (message, component) => {
 });
 
 // استيراد echo.js فقط
-import './echo';
+// import './echo';
