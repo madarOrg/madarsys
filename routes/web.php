@@ -582,5 +582,5 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
 
 
-    Route::resource('shipments', ShipmentController::class);
+    
 });
