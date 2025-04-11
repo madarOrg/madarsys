@@ -42,7 +42,8 @@ use App\Http\Controllers\{
     DashboardController,
     UnitController,
     BrandController,
-    ManufacturingCountryController
+    ManufacturingCountryController,
+    PartnerReportController
 };
 use App\Services\UnitService;
 
@@ -442,6 +443,9 @@ Route::middleware(['web', 'auth'])->group(function () {
                 ->name('inventory-transactions');
             
             Route::get('/product-stock', [InventoryReportController::class, 'productStockReport'])->name('product-stock');
+
+            Route::get('/partners', [PartnerReportController::class, 'index'])->name('partner');
+            Route::get('/products-by-warehouse', [PartnerReportController::class, 'getProductsByWarehouse']);
 
         });
         // Route::prefix('reports')->name('reports.')

@@ -1,6 +1,19 @@
 <x-layout>
     <div class="container ">
 
+  <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
+  <div class="hide-on-print text-right mb-4">
+    <button onclick="window.print()"
+    class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
+     التقرير
+    </button>
+</div>
+
+        <x-reportHeader>
+            <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المنتهية
+                الصلاحية </h1>
+        </x-reportHeader>
+
         <div x-data="{ open: true }">
             <button type="button" @click="open = !open"
                 class="hide-on-print text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
@@ -30,7 +43,7 @@
                         </div>
 
                         <!-- اختيار المنتج -->
-                        <div class="hide-on-print mb-2 flex-1 min-w-[250px]">
+                        <div class=" mb-2 flex-1 min-w-[250px]">
                             <label for="name" class="block">اسم المنتج/الباركود/SKU </label>
                             <select name="products[]"
                                 class="w-full product-select tom-select border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
@@ -43,13 +56,13 @@
                         </div>
 
                         <!-- من تاريخ -->
-                        <div class="hide-on-print mb-2 flex-1 min-w-[150px]">
+                        <div class=" mb-2 flex-1 min-w-[150px]">
                             <x-file-input id="expiration_from" name="expiration_from" label="من تاريخ" type="date"
                                 :value="request('expiration_from')" />
                         </div>
 
                         <!-- إلى تاريخ -->
-                        <div class="hide-on-print mb-2 flex-1 min-w-[150px]">
+                        <div class=" mb-2 flex-1 min-w-[150px]">
                             <x-file-input id="expiration_to" name="expiration_to" label="إلى تاريخ" type="date"
                                 :value="request('expiration_to')" />
                         </div>
@@ -58,7 +71,7 @@
 
                     </div>
                     <!-- زر التصفية -->
-                    <div class="hide-on-print  mt-1">
+                    <div class="hide-on-print mt-2 mt-1">
                         <button type="submit"
                             class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
                     </div>
@@ -75,22 +88,7 @@
 
 
         <div class="container mx-auto ">
-            <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
-            <div class="hide-on-print text-right mb-4">
-                <button onclick="window.print()"
-                class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
-                 التقرير
-                </button>
-            </div>
-
-            <!-- رأس التقرير -->
-            {{-- <x-reportHeader :company="$company" :warehouse="$arehouse"> --}}
-            <x-reportHeader>
-                <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المنتهية
-                    الصلاحية </h1>
-            </x-reportHeader>
-
-
+          
             <!-- محتوى التقرير -->
             <main>
                 @if ($report->isEmpty())
