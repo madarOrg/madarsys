@@ -79,7 +79,7 @@
             </thead>
             <tbody>
                 @foreach($roleWarehouses as $rw)
-                <tr                        class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                     
                     <td class="px-6 py-4">{{ $rw->role->name }}</td>
                     <td class="px-6 py-4">{{ $rw->warehouse->name }}</td>
