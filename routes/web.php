@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\WarehouseReports;
 use App\Models\Product;
 use App\Http\Controllers\NotificationController;
-
+use App\Http\Controllers\InvoiceCreationController;
 
 use App\Http\Controllers\{
     AuthController,
@@ -40,7 +40,17 @@ use App\Http\Controllers\{
     InventoryAuditController,
     InventoryTransactionItemsController,
     DashboardController,
+<<<<<<< HEAD
     UnitController
+=======
+    UnitController,
+    BrandController,
+    ManufacturingCountryController,
+    PartnerReportController,
+    PurchaseOrderController,
+    SalesOrderController,
+    InvoiceFromOrdersController
+>>>>>>> eabc8b89 (تم حل تعارض الدمج في routes/web.php وإضافة التعديلات الجديدة)
 };
 use App\Services\UnitService;
 
@@ -80,6 +90,12 @@ Route::get('/', function () {
 // استخدام middleware للتأكد من أن المستخدم مسجل الدخول
 // Route::middleware('auth')->group(function () {
 Route::middleware(['web', 'auth'])->group(function () {
+<<<<<<< HEAD
+=======
+    // مسارات مباشرة لصفحات تقارير المرتجعات
+    Route::get('/returns-management/reports', [App\Http\Controllers\ReturnOrderController::class, 'reports'])->name('returns-management.reports');
+    Route::get('/returns-management/reports/customer', [App\Http\Controllers\ReturnOrderController::class, 'customerReports'])->name('returns-management.customer-reports'); 
+>>>>>>> eabc8b89 (تم حل تعارض الدمج في routes/web.php وإضافة التعديلات الجديدة)
 
 
     // عرض لوحة التحكم (dashboard)
@@ -465,18 +481,38 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::post('/mark-notification-as-read/{id}', [NotificationController::class, 'markAsRead']);
     // Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
 
-    //invoices routes
+    // مسارات الفواتير
     Route::prefix('invoices')->name('invoices.')->group(function () {
-        Route::get('{type}', [InvoiceController::class, 'index'])->name('index'); // List invoices by type
-        Route::get('{type}/create', [InvoiceController::class, 'create'])->name('create'); // Create form for invoice type
-        Route::post('{type}', [InvoiceController::class, 'store'])->name('store'); // Store new invoice
-        Route::get('{type}/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit'); // Edit invoice
-        Route::put('{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
-        Route::delete('{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
+        Route::get('/', [InvoiceController::class, 'index'])->name('index'); // List invoices
+        Route::get('/{type}/create', [InvoiceController::class, 'create'])->name('create'); // Create invoice form
+        Route::post('/{type}', [InvoiceController::class, 'store'])->name('store'); // Store new invoice
+        Route::get('/{type}/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit'); // Edit invoice form
+        Route::put('/{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
+        Route::delete('/{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
+        
+        // مسارات إنشاء فاتورة من أمر شراء وأمر صرف
+        Route::get('purchase-orders', [InvoiceFromOrdersController::class, 'purchaseOrders'])->name('purchase-orders');
+        Route::get('sales-orders', [InvoiceFromOrdersController::class, 'salesOrders'])->name('sales-orders');
+        Route::get('create-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'createFromPurchaseOrder'])->name('create-from-purchase-order');
+        Route::post('store-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'storeFromPurchaseOrder'])->name('store-from-purchase-order');
+        
+        // مسارات إنشاء فاتورة من أمر صرف باستخدام المتحكم الجديد
+        Route::get('create-from-sales-order/{id}', [InvoiceCreationController::class, 'createFromSalesOrder'])->name('create-from-sales-order');
+        Route::post('store-from-sales-order/{id}', [InvoiceCreationController::class, 'storeFromSalesOrder'])->name('store-from-sales-order');
+        
+        // مسارات إنشاء فاتورة من طلب
+        Route::get('confirmed-orders', [InvoiceController::class, 'confirmedOrders'])->name('confirmed-orders');
+        Route::get('create-from-order/{id}', [InvoiceCreationController::class, 'createFromOrder'])->name('create-from-order');
+        Route::post('store-from-order/{id}', [InvoiceCreationController::class, 'storeFromOrder'])->name('store-from-order');
+        
+        // إبقاء المسارات القديمة للتوافق مع الروابط القديمة
+        Route::get('new-create-from-sales-order/{id}', [InvoiceCreationController::class, 'createFromSalesOrder'])->name('new-create-from-sales-order');
+        Route::post('new-store-from-sales-order/{id}', [InvoiceCreationController::class, 'storeFromSalesOrder'])->name('new-store-from-sales-order');
     });
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
     Route::post('/reports/get-fields', [ReportController::class, 'getFields'])->name('reports.get-fields');
+<<<<<<< HEAD
     
     Route::prefix('returns/process')->name('returns_process.')->group(function () {
 
@@ -488,49 +524,100 @@ Route::middleware(['web', 'auth'])->group(function () {
 
         // تعديل مرتجع
         Route::get('{id}/edit', [ReturnOrderController::class, 'edit'])->name('edit');
+=======
+
+// ...
+    Route::prefix('returns-management')->name('returns-management.')->group(function () {
+        // الصفحة الرئيسية للمرتجعات
+        Route::get('/', [ReturnOrderController::class, 'index'])->name('index');
+        Route::get('/create', [ReturnOrderController::class, 'create'])->name('create');
+        Route::post('/', [ReturnOrderController::class, 'store'])->name('store');
+        Route::get('/{id}', [ReturnOrderController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [ReturnOrderController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ReturnOrderController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ReturnOrderController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/print', [ReturnOrderController::class, 'print'])->name('print');
+        
+        // تقارير المرتجعات
+        Route::get('/reports', [ReturnOrderController::class, 'reports'])->name('reports'); 
+        Route::get('/reports/customer', [ReturnOrderController::class, 'customerReports'])->name('reports.customer');
+>>>>>>> eabc8b89 (تم حل تعارض الدمج في routes/web.php وإضافة التعديلات الجديدة)
     });
-    //   مسارات مرتجع مبيعات الى الموردين
-    Route::prefix('returns/supplier')->name('return_suppliers.')->group(function () {
-
-        Route::get('/', [ReturnOrderSupplierController::class, 'index'])->name('index'); // قائمة المرتجعات
-        // تعبئة طلب ارجاع للمورد
-        Route::get('create', [ReturnOrderSupplierController::class, 'create'])->name('create');
-
-        Route::post('/', [ReturnOrderSupplierController::class, 'store'])->name('store'); // تخزين الفواتير الجديد
-        Route::get('/sendToSupplier/{id}', [ReturnOrderSupplierController::class, 'sendToSupplier'])->name('sendToSupplier');
-        Route::get('/ordersendToSupplier', [ReturnOrderSupplierController::class, 'ordersendToSupplier'])->name('ordersendToSupplier'); // تخزين الفواتير الجديد
-        Route::get('/{id}/generate-pdf', [ReturnOrderSupplierController::class, 'generatePdf'])->name('generatePdf');
+    
+    // مسارات مرتجعات الموردين
+    Route::prefix('returns-suppliers')->name('returns-suppliers.')->group(function () {
+        Route::get('/', [ReturnOrderSupplierController::class, 'index'])->name('index');
+        Route::get('/create', [ReturnOrderSupplierController::class, 'create'])->name('create');
+        Route::post('/', [ReturnOrderSupplierController::class, 'store'])->name('store');
+        Route::get('/{id}', [ReturnOrderSupplierController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [ReturnOrderSupplierController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [ReturnOrderSupplierController::class, 'update'])->name('update');
+        Route::delete('/{id}', [ReturnOrderSupplierController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/print', [ReturnOrderSupplierController::class, 'print'])->name('print');
+        Route::put('/{id}/send', [ReturnOrderSupplierController::class, 'send'])->name('send');
+        
+        // تقارير مرتجعات الموردين
+        Route::get('/reports', [ReturnOrderSupplierController::class, 'reports'])->name('reports');
     });
 
-    //--------------------------------------------------
-    Route::get('/shipments', [ShipmentController::class, 'index']);
-
+    // طرق الشحنات
     Route::prefix('shipments')->group(function () {
-        // عرض جميع الشحنات
-        // Route::get('/', [ShipmentController::class, 'index'])->name('shipments.index');
-        Route::get('/', [ShipmentController::class, 'index'])->name('shipments.receive');
-        Route::get('/receive', [ShipmentController::class, 'index'])->name('shipments.index');
-
-
-        // عرض تفاصيل شحنة معينة
-        Route::get('/show/{id}', [ShipmentController::class, 'show'])->name('shipments.show');
-
-        // عرض نموذج إضافة شحنة جديدة
+        // صفحات خاصة
+        Route::get('/receive', [ShipmentController::class, 'receiveIndex'])->name('shipments.receive.index');
+        Route::get('/send', [ShipmentController::class, 'sendIndex'])->name('shipments.send.index');
+        Route::get('/track', [ShipmentController::class, 'trackIndex'])->name('shipments.track.index');
+        
+        // طرق استلام الشحنات
+        Route::get('/{id}/receive', [ShipmentController::class, 'showReceiveForm'])->name('shipments.receive.form');
+        Route::post('/{id}/receive', [ShipmentController::class, 'receive'])->name('shipments.receive');
+        
+        // طرق CRUD الأساسية
+        Route::get('/', [ShipmentController::class, 'index'])->name('shipments.index');
         Route::get('/create', [ShipmentController::class, 'create'])->name('shipments.create');
-
-        // حفظ الشحنة الجديدة
-        Route::post('/store', [ShipmentController::class, 'store'])->name('shipments.store');
-
-        // عرض نموذج تعديل شحنة
-        Route::get('/edit/{id}', [ShipmentController::class, 'edit'])->name('shipments.edit');
-
-        // تحديث الشحنة
-        Route::put('/update/{id}', [ShipmentController::class, 'update'])->name('shipments.update');
-
-        // حذف الشحنة
-        Route::delete('/destroy/{id}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
+        Route::post('/', [ShipmentController::class, 'store'])->name('shipments.store');
+        Route::get('/{id}', [ShipmentController::class, 'show'])->name('shipments.show');
+        Route::get('/{id}/edit', [ShipmentController::class, 'edit'])->name('shipments.edit');
+        Route::put('/{id}', [ShipmentController::class, 'update'])->name('shipments.update');
+        Route::delete('/{id}', [ShipmentController::class, 'destroy'])->name('shipments.destroy');
     });
 
+    // طرق مباشرة لصفحات الشحنات
+    Route::get('/shipments-receive', [ShipmentController::class, 'receiveIndex'])->name('shipments.receive.direct');
+    Route::get('/shipments-send', [ShipmentController::class, 'sendIndex'])->name('shipments.send.direct');
+    Route::get('/shipments-track', [ShipmentController::class, 'trackIndex'])->name('shipments.track.direct');
+
+    // إزالة الطرق المتعارضة
+    // Route::resource('shipments', ShipmentController::class);
+    // Route::get('shipments/{shipment}/receive', [ShipmentController::class, 'showReceiveForm'])->name('shipments.receive.form');
+    // Route::post('shipments/{shipment}/receive', [ShipmentController::class, 'receive'])->name('shipments.receive');
+
+    // طرق إدارة المرتجعات
+    Route::prefix('returns')->group(function () {
+        // مرتجعات الموردين
+        Route::get('/supplier', [ReturnOrderSupplierController::class, 'index'])->name('returns.supplier.index');
+        Route::get('/supplier/create', [ReturnOrderSupplierController::class, 'create'])->name('returns.supplier.create');
+        Route::post('/supplier', [ReturnOrderSupplierController::class, 'store'])->name('returns.supplier.store');
+        Route::get('/supplier/{id}', [ReturnOrderSupplierController::class, 'show'])->name('returns.supplier.show');
+        Route::get('/supplier/{id}/edit', [ReturnOrderSupplierController::class, 'edit'])->name('returns.supplier.edit');
+        Route::put('/supplier/{id}', [ReturnOrderSupplierController::class, 'update'])->name('returns.supplier.update');
+        Route::delete('/supplier/{id}', [ReturnOrderSupplierController::class, 'destroy'])->name('returns.supplier.destroy');
+        Route::get('/supplier/{id}/pdf', [ReturnOrderSupplierController::class, 'generatePdf'])->name('returns.supplier.pdf');
+        Route::post('/supplier/{id}/send', [ReturnOrderSupplierController::class, 'sendToSupplier'])->name('returns.supplier.send');
+        
+        // معالجة المرتجعات
+        Route::get('/process', [ReturnOrderController::class, 'index'])->name('returns.process.index');
+        Route::get('/process/create', [ReturnOrderController::class, 'create'])->name('returns.process.create');
+        Route::post('/process', [ReturnOrderController::class, 'store'])->name('returns.process.store');
+        Route::get('/process/{id}', [ReturnOrderController::class, 'show'])->name('returns.process.show');
+        Route::get('/process/{id}/edit', [ReturnOrderController::class, 'edit'])->name('returns.process.edit');
+        Route::put('/process/{id}', [ReturnOrderController::class, 'update'])->name('returns.process.update');
+        Route::delete('/process/{id}', [ReturnOrderController::class, 'destroy'])->name('returns.process.destroy');
+        
+        // تقارير المرتجعات
+        Route::get('/reports', [ReturnOrderController::class, 'reports'])->name('returns.reports.index');
+        Route::get('/reports/supplier', [ReturnOrderSupplierController::class, 'reports'])->name('returns.reports.supplier');
+        Route::get('/reports/customer', [ReturnOrderController::class, 'customerReports'])->name('returns.reports.customer');
+    });
 
     // عرض جميع الطلبات
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
@@ -547,6 +634,65 @@ Route::middleware(['web', 'auth'])->group(function () {
     // تحديث حالة الطلب
     Route::put('/orders/{order}', [OrderController::class, 'update'])->name('orders.update');
 
-
+    // عرض طلبات الشراء التي تحتاج إلى موافقة
+    Route::get('/orders/pending-approval', [OrderController::class, 'pendingApproval'])->name('orders.pending-approval');
     
+    // الموافقة على طلب الشراء
+    Route::post('/orders/{id}/approve', [OrderController::class, 'approve'])->name('orders.approve');
+    
+    // طباعة أمر الشراء
+    Route::get('/orders/{id}/print-purchase-order', [OrderController::class, 'printPurchaseOrder'])->name('orders.print-purchase-order');
+    Route::get('/orders/{id}/print-sales-order', [OrderController::class, 'printSalesOrder'])->name('orders.print-sales-order');
+
+    // فواتير الشراء المرتبطة بطلبات الشراء
+    Route::get('/invoices/confirmed-orders', [InvoiceController::class, 'confirmedOrders'])->name('invoices.confirmed-orders');
+    Route::get('/invoices/create-from-order/{orderId}', [InvoiceController::class, 'createFromOrder'])->name('invoices.create-from-order');
+    Route::post('/invoices/store-from-order/{orderId}', [InvoiceController::class, 'storeFromOrder'])->name('invoices.store-from-order');
+    Route::get('/orders/check-confirmed', [OrderController::class, 'checkConfirmedOrders'])->name('orders.check-confirmed');
+
+    // مسارات أوامر الشراء
+    Route::prefix('purchase-orders')->name('purchase-orders.')->group(function () {
+        Route::get('/', [PurchaseOrderController::class, 'index'])->name('index');
+        Route::get('/create/{orderId}', [PurchaseOrderController::class, 'create'])->name('create');
+        Route::post('/', [PurchaseOrderController::class, 'store'])->name('store');
+        Route::get('/{id}', [PurchaseOrderController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [PurchaseOrderController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [PurchaseOrderController::class, 'update'])->name('update');
+        Route::delete('/{id}', [PurchaseOrderController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/print', [PurchaseOrderController::class, 'print'])->name('print');
+        Route::post('/{id}/approve', [PurchaseOrderController::class, 'approve'])->name('approve');
+    });
+
+    // مسارات أوامر الصرف (البيع)
+    Route::prefix('sales-orders')->name('sales-orders.')->group(function () {
+        Route::get('/', [SalesOrderController::class, 'index'])->name('index');
+        Route::get('/create/{orderId}', [SalesOrderController::class, 'create'])->name('create');
+        Route::post('/', [SalesOrderController::class, 'store'])->name('store');
+        Route::get('/{id}', [SalesOrderController::class, 'show'])->name('show');
+        Route::get('/{id}/edit', [SalesOrderController::class, 'edit'])->name('edit');
+        Route::put('/{id}', [SalesOrderController::class, 'update'])->name('update');
+        Route::delete('/{id}', [SalesOrderController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/print', [SalesOrderController::class, 'print'])->name('print');
+        Route::post('/{id}/approve', [SalesOrderController::class, 'approve'])->name('approve');
+    });
+    
+    // مسارات إنشاء فواتير من أوامر الشراء والصرف
+    Route::prefix('invoices')->name('invoices.')->group(function () {
+        // عرض أوامر الشراء التي يمكن إنشاء فواتير منها
+        Route::get('/purchase-orders', [InvoiceFromOrdersController::class, 'purchaseOrders'])->name('purchase-orders');
+        
+        // عرض أوامر الصرف التي يمكن إنشاء فواتير منها
+        Route::get('/sales-orders', [InvoiceFromOrdersController::class, 'salesOrders'])->name('sales-orders');
+        
+        // إنشاء فاتورة من أمر شراء
+        Route::get('/create-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'createFromPurchaseOrder'])->name('create-from-purchase-order');
+        Route::post('/store-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'storeFromPurchaseOrder'])->name('store-from-purchase-order');
+        
+        // إنشاء فاتورة من أمر صرف
+        Route::get('/create-from-sales-order/{id}', [InvoiceFromOrdersController::class, 'createFromSalesOrder'])->name('create-from-sales-order');
+        Route::post('/store-from-sales-order/{id}', [InvoiceFromOrdersController::class, 'storeFromSalesOrder'])->name('store-from-sales-order');
+    });
+
 });
+
+Route::get('/orders/check-confirmed', [OrderController::class, 'checkConfirmedOrders'])->name('orders.check-confirmed');
