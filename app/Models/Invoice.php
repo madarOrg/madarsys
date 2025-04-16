@@ -15,6 +15,7 @@ class Invoice extends Model
         'discount_amount', 'discount_percentage', 'type', 
         'inventory_id', 'warehouse_id', 'currency_id', 
         'exchange_rate', 'department_id','inventory_transaction_id',
+        'order_id', 'purchase_order_id', 'sales_order_id',
     ];
     
 
@@ -58,5 +59,23 @@ class Invoice extends Model
     public function inventoryTransaction()
     {
         return $this->belongsTo(InventoryTransaction::class);
+    }
+    
+    // علاقة مع الطلب
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+    
+    // علاقة مع أمر الشراء
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
+    }
+    
+    // علاقة مع أمر الصرف
+    public function salesOrder()
+    {
+        return $this->belongsTo(SalesOrder::class, 'sales_order_id');
     }
 }

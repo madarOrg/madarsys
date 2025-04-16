@@ -3,8 +3,11 @@
         <div class="space-y-12 dark:bg-gray-900 mb-24">
             <x-title :title="'فواتير المشتريات'"></x-title>
             <div class="flex justify-start"> <!-- Align the button to the left -->
-                <x-button :href="route('invoices.create', ['type' => 'purchase'])" type="button">
+                <x-button :href="route('invoices.create', ['type' => 'purchase'])" type="button" class="ml-2">
                     <i class="fas fa-plus mr-2"></i> إضافة فاتورة جديدة
+                </x-button>
+                <x-button :href="route('invoices.confirmed-orders')" type="button" class="bg-green-600 hover:bg-green-700">
+                    <i class="fas fa-clipboard-check mr-2"></i> فواتير من طلبات الشراء
                 </x-button>
             </div>
             <!-- Search Form with Filters -->
@@ -88,6 +91,7 @@
                     <th class="px-6 py-3">الفرع</th>
                     <th class="px-6 py-3">طريقة الدفع</th>
                     <th class="px-6 py-3">المستودع</th>
+                    <th class="px-6 py-3">رقم الطلب</th>
                     <th class="px-6 py-3">الإجراءات</th>
                 </tr>
             </thead>
@@ -103,6 +107,19 @@
                         <td class="px-6 py-4">{{ optional($invoice->branch)->name ?? 'غير محدد' }}</td>
                         <td class="px-6 py-4">{{ optional($invoice->paymentType)->name ?? 'غير محدد' }}</td>
                         <td class="px-6 py-4">{{ optional($invoice->warehouse)->name ?? 'غير محدد' }}</td>
+                        <td class="px-6 py-4">
+                            @if($invoice->order_id)
+                                @if($invoice->order && $invoice->order->type == 'purchase')
+                                    <a href="{{ route('purchase-orders.show', $invoice->order_id) }}" class="text-blue-600 hover:underline">{{ $invoice->order_id }}</a>
+                                @elseif($invoice->order && $invoice->order->type == 'sale')
+                                    <a href="{{ route('sales-orders.show', $invoice->order_id) }}" class="text-blue-600 hover:underline">{{ $invoice->order_id }}</a>
+                                @else
+                                    {{ $invoice->order_id }}
+                                @endif
+                            @else
+                                غير مرتبط بطلب
+                            @endif
+                        </td>
                         <td class="px-6 py-4 flex space-x-2">
                             <x-button href="{{ route('invoices.edit', ['type' => 'purchase', 'invoice' => $invoice->id]) }}" class="text-blue-600 hover:underline dark:text-blue-500">
                                 <i class="fa-solid fa-pen"></i>

@@ -42,6 +42,13 @@
                         {{-- <td class="px-6 py-4">{{ $shipment->company_name }}</td> <!-- إذا كانت هناك شركة --> --}}
                         {{-- <td class="px-6 py-4">{{ $shipment->address }}</td> --}}
                         <td class="px-6 py-4 flex space-x-2">
+                            <!-- زر استلام الشحنة -->
+                            @if($shipment->status !== 'received')
+                            <x-button href="{{ route('shipments.receive.form', $shipment->id) }}" class="text-green-600 hover:underline ml-2">
+                                <i class="fas fa-check-circle"></i>
+                            </x-button>
+                            @endif
+                            
                             <!-- زر التعديل -->
                             <x-button href="{{ route('shipments.edit', $shipment->id) }}" class="text-yellow-600 hover:underline">
                                 <i class="fas fa-pen"></i>

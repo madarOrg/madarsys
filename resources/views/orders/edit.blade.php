@@ -51,6 +51,17 @@
                 </select>
             </div>
 
+            <!-- اختيار المورد/الشريك -->
+            <div class="col-span-1">
+                <label for="partner_id" class="block mb-2">المورد/الشريك</label>
+                <select name="partner_id" id="partner_id" class="form-control w-full">
+                    <option value="">اختر المورد/الشريك</option>
+                    @foreach($partners as $partner)
+                        <option value="{{ $partner->id }}" @selected($order->partner_id == $partner->id)>{{ $partner->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+
             <!-- تفاصيل الطلب -->
             <div class="col-span-2 mt-4">
                 <h3 class="text-lg font-medium">تفاصيل الطلب</h3>
@@ -77,4 +88,3 @@
         </div>
     </form>
 </x-layout>
-
