@@ -1,6 +1,21 @@
 <x-layout>
     <div class="container">
 
+        <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
+        <div class="hide-on-print text-right mb-4 ">
+            <button onclick="window.print()"
+                class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
+                التقرير
+            </button>
+        </div>
+
+
+        <x-reportHeader :company="$company" :warehouse="$warehouse">
+            <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300 ">
+                تقرير المنتجات التي وصلت لحد إعادة الطلب
+            </h1>
+        </x-reportHeader>
+
         <div x-data="{ open: true }">
             <button type="button" @click="open = !open"
                 class=" hide-on-print text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
@@ -59,86 +74,79 @@
         </div>
 
         <div class="container mx-auto p-4">
-            <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
-            <div class="hide-on-print text-right mb-4 ">
-                <button onclick="window.print()"
-                class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
-                 التقرير
-                </button>
-            </div>
 
 
-<x-reportHeader :company="$company" :warehouse="$warehouse">
-    <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300 ">
-        تقرير المنتجات التي وصلت لحد إعادة الطلب
-    </h1>
-</x-reportHeader>
+            @if ($reorderProducts->isEmpty())
+                <p class="text-center text-red-500">لا توجد منتجات وصلت لحد إعادة الطلب.</p>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300 text-sm">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border p-2">اسم المنتج</th>
+                                <th class="border p-2">رقم المنتج (SKU)</th>
+                                <th class="border p-2">وصف مختصر</th>
+                                <th class="border p-2">الكمية المتوفرة</th>
+                                <th class="border p-2">مستوى إعادة الطلب</th>
+                                <th class="border p-2">الحد الأعلى للمخزون</th>
+                                <th class="border p-2">تاريخ آخر طلب شراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($reorderProducts as $productDetail)
+                                <tr>
+                                    <td class="border p-2">{{ $productDetail['name'] }}</td>
+                                    <td class="border p-2">{{ $productDetail['sku'] }}</td>
+                                    <td class="border p-2">{{ $productDetail['description'] }}</td>
+                                    <td class="border p-2">{{ $productDetail['available_quantity'] }}</td>
+                                    <td class="border p-2 text-red-600 font-bold">
+                                        {{ $productDetail['min_stock_level'] }}</td>
+                                    <td class="border p-2 text-green-600 font-bold">
+                                        {{ $productDetail['max_stock_level'] }}</td>
+                                    <td class="border p-2">{{ $productDetail['last_purchase_date'] ?? 'غير متاح' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
 
-@if ($reorderProducts->isEmpty())
-    <p class="text-center text-red-500">لا توجد منتجات وصلت لحد إعادة الطلب.</p>
-@else
-    <div class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300 text-sm">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border p-2">اسم المنتج</th>
-                    <th class="border p-2">رقم المنتج (SKU)</th>
-                    <th class="border p-2">وصف مختصر</th>
-                    <th class="border p-2">الكمية المتوفرة</th>
-                    <th class="border p-2">مستوى إعادة الطلب</th>
-                    <th class="border p-2">الحد الأعلى للمخزون</th>
-                    <th class="border p-2">تاريخ آخر طلب شراء</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($reorderProducts as $productDetail)
-                    <tr>
-                        <td class="border p-2">{{ $productDetail['name'] }}</td>
-                        <td class="border p-2">{{ $productDetail['sku'] }}</td>
-                        <td class="border p-2">{{ $productDetail['description'] }}</td>
-                        <td class="border p-2">{{ $productDetail['available_quantity'] }}</td>
-                        <td class="border p-2 text-red-600 font-bold">{{ $productDetail['min_stock_level'] }}</td>
-                        <td class="border p-2 text-green-600 font-bold">{{ $productDetail['max_stock_level'] }}</td>
-                        <td class="border p-2">{{ $productDetail['last_purchase_date'] ?? 'غير متاح' }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-@endif
-
-{{-- عرض المنتجات التي تجاوزت `max_stock_level` --}}
-@if (!$overstockProducts->isEmpty())
-    <h2 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300 mt-6">
-        المنتجات التي تجاوزت الحد الأعلى للمخزون
-    </h2>
-    <div class="overflow-x-auto">
-        <table class="w-full border-collapse border border-gray-300 text-sm">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border p-2">اسم المنتج</th>
-                    <th class="border p-2">رقم المنتج (SKU)</th>
-                    <th class="border p-2">وصف مختصر</th>
-                    <th class="border p-2">الكمية المتوفرة</th>
-                    <th class="border p-2">الحد الأعلى للمخزون</th>
-                    <th class="border p-2">تاريخ آخر طلب شراء</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach ($overstockProducts as $productDetail)
-                    <tr>
-                        <td class="border p-2">{{ $productDetail['name'] }}</td>
-                        <td class="border p-2">{{ $productDetail['sku'] }}</td>
-                        <td class="border p-2">{{ $productDetail['description'] }}</td>
-                        <td class="border p-2 text-green-600 font-bold">{{ $productDetail['available_quantity'] }}</td>
-                        <td class="border p-2 text-green-600 font-bold">{{ $productDetail['max_stock_level'] }}</td>
-                        <td class="border p-2">{{ $productDetail['last_purchase_date'] ?? 'غير متاح' }}</td>
-                    </tr>
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-@endif
+            {{-- عرض المنتجات التي تجاوزت `max_stock_level` --}}
+            @if (!$overstockProducts->isEmpty())
+                <h2 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300 mt-6">
+                    المنتجات التي تجاوزت الحد الأعلى للمخزون
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse border border-gray-300 text-sm">
+                        <thead>
+                            <tr class="bg-gray-100">
+                                <th class="border p-2">اسم المنتج</th>
+                                <th class="border p-2">رقم المنتج (SKU)</th>
+                                <th class="border p-2">وصف مختصر</th>
+                                <th class="border p-2">الكمية المتوفرة</th>
+                                <th class="border p-2">الحد الأعلى للمخزون</th>
+                                <th class="border p-2">تاريخ آخر طلب شراء</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($overstockProducts as $productDetail)
+                                <tr>
+                                    <td class="border p-2">{{ $productDetail['name'] }}</td>
+                                    <td class="border p-2">{{ $productDetail['sku'] }}</td>
+                                    <td class="border p-2">{{ $productDetail['description'] }}</td>
+                                    <td class="border p-2 text-green-600 font-bold">
+                                        {{ $productDetail['available_quantity'] }}</td>
+                                    <td class="border p-2 text-green-600 font-bold">
+                                        {{ $productDetail['max_stock_level'] }}</td>
+                                    <td class="border p-2">{{ $productDetail['last_purchase_date'] ?? 'غير متاح' }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
 </x-layout>
 <script>
     document.getElementById('resetFilters').addEventListener('click', function() {

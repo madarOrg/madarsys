@@ -4,9 +4,17 @@
         <!-- فلترة الطلبات -->
         <form method="GET" action="{{ route('orders.index') }}" class="w-full flex justify-between items-center mt-5">
             <x-search-input id="search-orders" name="search" placeholder="ابحث عن الطلبات" :value="request()->input('search')" class="w-1/3 p-2 border border-gray-300 rounded-md shadow-sm" />
-            <x-button :href="route('orders.create')" type="button" class="ml-4 bg-blue-500 text-white p-2 rounded-md shadow-md hover:bg-blue-600">
-                <i class="fas fa-plus mr-2"></i> إضافة طلب جديد
-            </x-button>
+            <div class="flex">
+                <x-button :href="route('orders.pending-approval')" type="button" class="ml-2 bg-yellow-500 text-white p-2 rounded-md shadow-md hover:bg-yellow-600">
+                    <i class="fas fa-clipboard-list mr-2"></i> طلبات الشراء المعلقة
+                </x-button>
+                <x-button :href="route('orders.check-confirmed')" type="button" class="ml-2 bg-green-500 text-white p-2 rounded-md shadow-md hover:bg-green-600">
+                    <i class="fas fa-clipboard-check mr-2"></i> طلبات الشراء المؤكدة
+                </x-button>
+                <x-button :href="route('orders.create')" type="button" class="ml-2 bg-blue-500 text-white p-2 rounded-md shadow-md hover:bg-blue-600">
+                    <i class="fas fa-plus mr-2"></i> إضافة طلب جديد
+                </x-button>
+            </div>
         </form>
         <!-- جدول عرض الطلبات -->
         <div class="overflow-x-auto bg-white shadow-md rounded-lg mt-4 w-full">

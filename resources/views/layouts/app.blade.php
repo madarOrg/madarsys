@@ -13,7 +13,11 @@
         </header>
 
         <main class="py-8">
-            {{ $slot }}
+            @hasSection('content')
+                @yield('content')
+            @else
+                {{ $slot ?? '' }}
+            @endif
         </main>
 
         <footer class="bg-gray-800 text-white text-center p-4">

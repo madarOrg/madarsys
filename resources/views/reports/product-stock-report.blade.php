@@ -2,7 +2,7 @@
     <div class="container">
 
         <!-- زر الطباعة -->
-        <div class="hide-on-print text-right mb-4">
+        <div class="hide-on-print text-right mt-2 mb-4">
             <button onclick="window.print()"
                 class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 dark:text-gray-400 text-base font-semibold leading-7">
                 طباعة التقرير
@@ -19,7 +19,7 @@
         <!-- زر إظهار/إخفاء الفلاتر -->
         <div x-data="{ open: true }" class=" mb-4">
             <button type="button" @click="open = !open"
-                class="text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
+                class=" hide-on-print text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
                 <span
                     x-html="open ? '<i class=\'fa-solid fa-magnifying-glass-minus fa-lg\'></i>' :'<i class=\'fa-solid fa-magnifying-glass-plus fa-lg\'></i>'">
                 </span>
@@ -27,8 +27,8 @@
 
             <!-- نموذج الفلترة -->
             <div x-show="open" x-transition>
-                <form action="{{ route('reports.product-stock') }}" method="GET" class="bg-gray-50 p-4 rounded shadow">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <form action="{{ route('reports.product-stock') }}" method="GET" class=" p-4 rounded shadow">
+                    <div class=" grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <!-- البحث باسم المنتج / SKU / الباركود -->
                         <div>
                             <label for="products" class="block mb-1">اسم المنتج / الباركود / SKU</label>
@@ -102,11 +102,18 @@
                     <!-- أزرار التصفية والتفريغ -->
                     <div class="mt-4 flex gap-4">
                         <button type="submit"
-                            class="btn btn-primary text-white bg-indigo-600 hover:bg-indigo-700">تصفية</button>
+                            class=" hide-on-print btn btn-primary text-white bg-indigo-600 hover:bg-indigo-700">تصفية</button>
 
                         <a href="{{ route('reports.product-stock') }}"
-                            class="btn bg-gray-300 hover:bg-gray-400 text-gray-800">تفريغ الفلاتر</a>
+                            class="hide-on-print btn bg-gray-300 hover:bg-gray-400 text-gray-800">تفريغ الفلاتر</a>
                     </div>
+                    <div class="flex gap-4">
+                        <label><input type="checkbox" name="expired" value="1" {{ request('expired') ? 'checked' : '' }}> منتهية الصلاحية</label>
+                        <label><input type="checkbox" name="near_expiry" value="1" {{ request('near_expiry') ? 'checked' : '' }}> قاربت على الانتهاء</label>
+                        <label><input type="checkbox" name="reorder" value="1" {{ request('reorder') ? 'checked' : '' }}> وصلت حد الطلب</label>
+                        <label><input type="checkbox" name="surplus" value="1" {{ request('surplus') ? 'checked' : '' }}> فائض</label>
+                    </div>
+                    
                 </form>
             </div>
         </div>
@@ -118,7 +125,7 @@
             @else
                 <table class="w-full border-collapse border border-gray-300 text-sm mt-4">
                     <thead>
-                        <tr class="bg-gray-100 text-gray-900 dark:text-gray-100">
+                        <tr class=" text-gray-900 dark:text-gray-100">
                             <th class="border p-2">المستودع</th>
                             <th class="border p-2">اسم المنتج</th>
                             <th class="border p-2">SKU</th>
