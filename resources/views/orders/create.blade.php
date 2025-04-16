@@ -28,6 +28,15 @@
                     </select>
                 </div>
 
+                <div class="mb-4 w-full" id="partner-container">
+                    <label for="partner_id" class="block text-gray-700">المورد/الشريك</label>
+                    <select name="partner_id" id="partner_id" class="w-full p-2 border border-gray-300 rounded-md">
+                        <option value="">اختر المورد/الشريك</option>
+                        @foreach($partners as $partner)
+                            <option value="{{ $partner->id }}" @selected(old('partner_id') == $partner->id)>{{ $partner->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
             </div>
 
 
@@ -92,9 +101,12 @@
           
 
             <!-- زر إرسال النموذج -->
-            <button type="submit" class="bg-blue-500 text-black p-2 rounded-md shadow-md hover:bg-blue-600">
-                إضافة الطلب
-            </button>
+            <div class="mt-12 flex justify-center">
+                <button type="submit" 
+                        class="bg-green-600 text-white font-bold py-4 px-10 rounded-lg shadow-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-75 transition duration-300 ease-in-out text-xl border-2 border-green-400 transform hover:scale-105">
+                    <i class="fas fa-plus mr-2"></i> إضافة الطلب
+                </button>
+            </div>
 
         </form>
     </section>

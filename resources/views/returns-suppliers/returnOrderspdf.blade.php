@@ -1,15 +1,17 @@
 <!-- resources/views/returns-suppliers/returnOrders/pdf.blade.php -->
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>طلب إرجاع المورد #{{ $returnOrder->id }}</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: DejaVu Sans, sans-serif;
             direction: rtl;
             font-size: 14px;
+            text-align: right;
         }
         table {
             width: 100%;

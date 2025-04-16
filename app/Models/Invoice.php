@@ -23,7 +23,8 @@ class Invoice extends Model
         'exchange_rate', 'department_id','inventory_transaction_id',
         'production_date',
         'expiration_date',
-        'created_user', 'updated_user'
+        'created_user', 'updated_user',
+        'order_id', 'purchase_order_id', 'sales_order_id',
     ];
     
    
@@ -67,5 +68,23 @@ class Invoice extends Model
     public function inventoryTransaction()
     {
         return $this->belongsTo(InventoryTransaction::class);
+    }
+    
+    // علاقة مع الطلب
+    public function order()
+    {
+        return $this->belongsTo(Order::class, 'order_id');
+    }
+    
+    // علاقة مع أمر الشراء
+    public function purchaseOrder()
+    {
+        return $this->belongsTo(PurchaseOrder::class, 'purchase_order_id');
+    }
+    
+    // علاقة مع أمر الصرف
+    public function salesOrder()
+    {
+        return $this->belongsTo(SalesOrder::class, 'sales_order_id');
     }
 }
