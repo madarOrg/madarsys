@@ -35,9 +35,11 @@ class PartnerReportController extends Controller
             
                     if ($request->warehouse_id) {
                         $productQuery->whereHas('quantityOfProductOfWarehouses', function ($warehouseQuery) use ($request) {
-                            $warehouseQuery->where('warehouse_id', $request->warehouse_id);
+                            $warehouseQuery->where('warehouse_id', $request->warehouse_id)
+                                           ->where('quantity', '>', 0); // شرط الكمية
                         });
                     }
+                    
                 });
             })
             

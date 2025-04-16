@@ -1,6 +1,6 @@
 <x-layout>
 
-    <form action="{{ route('inventory-products.search') }}" method="GET" class="p-1 rounded-lg shadow mb-2">
+    <form action="{{ route('inventory-products.search') }}" method="GET" class="p-1 rounded-lg shadow ">
         <div x-data="{ open: true }">
             <!-- زر لفتح أو إغلاق القسم -->
             <button type="button" @click="open = !open" class="text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
@@ -71,15 +71,15 @@
                     <x-file-input id="batch_number" name="batch_number" label="رقم الدفعة"
                         value="{{ request('batch_number') }}" />
 
-                     
-
-                </div>
-                <!-- زر البحث -->
-                <div class="flex justify-end mt-2">
+                      <!-- زر البحث -->
+                <div class="flex justify-end mt-4">
                     <x-button>
                         بحث
                     </x-button>
                 </div>
+
+                </div>
+               
             </div>
     </form>
 
@@ -106,14 +106,14 @@
         @else
             <!-- عرض المنتجات في جدول -->
             @if ($products->isNotEmpty())
-                <div class="overflow-x-auto mt-6">
+                <div class="overflow-x-auto mt-0">
                     <h2 class="text-lg font-semibold">المنتجات في المستودع المحدد</h2>
                     <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
                         <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400 p-2 w-auto min-w-[50px] whitespace-nowrap">
                             <tr class="">
                                 {{-- <th class="py-4">الرقم</th> --}}
                                 <th class="py-4">النوع</th>
-
+                                <th class="px-6 py-3"> المستودع</th>
                                 <th class="px-6 py-3">اسم المنتج</th>
                                 <th class="px-6 py-3">الكمية</th>
                                 <th class="px-6 py-3">موقع المنتج</th>
@@ -130,10 +130,10 @@
                         </thead>
                         <tbody>
                             @foreach ($products as $product)
-                                <tr
-                                    class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                                <tr  class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+
                                     {{-- <td class="">{{ $loop->iteration }}</td> --}}
-                                    <td class="px-2 py-4">
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">
                                         @if($product->distribution_type === 1)
                                             <i class="fas fa-arrow-up text-blue-500"></i> إدخال
                                         @elseif($product->distribution_type === -1)
@@ -142,26 +142,27 @@
                                             <i class="fas fa-question-circle text-gray-500"></i> غير محدد
                                         @endif
                                     </td>
-                                    
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap"> {{ $product->warehouse_name ?? 'غير محدد' }}</td>
+
                                     
                                     <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">
                                         <a href="{{ route('products.show', $product->product->id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
                                             {{ $product->product->name }}  {{ $product->product->sku }}
                                         </a>
                                     </td>
-                                    <td class="px-6 py-4">{{ $product->productQuantity ?? 'غير محدد' }}</td>
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->productQuantity ?? 'غير محدد' }}</td>
                                     <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->location->rack_code ?? 'غير محدد' }}</td>
-                                    <td class="px-6 py-4">{{ $product->storageArea->area_name ?? 'غير محدد' }}</td>
-                                    <td class="px-6 py-4">{{ $product->production_date ?? 'غير محدد' }}</td>
-                                    <td class="px-6 py-4">{{ $product->expiration_date ?? 'غير محدد' }}</td>
-                                    <td class="px-6 py-4">{{ $product->batch_number ?? 'غير محدد' }}</td>
-                                    <td class="px-6 py-4">{{ $product->inventory_transaction_item_id ?? 'غير محدد' }}
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->storageArea->area_name ?? 'غير محدد' }}</td>
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->production_date ?? 'غير محدد' }}</td>
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->expiration_date ?? 'غير محدد' }}</td>
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->batch_number ?? 'غير محدد' }}</td>
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->inventory_transaction_item_id ?? 'غير محدد' }}
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">
                                         {{ $product->quantity ?? 'غير محدد' }} /
                                         {{ $distributedQuantities[$product->id] ?? 'غير محدد' }}
                                     </td>
-                                    <td class="px-6 py-4">
+                                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">
                                         <a href="{{ route('inventory-products.new', [
                                             'warehouse_id' => $product->warehouse_id,
                                             'inventory_transaction_item_id' => $product->inventory_transaction_item_id,
@@ -203,7 +204,7 @@
                     </table>
 
                     <!-- Links for Pagination -->
-                    <div class="mt-4">
+                    <div class="mt-2">
                         <x-pagination-links :paginator="$products" />
 
                     </div>

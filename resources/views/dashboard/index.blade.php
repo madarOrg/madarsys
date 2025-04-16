@@ -58,6 +58,7 @@
                 series: @json($categoryCounts),
                 labels: @json($categoryLabels),
                 title: { text: "المنتجات حسب التصنيفات", align: 'center' }
+                
             };
             var chart = new ApexCharts(document.querySelector("#categoryChart"), options);
             chart.render();

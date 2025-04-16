@@ -193,13 +193,15 @@ class InventoryProductController extends Controller
                 'warehouse_storage_areas.area_name',
                 'warehouse_locations.rack_code',
                 'inventory_transaction_items.quantity',
-                'inventory_products.inventory_transaction_item_id'
-
+                'inventory_products.inventory_transaction_item_id',
+                'warehouses.name as warehouse_name' 
             ])
             ->leftJoin('products', 'inventory_products.product_id', '=', 'products.id')
             ->leftJoin('warehouse_storage_areas', 'inventory_products.storage_area_id', '=', 'warehouse_storage_areas.id')
             ->leftJoin('warehouse_locations', 'inventory_products.location_id', '=', 'warehouse_locations.id')
             ->leftJoin('inventory_transaction_items', 'inventory_products.inventory_transaction_item_id', '=', 'inventory_transaction_items.id')
+            ->leftJoin('warehouses', 'inventory_products.warehouse_id', '=', 'warehouses.id')  // إضافة الانضمام للمستودعات
+
             ->paginate(10);  // جلب البيانات
 
 
@@ -246,7 +248,7 @@ class InventoryProductController extends Controller
     public function getProductInventory($transactionId)
     {
         // جلب تفاصيل المنتج مع الكمية من جدول InventoryTransactionItem
-        $transaction = InventoryTransactionItem::with('product')->find($transactionId);
+        $transaction = InventoryTransactionItem::with('product.unit')->find($transactionId);
     
         if (!$transaction) {
             return response()->json(['error' => 'Transaction not found'], 404);
@@ -261,30 +263,31 @@ class InventoryProductController extends Controller
     
         // إذا لم يتم العثور على قيمة، يتم استخدام الكمية الأصلية
         $quantity = $remainingQuantity !== null ? $remainingQuantity : $transaction->quantity;
-    
-        return response()->json([
-            'product_id' => $transaction->product->id,
-            'product_name' => $transaction->product->name,
-            'production_date' => $transaction->production_date,
-            'expiration_date' => $transaction->expiration_date,
-            'quantity' => $quantity, // استخدام الكمية المتبقية بدلاً من الكمية الأصلية
-        ]);
-    }
+     
+            return response()->json([
+                'product_id' => $transaction->product_id,
+                'product_name' => $transaction->product->name,
+                'quantity' => $quantity,
+                'production_date' => $transaction->production_date,
+                'expiration_date' => $transaction->expiration_date,
+                'unit_name' => $transaction->product->unit?->name, // هنا اسم الوحدة
+            ]);
+        }
     
     public function create(Request $request)
     {
 
         $transactions = collect();
-        $products = InventoryTransaction::with('items.product')
-            ->get()
-            ->flatMap(function ($transaction) {
-                return $transaction->items->map(function ($item) {
-                    return $item->product;
-                });
-            })
-            ->unique('id'); // تجنب التكرار
-
-        $products = $transactions->unique('product_id')->values(); // تجنب التكرار واسترجاع القيم
+        $products = InventoryTransaction::with('items.product.unit')
+        ->get()
+        ->flatMap(function ($transaction) {
+            return $transaction->items->map(function ($item) {
+                return $item->product;
+            });
+        })
+        ->unique('id');
+    
+        // $products = $transactions->unique('product_id')->values(); // تجنب التكرار واسترجاع القيم
 
 
         $distributionType = $request->input('distribution_type', 1); // Default to '1' (توزيع)

@@ -43,7 +43,8 @@ use App\Http\Controllers\{
     UnitController,
     BrandController,
     ManufacturingCountryController,
-    PartnerReportController
+    PartnerReportController,
+AllInvoiceController
 };
 use App\Services\UnitService;
 
@@ -75,20 +76,27 @@ Route::post('/signup', [SignupController::class, 'store'])->name('signup.submit'
 
 Route::get('/reset-password', [PasswordController::class, 'create'])->name('password.change');
 Route::post('/reset-password', [PasswordController::class, 'store'])->name('password.update');
-
-// عرض الصفحة الرئيسية
+// routes/web.php
 Route::get('/', function () {
     return view('home');
-});
+})->name('home');
 
 
 // عرض الصفحة الرئيسية
 Route::get('/team', function () {
     return view('team');
 });
+
+//
+// web.php
+Route::get('/welcome', function () {
+    return view('splash');
+});
+
+
 // استخدام middleware للتأكد من أن المستخدم مسجل الدخول
 // Route::middleware('auth')->group(function () {
-Route::middleware(['web', 'auth'])->group(function () { 
+Route::middleware(['web', 'auth',\App\Http\Middleware\CheckPermission::class])->group(function () { 
 
 
     // عرض لوحة التحكم (dashboard)
@@ -342,7 +350,15 @@ Route::middleware(['web', 'auth'])->group(function () {
     //settings
     Route::get('/settings', [SettingController::class, 'index'])->name('settings.index');
     Route::post('/settings', [SettingController::class, 'update'])->name('settings.update');
-
+    // invoices
+    // Route::prefix('invoicesP')->name('invoicesP.')->group(function () {
+    //     Route::get('{type}', [AllInvoiceController::class, 'index'])->name('index'); // List invoices by type
+    //     Route::get('{type}/create', [AllInvoiceController::class, 'create'])->name('create'); // Create form for invoice type
+    //     Route::post('{type}', [AllInvoiceController::class, 'store'])->name('store'); // Store new invoice
+    //     Route::get('{type}/{invoice}/edit', [AllInvoiceController::class, 'edit'])->name('edit'); // Edit invoice
+    //     Route::put('{type}/{invoice}', [AllInvoiceController::class, 'update'])->name('update'); // Update invoice
+    //     Route::delete('{type}/{invoice}', [AllInvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
+    // });
     //inventory/transactions
     // في ملف routes/web.php
     Route::get('transaction-effect/{transactionType}', [InventoryTransactionController::class, 'getEffectByTransactionType']);
@@ -481,7 +497,11 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::post('/store', [InventoryAuditController::class, 'store'])->name('store');
         Route::get('/edit/{id}', [InventoryAuditController::class, 'edit'])->name('edit');
         Route::post('/update/{id}', [InventoryAuditController::class, 'update'])->name('update');
+        
         Route::get('/editTrans/{id}', [InventoryAuditController::class, 'editTrans'])->name('editTrans');
+        Route::get('/audit-transaction/{auditId}/{warehouseId}', [InventoryAuditController::class, 'createInventoryAuditTransaction']);
+
+
         Route::post('/updateTrans/{id}', [InventoryAuditController::class, 'updateTrans'])->name('updateTrans');
         Route::delete('/destroy/{id}', [InventoryAuditController::class, 'destroy'])->name('destroy');
         Route::middleware([\App\Http\Middleware\GlobalVariablesMiddleware::class])->group(function () {

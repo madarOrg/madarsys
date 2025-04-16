@@ -49,7 +49,7 @@ CREATE TABLE IF NOT EXISTS `brands` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `brands_code_unique` (`code`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -109,7 +109,7 @@ CREATE TABLE IF NOT EXISTS `companies` (
   `updated_user` bigint unsigned DEFAULT NULL COMMENT 'معرف المستخدم الذي قام بالتحديث',
   PRIMARY KEY (`id`),
   UNIQUE KEY `companies_phone_number_unique` (`phone_number`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -122,7 +122,7 @@ CREATE TABLE IF NOT EXISTS `currencies` (
   `created_at` timestamp NULL DEFAULT NULL COMMENT 'تاريخ ووقت الإنشاء',
   `updated_at` timestamp NULL DEFAULT NULL COMMENT 'تاريخ ووقت التحديث',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -176,7 +176,7 @@ CREATE TABLE IF NOT EXISTS `inventory` (
   KEY `inventory_product_id_foreign` (`product_id`),
   CONSTRAINT `inventory_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `inventory_warehouse_id_foreign` FOREIGN KEY (`warehouse_id`) REFERENCES `warehouses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=31 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -296,7 +296,7 @@ CREATE TABLE IF NOT EXISTS `inventory_products` (
   CONSTRAINT `inventory_products_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `inventory_products_storage_area_id_foreign` FOREIGN KEY (`storage_area_id`) REFERENCES `warehouse_storage_areas` (`id`) ON DELETE CASCADE,
   CONSTRAINT `inventory_products_warehouse_id_foreign` FOREIGN KEY (`warehouse_id`) REFERENCES `warehouses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=103 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -394,7 +394,7 @@ CREATE TABLE IF NOT EXISTS `inventory_transactions` (
   CONSTRAINT `inventory_transactions_sub_type_id_foreign` FOREIGN KEY (`sub_type_id`) REFERENCES `inventory_transaction_subtypes` (`id`) ON DELETE SET NULL,
   CONSTRAINT `inventory_transactions_transaction_type_id_foreign` FOREIGN KEY (`transaction_type_id`) REFERENCES `transaction_types` (`id`) ON DELETE CASCADE,
   CONSTRAINT `inventory_transactions_warehouse_id_foreign` FOREIGN KEY (`warehouse_id`) REFERENCES `warehouses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=806 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول يسجل الحركات المخزنية التي تتم على المنتجات، مثل الإدخال، الإخراج، والتعديلات على المخزون.';
+) ENGINE=InnoDB AUTO_INCREMENT=865 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول يسجل الحركات المخزنية التي تتم على المنتجات، مثل الإدخال، الإخراج، والتعديلات على المخزون.';
 
 -- Data exporting was unselected.
 
@@ -418,8 +418,8 @@ CREATE TABLE IF NOT EXISTS `inventory_transaction_items` (
   `updated_user` bigint unsigned DEFAULT NULL,
   `target_warehouse_id` bigint unsigned DEFAULT NULL COMMENT 'المستودع المستهدف في عمليات التحويل',
   `converted_price` decimal(15,2) NOT NULL DEFAULT '0.00',
-  `production_date` timestamp NULL DEFAULT NULL,
-  `expiration_date` timestamp NULL DEFAULT NULL,
+  `production_date` date DEFAULT NULL,
+  `expiration_date` date DEFAULT NULL,
   `source_warehouse_id` bigint unsigned DEFAULT NULL COMMENT 'المستودع المصدر في عمليات التحويل',
   `status` tinyint unsigned NOT NULL DEFAULT '1' COMMENT 'حالة العنصر في العملية: 1 = قيد التنفيذ، 2 = مكتملة، 3 = مُلغاة',
   `result` tinyint unsigned NOT NULL DEFAULT '1' COMMENT 'نتيجة الجرد: 1 = مطابقة، 2 = تلف، 3 = فقدان، 4 = نقل',
@@ -441,7 +441,7 @@ CREATE TABLE IF NOT EXISTS `inventory_transaction_items` (
   CONSTRAINT `inventory_transaction_items_unit_id_foreign` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`) ON DELETE SET NULL,
   CONSTRAINT `inventory_transaction_items_unit_product_id_foreign` FOREIGN KEY (`unit_product_id`) REFERENCES `units` (`id`) ON DELETE SET NULL,
   CONSTRAINT `inventory_transaction_items_warehouse_location_id_foreign` FOREIGN KEY (`warehouse_location_id`) REFERENCES `warehouse_locations` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=561 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول يحتوي على تفاصيل العناصر في كل عملية مخزنية، بما في ذلك المنتجات، الكميات، المواقع، والتكاليف.';
+) ENGINE=InnoDB AUTO_INCREMENT=606 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='جدول يحتوي على تفاصيل العناصر في كل عملية مخزنية، بما في ذلك المنتجات، الكميات، المواقع، والتكاليف.';
 
 -- Data exporting was unselected.
 
@@ -484,9 +484,11 @@ CREATE TABLE IF NOT EXISTS `inventory_update_errors` (
 -- Dumping structure for table madarsys.invoices
 CREATE TABLE IF NOT EXISTS `invoices` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `production_date` date DEFAULT NULL,
+  `expiration_date` date DEFAULT NULL,
   `invoice_code` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `partner_id` bigint unsigned NOT NULL,
-  `payment_type_id` bigint unsigned DEFAULT NULL,
+  `payment_type_id` bigint unsigned NOT NULL DEFAULT '1',
   `invoice_date` date NOT NULL,
   `total_amount` decimal(10,2) NOT NULL,
   `check_number` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -518,7 +520,7 @@ CREATE TABLE IF NOT EXISTS `invoices` (
   CONSTRAINT `invoices_partner_id_foreign` FOREIGN KEY (`partner_id`) REFERENCES `partners` (`id`) ON DELETE CASCADE,
   CONSTRAINT `invoices_payment_type_id_foreign` FOREIGN KEY (`payment_type_id`) REFERENCES `payment_types` (`id`) ON DELETE CASCADE,
   CONSTRAINT `invoices_updated_user_foreign` FOREIGN KEY (`updated_user`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='يخزن بيانات الفواتير مثل الفواتير المبيعات والمشتريات';
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='يخزن بيانات الفواتير مثل الفواتير المبيعات والمشتريات';
 
 -- Data exporting was unselected.
 
@@ -540,7 +542,7 @@ CREATE TABLE IF NOT EXISTS `invoice_items` (
   CONSTRAINT `invoice_items_invoice_id_foreign` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`id`) ON DELETE CASCADE,
   CONSTRAINT `invoice_items_product_id_foreign` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `invoice_items_unit_id_foreign` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=83 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -600,7 +602,7 @@ CREATE TABLE IF NOT EXISTS `migrations` (
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `batch` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=132 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=135 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -641,7 +643,7 @@ CREATE TABLE IF NOT EXISTS `module_actions` (
   KEY `module_actions_branch_id_foreign` (`branch_id`),
   CONSTRAINT `module_actions_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL,
   CONSTRAINT `module_actions_module_id_foreign` FOREIGN KEY (`module_id`) REFERENCES `modules` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=90 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='يخزن الإجراءات المتاحة للوحدات البرمجية مثل إضافة أو تعديل أو حذف';
+) ENGINE=InnoDB AUTO_INCREMENT=93 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='يخزن الإجراءات المتاحة للوحدات البرمجية مثل إضافة أو تعديل أو حذف';
 
 -- Data exporting was unselected.
 
@@ -726,7 +728,7 @@ CREATE TABLE IF NOT EXISTS `partners` (
   KEY `partners_branch_id_foreign` (`branch_id`),
   CONSTRAINT `partners_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL,
   CONSTRAINT `partners_type_foreign` FOREIGN KEY (`type`) REFERENCES `partner_types` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=37 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -794,7 +796,7 @@ CREATE TABLE IF NOT EXISTS `permissions` (
   CONSTRAINT `permissions_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL,
   CONSTRAINT `permissions_module_action_id_foreign` FOREIGN KEY (`module_action_id`) REFERENCES `module_actions` (`id`),
   CONSTRAINT `permissions_module_id_foreign` FOREIGN KEY (`module_id`) REFERENCES `modules` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=78 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=82 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -846,7 +848,6 @@ CREATE TABLE IF NOT EXISTS `products` (
   `manufacturing_date` date DEFAULT NULL COMMENT 'تاريخ التصنيع',
   `expiration_date` date DEFAULT NULL COMMENT 'تاريخ انتهاء الصلاحية',
   `last_updated` date DEFAULT NULL COMMENT 'تاريخ آخر تحديث للبيانات',
-  `brand` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL COMMENT 'العلامة التجارية للمنتج',
   PRIMARY KEY (`id`),
   UNIQUE KEY `products_sku_unique` (`sku`),
   UNIQUE KEY `products_barcode_unique` (`barcode`),
@@ -862,7 +863,7 @@ CREATE TABLE IF NOT EXISTS `products` (
   CONSTRAINT `products_manufacturing_country_id_foreign` FOREIGN KEY (`manufacturing_country_id`) REFERENCES `manufacturing_countries` (`id`) ON DELETE SET NULL,
   CONSTRAINT `products_supplier_id_foreign` FOREIGN KEY (`supplier_id`) REFERENCES `partners` (`id`) ON DELETE SET NULL,
   CONSTRAINT `products_unit_id_foreign` FOREIGN KEY (`unit_id`) REFERENCES `units` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=111 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -1027,6 +1028,10 @@ CREATE TABLE IF NOT EXISTS `role_permissions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT COMMENT 'المعرّف الفريد للحق في الدور',
   `role_id` bigint unsigned NOT NULL COMMENT 'معرّف الدور المرتبط بهذا الحق',
   `permission_id` bigint unsigned NOT NULL COMMENT 'معرّف الصلاحية المرتبطة بهذا الدور',
+  `can_view` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'السماح بالعرض',
+  `can_create` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'السماح بالإضافة',
+  `can_update` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'السماح بالتعديل',
+  `can_delete` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'السماح بالحذف',
   `status` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'حالة الصلاحية المرتبطة بالدور',
   `status_updated_at` timestamp NULL DEFAULT NULL COMMENT 'تاريخ آخر تحديث لحالة الصلاحية',
   `created_at` timestamp NULL DEFAULT NULL COMMENT 'تاريخ إنشاء السجل',
@@ -1038,7 +1043,7 @@ CREATE TABLE IF NOT EXISTS `role_permissions` (
   KEY `role_permissions_permission_id_foreign` (`permission_id`),
   CONSTRAINT `role_permissions_permission_id_foreign` FOREIGN KEY (`permission_id`) REFERENCES `permissions` (`id`) ON DELETE CASCADE,
   CONSTRAINT `role_permissions_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=448 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=835 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -1052,8 +1057,8 @@ CREATE TABLE IF NOT EXISTS `role_user` (
   `updated_user` bigint unsigned DEFAULT NULL COMMENT 'معرّف المستخدم الذي عدل السجل',
   PRIMARY KEY (`user_id`,`role_id`),
   KEY `role_user_role_id_foreign` (`role_id`),
-  CONSTRAINT `role_user_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `role_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  CONSTRAINT `role_user_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE RESTRICT,
+  CONSTRAINT `role_user_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE RESTRICT
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
@@ -1143,7 +1148,7 @@ CREATE TABLE IF NOT EXISTS `telescope_entries` (
   KEY `telescope_entries_family_hash_index` (`family_hash`),
   KEY `telescope_entries_created_at_index` (`created_at`),
   KEY `telescope_entries_type_should_display_on_index_index` (`type`,`should_display_on_index`)
-) ENGINE=InnoDB AUTO_INCREMENT=667913 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=820267 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -1203,7 +1208,7 @@ CREATE TABLE IF NOT EXISTS `units` (
   KEY `units_branch_id_foreign` (`branch_id`),
   CONSTRAINT `units_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL,
   CONSTRAINT `units_parent_unit_id_foreign` FOREIGN KEY (`parent_unit_id`) REFERENCES `units` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 
@@ -1224,8 +1229,8 @@ CREATE TABLE IF NOT EXISTS `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
   KEY `users_branch_id_foreign` (`branch_id`),
-  CONSTRAINT `users_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `users_branch_id_foreign` FOREIGN KEY (`branch_id`) REFERENCES `branches` (`id`) ON DELETE RESTRICT
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Data exporting was unselected.
 

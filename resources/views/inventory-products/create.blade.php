@@ -74,13 +74,13 @@
                         <x-file-input type="date" id="expiration_date" name="expiration_date"
                             label="تاريخ الانتهاء" />
                     </div> --}}
-                    <div class="mb-4">
-                    </div>
                     <div class="mb-4 flex items-center gap-2">
                         <x-file-input type="number" id="quantity" name="quantity" label="الكمية" required min="1" />
                         <span class="text-lg font-semibold">/</span>
                         <span id="quantityOfProduct" class="px-3 py-2-200 rounded-md text-center min-w-[50px]">0</span>
+                        <span id="productUnitName">---</span>
                     </div>
+                    
 
                     <!-- اختيار المنطقة التخزينية -->
                     <div class="mb-4">
@@ -194,6 +194,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     productionDateInput.value = product.production_date || '';
                     expirationDateInput.value = product.expiration_date || '';
                     quantityInput.innerText = product.quantity || '';
+                    unitNameSpan.innerText = product.unit_name || '---'; // عرض اسم الوحدة
+
                     // document.getElementById('quantityOfProduct').innerText = product.quantity || '0';
 
                     console.log('fetching product:', product.quantity );

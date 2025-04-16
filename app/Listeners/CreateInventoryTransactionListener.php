@@ -193,8 +193,9 @@ class CreateInventoryTransactionListener
             }
             if ($quantityInput < 0) {
                 // التحقق من توفر الكمية قبل إنشاء الحركة
+                
                 if (!$this->isQuantityAvailable($data['warehouse_id'], $productId, $quantityInput)) {
-                    // dump("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:");
+                    // dd("خطأ أثناء إنشاء تفاصيل الحركة المخزنية:");
                     session()->flash('error', "خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
                     throw new \Exception("خطأ: الكمية غير متوفرة في المخزون للمنتج ID: {$productId} في المستودع ID: {$data['warehouse_id']}");
                 }

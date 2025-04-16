@@ -1,9 +1,6 @@
-<x-layout>
-
+{{-- <x-layout>
     <x-title :title="'تحديث بيانات الشركة'"></x-title>
-
-    <div class="container mx-auto flex px-5 pt-0 pb-28 md:flex-row flex-col-reverse items-center min-h-screen overflow-hidden">
-        
+    <div class="container mx-auto flex px-5 pt-0 pb-28 md:flex-row flex-col-reverse items-center min-h-screen overflow-hidden"> 
         <!-- Right Side: Form -->
         <div class="lg:flex-grow md:w-2/3 lg:pl-16 md:pl-8 flex flex-col md:items-start md:text-left items-start text-start">
             <!-- Left Side: Company Image -->
@@ -111,5 +108,59 @@
                 </div>
             </form>
         </div>
+    </div>
+</x-layout> --}}
+<x-layout>
+    <div class="relative overflow-hidden min-h-screen">
+        <section class="container px-6 py-4">
+            <x-title :title="'تعديل بيانات الشركة'" />
+
+            <!-- نموذج التعديل -->
+            <form action="{{ route('companies.update', $company->id) }}" method="POST" enctype="multipart/form-data"
+                class="w-full space-y-6">
+                @csrf
+                @method('PUT') <!-- نستخدم PUT لتحديد أن هذه عملية تحديث -->
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+
+                    <!--  صورة الشعار أو معاينة -->
+                    <div class="flex flex-col items-center">
+                        <label for="logo" class="text-lg font-semibold mb-4">شعار الشركة</label>
+
+                        <!-- معاينة الصورة -->
+                        <div id="logo-preview"
+                            class="w-full max-w-xs h-64 border rounded-lg flex items-center justify-center overflow-hidden bg-gray-100 dark:bg-gray-800">
+                            @if ($company->logo)
+                                <img src="{{ asset('storage/' . $company->logo) }}"
+                                    class="object-contain w-full h-full" alt="Logo">
+                            @else
+                                <span class="text-gray-400">لم يتم تحميل شعار بعد</span>
+                            @endif
+                        </div>
+
+                        <!-- شعار الشركة -->
+                        <div>
+                            <x-file-input id="logo" name="logo" type="file" label="تحميل شعار الشركة" />
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <x-file-input id="name" name="name" label="اسم الشركة" required="true" :value="$company->name" />
+                        <x-file-input id="phone_number" name="phone_number" label="رقم الهاتف" required="true" :value="$company->phone_number" />
+                        <x-file-input id="email" name="email" label="البريد الإلكتروني" type="email" required="true" :value="$company->email" />
+                        <x-file-input id="address" name="address" label="العنوان" required="true" :value="$company->address" />
+                        <x-textarea id="additional_info" name="additional_info" label="معلومات إضافية" rows="4">{{ $company->additional_info }}</x-textarea>
+                    </div>
+                </div>
+
+                <!-- إعدادات الشركة -->
+                <x-textarea id="settings" name="settings" label="" rows="4" hidden />
+
+                <!-- زر الإرسال -->
+                <div class="flex justify-end">
+                    <x-button type="submit">تحديث البيانات</x-button>
+                </div>
+            </form>
+        </section>
     </div>
 </x-layout>

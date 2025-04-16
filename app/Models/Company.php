@@ -29,13 +29,14 @@ class Company extends Model
      */
     protected $fillable = [
         'name',
-        'logo',
         'phone_number',
         'email',
-        'address',
-        'additional_info',
+        'logo',           
+        'address',         
+        'additional_info', 
         'settings',
-        'created_user', 'updated_user'
+        'created_user',
+        'updated_user',
     ];
     // protected static function booted()
     // {

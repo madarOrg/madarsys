@@ -33,7 +33,7 @@
                                 'attributes' => 'value="' . request()->input('end_date') . '"',
                             ])
                         </div>
-                                {{-- <div class="">
+                        {{-- <div class="">
                                 <label for="inventory_type">نوع الجرد</label>
                                 <select name="inventory_type" id="inventory_type" class="form-control">
                                     <option value="">الكل</option>
@@ -73,7 +73,7 @@
                         </div>
 
                     </div>
-                                {{-- <div class="hide-on-print  mb-4 mt-1">
+                    {{-- <div class="hide-on-print  mb-4 mt-1">
                             <button type="submit" class=" btn btn-primary text-indigo-600 hover:text-indigo-700">تصفية</button>
                         </div> --}}
                     <div class="flex justify-end mt-2">
@@ -158,10 +158,12 @@
                                     <i class="fas fa-eye"></i>
                                 </a>
 
-                                <a href="{{ route('inventory.transactions.create') . '?transaction_type_id[]=8' }}"
-                                    class="btn btn-info mt-3 mx-2 text-green-600">
-                                    <i class="fas fa-plus mr-2"></i>
+                                <a href="#" class="btn btn-info mt-3 mx-2 text-green-600"
+                                    onclick="createAuditForAllWarehouses({{ $audit->id }}, {{ json_encode($audit->warehouses->pluck('id')) }})">
+                                    <i class="fas fa-plus mr-2"></i> تنفيذ الجرد
                                 </a>
+
+
 
                                 {{--                                 
                                 <a href="{{ route('inventory.transactions.editTrans', $audit->id,) }}"
@@ -177,3 +179,74 @@
         </div>
 
 </x-layout>
+{{-- <script>
+    function createAuditTransaction(auditId, warehouseId) {
+        if (!confirm("هل أنت متأكد أنك تريد تنفيذ عملية الجرد؟")) return;
+        console.log(`/inventory/audit-transaction/${auditId}/${warehouseId}`);
+        fetch(`/inventory/audit-transaction/${auditId}/${warehouseId}`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('فشل تنفيذ الجرد');
+                return response.json();
+            })
+            .then(data => {
+                if (data.transaction && data.transaction.id) {
+                    window.location.href = `/editTrans/${data.transaction.id}`;
+                } else {
+                    alert("تم التنفيذ بنجاح، ولكن لم يتم استرجاع رقم العملية.");
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert("حدث خطأ أثناء تنفيذ الجرد.");
+            });
+    }
+</script> --}}
+<script>
+    function createAuditForAllWarehouses(auditId, warehouseIds) {
+        if (!Array.isArray(warehouseIds)) {
+            warehouseIds = warehouseIds.split(',').map(Number);
+        }
+
+        if (!confirm("هل أنت متأكد أنك تريد تنفيذ الجرد لجميع المستودعات؟")) return;
+
+        let firstTransactionUrl = null;
+        
+        console.log(`/inventory/audit/audit-transaction/${auditId}/${warehouseIds[0]}`); // مثال لطباعة المستودع الأول
+        
+        Promise.all(warehouseIds.map(warehouseId => {
+                return fetch(`/inventory/audit/audit-transaction/${auditId}/${warehouseId}`, {
+                        method: 'GET',
+                        headers: {
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.transaction && data.transaction.id) {
+                            if (!firstTransactionUrl) {
+                                firstTransactionUrl = `/inventory/audit/editTrans/${data.transaction.id}`;
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        console.error(`خطأ أثناء تنفيذ الجرد للمستودع ${warehouseId}:`, error);
+                    });
+            }))
+            .then(() => {
+                if (firstTransactionUrl) {
+                    window.location.href = firstTransactionUrl;
+                } else {
+                    alert("تم تنفيذ الجرد ولكن لم يتم إنشاء أي عملية.");
+                }
+            });
+    }
+</script>

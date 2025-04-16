@@ -12,12 +12,12 @@
         <a href="{{ route('settings.index') }}" class="p-0 transition-all text-sm ease-nav-brand text-slate-500 dark:text-white">
           <i class="cursor-pointer fa fa-cog" aria-hidden="true"></i>
         </a>
-        <a href="#" id="notificationsLink" class="relative">
+        {{-- <a href="#" id="notificationsLink" class="relative">
           <i class="fas fa-bell"></i>
           <span id="unreadCount" class="absolute top-0 right-0 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
             0
           </span>
-        </a>
+        </a> --}}
       </li>
     
   </div>

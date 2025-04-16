@@ -2,7 +2,7 @@
     <div class="container">
 
         <!-- زر الطباعة -->
-        <div class="hide-on-print text-right mb-4">
+        <div class="hide-on-print text-right mb-2">
             <button onclick="window.print()"
                 class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 dark:text-gray-400 text-base font-semibold leading-7">
                 طباعة التقرير
@@ -17,9 +17,8 @@
         </x-reportHeader>
 
         <!-- زر إظهار/إخفاء الفلاتر -->
-        <div x-data="{ open: true }" class="mt-2 mb-2">
-            <button type="button" @click="open = !open"
-                class="hide-on-print text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
+        <div x-data="{ open: true }" class=" ">
+            <button type="button" @click="open = !open" class="hide-on-print text-indigo-600 hover:text-indigo-700 ml-4">
                 <span
                     x-html="open ? '<i class=\'fa-solid fa-magnifying-glass-minus fa-lg\'></i>' :'<i class=\'fa-solid fa-magnifying-glass-plus fa-lg\'></i>'">
                 </span>
@@ -28,65 +27,78 @@
             <!-- نموذج الفلترة -->
             <div x-show="open" x-transition>
                 <form action="{{ route('reports.partner') }}" method="GET" class=" p-4 rounded shadow">
-                    <div>
-                        <label for="partner_name" class="block mb-1">اسم الشريك</label>
-                        <input type="text" name="partner_name" value="{{ request('partner_name') }}" class="w-full">
+                    <div class="flex flex-wrap">
+                        <!-- اسم الشريك -->
+                        <div class="w-1/6 px-2">
+                            <label for="partner_name" class="block mb-1">اسم الشريك</label>
+                            <input type="text" name="partner_name" value="{{ request('partner_name') }}" class="w-full">
+                        </div>
+                
+                        <!-- نوع الشريك -->
+                        <div class="w-1/6 px-2">
+                            <label for="type" class="block mb-1">نوع الشريك</label>
+                            <select name="type" class="w-full tom-select">
+                                <option value="">اختر النوع</option>
+                                @foreach ($partnerTypes as $type)
+                                    <option value="{{ $type->id }}" {{ request('type') == $type->id ? 'selected' : '' }}>
+                                        {{ $type->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+                
+                        <!-- حالة الشريك -->
+                        <div class="w-1/6 px-2">
+                            <label for="is_active" class="block mb-1">حالة الشريك</label>
+                            <select name="is_active" class="w-full tom-select">
+                                <option value="">اختر الحالة</option>
+                                <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>نشط</option>
+                                <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>غير نشط</option>
+                            </select>
+                        </div>
+                
+                        <!-- المستودع -->
+                        <div class="w-1/6 px-2">
+                            <label for="warehouse_id" class="block mb-1">المستودع</label>
+                            <select id="warehouse_id" name="warehouse_id" class="tom-select w-full">
+                                <option value="">اختر مستودعًا</option>
+                                @foreach ($warehouses as $warehouse)
+                                    <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                
+                        <!-- المنتج -->
+                        <div class="w-1/6 px-2">
+                            <label for="product_id" class="block mb-1">المنتج</label>
+                            <select id="product_id" name="product_id" class="w-full tom-select">
+                                <option value="">اختر منتجًا</option>
+                                <!-- سيتم تحميل المنتجات ديناميكيًا -->
+                            </select>
+                        </div>
+                
+                        <!-- فلترة الحركات -->
+                        <div class="w-1/6 px-2 mb-4">
+                            <label for="has_transactions" class="block mb-1">فلترة الموردين </label>
+                            <select name="has_transactions" class="w-full tom-select">
+                                <option value="">اختر التصفية</option>
+                                <option value="1" {{ request('has_transactions') == '1' ? 'selected' : '' }}>الموردين مع الحركات فقط</option>
+                                <option value="0" {{ request('has_transactions') == '0' ? 'selected' : '' }}>جميع الموردين</option>
+                            </select>
+                        </div>
                     </div>
-
-                    <!-- نوع الشريك -->
-                    <div>
-                        <label for="type" class="block mb-1">نوع الشريك</label>
-                        <select name="type" class="w-full tom-select">
-                            <option value="">اختر النوع</option>
-                            @foreach ($partnerTypes as $type)
-                                <option value="{{ $type->id }}"
-                                    {{ request('type') == $type->id ? 'selected' : '' }}>
-                                    {{ $type->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <!-- حالة الشريك -->
-                    <div>
-                        <label for="is_active" class="block mb-1">حالة الشريك</label>
-                        <select name="is_active" class="w-full tom-select">
-                            <option value="">اختر الحالة</option>
-                            <option value="1" {{ request('is_active') == '1' ? 'selected' : '' }}>نشط</option>
-                            <option value="0" {{ request('is_active') == '0' ? 'selected' : '' }}>غير نشط</option>
-                        </select>
-                    </div>
-                    <select id="warehouse_id" name="warehouse_id">
-                        <option value="">اختر مستودعًا</option>
-                        @foreach ($warehouses as $warehouse)
-                            <option value="{{ $warehouse->id }}">{{ $warehouse->name }}</option>
-                        @endforeach
-                    </select>
+                
                     
-                    <select id="product_id" name="product_id">
-                        <option value="">اختر منتجًا</option>
-                        <!-- هنا ستتم إضافة المنتجات التي سيتم تحميلها ديناميكيًا -->
-                    </select>
-                    
-                    <!-- فلترة الحركات -->
-                    <div>
-                        <label for="has_transactions" class="block mb-1">فلترة الموردين حسب الحركات</label>
-                        <select name="has_transactions" class="w-full tom-select">
-                            <option value="">اختر التصفية</option>
-                            <option value="1" {{ request('has_transactions') == '1' ? 'selected' : '' }}>الموردين
-                                مع الحركات فقط</option>
-                            <option value="0" {{ request('has_transactions') == '0' ? 'selected' : '' }}>جميع
-                                الموردين</option>
-                        </select>
-                    </div>
-
                     <!-- أزرار التصفية والتفريغ -->
                     <div class="mt-4 flex gap-4">
-                        <button type="submit"
-                            class=" hide-on-print btn btn-primary text-white bg-indigo-600 hover:bg-indigo-700">تصفية</button>
-
-                        <a href="{{ route('reports.partner') }}"
-                            class="hide-on-print btn bg-gray-300 hover:bg-gray-400 text-gray-800">تفريغ الفلاتر</a>
+                        <div class="col-md-12 mt-1 hide-on-print">
+                            <button type="submit" name="filter" value="1"
+                                class=" btn btn-primary text-indigo-600 hover:text-indigo-700">
+                                تصفية</button>
+                            <a href="{{ route('reports.partner') }}"
+                                class="hide-on-print btn bg-gray-300 hover:bg-gray-400 text-gray-800">تفريغ
+                                الفلاتر</a>
+                        </div>
                     </div>
                 </form>
 
@@ -138,11 +150,11 @@
     </div>
 </x-layout>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+    document.addEventListener('DOMContentLoaded', function() {
         const warehouseSelect = document.getElementById('warehouse_id');
         const productSelect = document.getElementById('product_id');
-        
-        warehouseSelect.addEventListener('change', function () {
+
+        warehouseSelect.addEventListener('change', function() {
             const warehouseId = warehouseSelect.value;
             // console.log(`/products-by-warehouse?warehouse_id=${warehouseId}`);
 
@@ -150,7 +162,7 @@
             fetch(`/reports/products-by-warehouse?warehouse_id=${warehouseId}`)
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);  // انظر إلى محتوى الاستجابة
+                    console.log(data); // انظر إلى محتوى الاستجابة
 
                     // إفراغ قائمة المنتجات الحالية
                     productSelect.innerHTML = '<option value="">اختر منتجًا</option>';

@@ -136,18 +136,19 @@
         
             <!-- تواريخ المنتج -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5 border border-gray-300 p-4 rounded-md">
-                <x-file-input id="purchase_date" name="purchase_date" label="تاريخ الشراء" type="date"
-                    required />
-                <x-file-input id="manufacturing_date" name="manufacturing_date" label="تاريخ الإنتاج"
+               
+                {{-- <x-file-input id="manufacturing_date" name="manufacturing_date" label="تاريخ الإنتاج"
                     type="date" />
                 <x-file-input id="expiration_date" name="expiration_date" label="تاريخ الانتهاء" type="date" />
-           
+            --}}
 
               <!-- الملاحظات والمكونات -->
             
                 <x-textarea id="ingredients" name="ingredients" label="المكونات" :value="old('ingredients')" />
                 <x-textarea id="description" name="description" label=" الوصف" :value="old('notes')" />
                 <x-textarea id="notes" name="notes" label="ملاحظات إضافية" :value="old('notes')" />
+                <x-file-input id="purchase_date" name="purchase_date" label="تاريخ الشراء" type="date"
+                required />
                <!-- الحالة -->
               <div class="mt-6 flex items-center space-x-2 rtl:space-x-reverse">
                 <input type="checkbox" name="is_active" id="is_active" value="1"

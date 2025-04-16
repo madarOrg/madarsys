@@ -4,10 +4,16 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Traits\
+{
+HasBranch,
+HasUser
+};
 class Invoice extends Model
 {
-    use HasFactory; 
+    use HasBranch,
+    HasUser,
+    HasFactory; 
 
     protected $fillable = [
         'invoice_code', 'partner_id', 'invoice_date', 'payment_type_id', 
@@ -15,9 +21,12 @@ class Invoice extends Model
         'discount_amount', 'discount_percentage', 'type', 
         'inventory_id', 'warehouse_id', 'currency_id', 
         'exchange_rate', 'department_id','inventory_transaction_id',
+        'production_date',
+        'expiration_date',
+        'created_user', 'updated_user'
     ];
     
-
+   
     public function partner()
     {
         return $this->belongsTo(Partner::class, 'partner_id');

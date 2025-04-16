@@ -10,6 +10,7 @@ use App\Models\InventoryAudit;
 use App\Models\InventoryAuditUser;
 use App\Models\InventoryAuditWarehouse;
 use App\Models\Company;
+use App\Models\Unit;
 use App\Models\InventoryTransactionSubtype;
 use App\Models\InventoryTransaction;
 
@@ -199,6 +200,7 @@ class InventoryAuditController extends Controller
         return view('inventory.audit.index', compact('audits', 'subTypeOptions'));
         
     }
+
     public function createInventoryAuditTransaction($auditId, int $warehouseId, $groupByBatch = true)
     {
 
@@ -211,11 +213,12 @@ class InventoryAuditController extends Controller
                 'price',
                 'production_date',
                 'expiration_date',
-
-                DB::raw('SUM(converted_quantity * distribution_type) as total_quantity')
+                DB::raw('SUM(converted_quantity * distribution_type) as total_quantity'),
+                DB::raw('MIN(created_at) as created_at')
             )
-            ->groupBy('created_at' ,'product_id')
-            ->orderBy('created_at','ASC'); 
+            ->groupBy('product_id', 'unit_product_id', 'price', 'production_date', 'expiration_date')
+            ->orderBy('created_at','ASC');
+        
 
         // تطبيق التجميع بناءً على قيمة groupByBatch
         if ($groupByBatch) {
@@ -428,7 +431,7 @@ class InventoryAuditController extends Controller
              $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($id);
              $items = $selectedTransaction->items()->paginate(6);
  
-             return view('inventory.transactions.editTrans', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
+             return view('inventory.audit.editTrans', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
          } catch (\Exception $e) {
              return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
          }

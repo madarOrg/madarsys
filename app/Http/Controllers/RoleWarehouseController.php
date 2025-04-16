@@ -7,6 +7,8 @@ use App\Models\RoleWarehouse;
 use App\Models\Role;
 use App\Models\Warehouse;
 use App\Models\Branch;
+use App\Models\RoleBranch;
+use App\Models\RoleCompany;
 
 class RoleWarehouseController extends Controller
 {
@@ -24,21 +26,42 @@ class RoleWarehouseController extends Controller
         }
     }
 
-    public function store(Request $request)
-    {
-        try {
-            $request->validate([
-                'role_id' => 'required|exists:roles,id',
-                'warehouse_id' => 'required|exists:warehouses,id',
-                'branch_id' => 'required|exists:branches,id',
-            ]);
+ 
 
-            RoleWarehouse::create($request->all());
-            return response()->json(['success' => 'تمت الإضافة بنجاح']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'حدث خطأ أثناء إضافة البيانات: ' . $e->getMessage()]);
-        }
+public function store(Request $request)
+{
+    try {
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+            'warehouse_id' => 'required|exists:warehouses,id',
+            'branch_id' => 'required|exists:branches,id',
+        ]);
+
+        $data = $request->only(['role_id', 'warehouse_id', 'branch_id']);
+        RoleWarehouse::create($data);
+
+        // احصل على الـ branch
+        $branch = \App\Models\Branch::findOrFail($data['branch_id']);
+        $companyId = $branch->company_id;
+
+        // تحقق أو أضف الدور إلى الفرع
+        RoleBranch::firstOrCreate([
+            'role_id' => $data['role_id'],
+            'branch_id' => $data['branch_id'],
+            'company_id' => $companyId
+        ]);
+
+        // تحقق أو أضف الدور إلى الشركة
+        RoleCompany::firstOrCreate([
+            'role_id' => $data['role_id'],
+            'company_id' => $companyId
+        ]);
+
+        return response()->json(['success' => 'تمت الإضافة بنجاح']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => 'حدث خطأ أثناء إضافة البيانات: ' . $e->getMessage()]);
     }
+}
 
     public function update(Request $request, $id)
     {
