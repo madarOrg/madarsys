@@ -1,5 +1,5 @@
 <x-layout>
-    <main class="dark:bg-gray-800 bg-white relative overflow-hidden min-h-screen">
+    <main class="relative overflow-hidden min-h-screen">
         <section class="container mx-auto px-6 py-16">
             <div class="relative">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6 items-start">
@@ -46,9 +46,9 @@
                                 ${{ number_format($product->selling_price, 2) }}</p>
 
                             <p class="text-gray-700 dark:text-gray-300"><strong>الحد الأدنى للمخزون:</strong>
-                                {{ $product->min_stock_level }}</p>
+                                {{ $product->min_stock_level }} {{ $product->unit->name}}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>الحد الأقصى للمخزون:</strong>
-                                {{ $product->max_stock_level }}</p>
+                                {{ $product->max_stock_level }} {{ $product->unit->name}}</p>
                         </div>
 
                         <!-- القسم الثاني من بيانات المنتج -->
@@ -62,12 +62,12 @@
 
                             <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الشراء:</strong>
                                 {{ $product->purchase_date ?? 'غير متوفر' }}</p>
-                            <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ التصنيع:</strong>
+                            <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الإنتاج:</strong>
                                 {{ $product->manufacturing_date ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الانتهاء:</strong>
                                 {{ $product->expiration_date ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>آخر تحديث:</strong>
-                                {{ $product->last_updated ?? 'غير متوفر' }}</p>
+                                {{ $product->updated_at ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>الملاحظات :</strong>
                                 {{ $product->notes ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300">

@@ -40,9 +40,8 @@ use App\Http\Controllers\{
     InventoryAuditController,
     InventoryTransactionItemsController,
     DashboardController,
-<<<<<<< HEAD
-    UnitController
-=======
+
+
     UnitController,
     BrandController,
     ManufacturingCountryController,
@@ -50,7 +49,7 @@ use App\Http\Controllers\{
     PurchaseOrderController,
     SalesOrderController,
     InvoiceFromOrdersController
->>>>>>> eabc8b89 (تم حل تعارض الدمج في routes/web.php وإضافة التعديلات الجديدة)
+
 };
 use App\Services\UnitService;
 
@@ -87,15 +86,20 @@ Route::post('/reset-password', [PasswordController::class, 'store'])->name('pass
 Route::get('/', function () {
     return view('home');
 });
+
+
+// عرض الصفحة الرئيسية
+Route::get('/team', function () {
+    return view('team');
+});
 // استخدام middleware للتأكد من أن المستخدم مسجل الدخول
 // Route::middleware('auth')->group(function () {
 Route::middleware(['web', 'auth'])->group(function () {
-<<<<<<< HEAD
-=======
     // مسارات مباشرة لصفحات تقارير المرتجعات
     Route::get('/returns-management/reports', [App\Http\Controllers\ReturnOrderController::class, 'reports'])->name('returns-management.reports');
     Route::get('/returns-management/reports/customer', [App\Http\Controllers\ReturnOrderController::class, 'customerReports'])->name('returns-management.customer-reports'); 
->>>>>>> eabc8b89 (تم حل تعارض الدمج في routes/web.php وإضافة التعديلات الجديدة)
+
+Route::middleware(['web', 'auth'])->group(function () { 
 
 
     // عرض لوحة التحكم (dashboard)
@@ -103,7 +107,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     // Route::get('/dashboard', [NavbarController::class, 'showNavbar'])->name('dashboard');
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     Route::get('/warehouse-reports', WarehouseReports::class)->name('warehouse.reports');
     // مجموعة مسارات لإدارة الأدوار
     Route::prefix('roles')->name('roles.')->group(function () {
@@ -123,7 +127,7 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::post('/store', [RoleWarehouseController::class, 'store'])->name('store');
         Route::put('/update/{id}', [RoleWarehouseController::class, 'update'])->name('update');
         // Route::delete('/delete/{id}', [RoleWarehouseController::class, 'destroy'])->name('destroy');
-        
+
     });
     Route::delete('role-warehouse/{id}', [RoleWarehouseController::class, 'destroy'])->name('role-warehouse.destroy');
 
@@ -281,6 +285,26 @@ Route::middleware(['web', 'auth'])->group(function () {
         Route::get('/all', [ZonesController::class, 'index'])->name('all.index');
     });
 
+    Route::get('/brands', [BrandController::class, 'index'])->name('brands.index');
+    Route::post('/brands', [BrandController::class, 'store'])->name('brands.store');
+    Route::put('/brands/{brand}', [BrandController::class, 'store'])->name('brands.update'); // إعادة استخدام نفس دالة store
+    Route::delete('/brands/{brand}', [BrandController::class, 'destroy'])->name('brands.destroy');
+    Route::get('brands/{brand}/edit', [BrandController::class, 'edit'])->name('brands.edit');
+
+    // عرض جميع الشركات المصنعة
+    Route::get('/manufacturing_countries', [ManufacturingCountryController::class, 'index'])->name('manufacturing_countries.index');
+
+    // عرض نموذج إضافة شركة جديدة
+    Route::get('/manufacturing_countries/create', [ManufacturingCountryController::class, 'create'])->name('manufacturing_countries.create');
+
+    // حفظ شركة جديدة أو تحديث شركة موجودة
+    Route::post('/manufacturing_countries', [ManufacturingCountryController::class, 'store'])->name('manufacturing_countries.store');
+
+    // تحديث شركة موجودة
+    Route::put('/manufacturing_countries/{id}', [ManufacturingCountryController::class, 'update'])->name('manufacturing_countries.update');
+
+    // حذف شركة
+    Route::delete('/manufacturing_countries/{id}', [ManufacturingCountryController::class, 'destroy'])->name('manufacturing_countries.destroy');
 
 
     //Categroy routers
@@ -307,7 +331,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/units', [UnitController::class, 'index'])->name('units.index');
     Route::post('/units', [UnitController::class, 'store'])->name('units.store');
     Route::post('/units/{unit}', [UnitController::class, 'update'])->name('units.update');
-    
+
     // مجموعة مسارات إدارة الشركاء
     Route::prefix('partners')->name('partners.')->group(function () {
         Route::get('/', [PartnerController::class, 'index'])->name('index'); // عرض قائمة الشركاء
@@ -428,6 +452,12 @@ Route::middleware(['web', 'auth'])->group(function () {
             // تقرير الحركات المخزنية
             Route::get('/inventory-transactions', [InventoryReportController::class, 'inventoryTransactions'])
                 ->name('inventory-transactions');
+            
+            Route::get('/product-stock', [InventoryReportController::class, 'productStockReport'])->name('product-stock');
+
+            Route::get('/partners', [PartnerReportController::class, 'index'])->name('partner');
+            Route::get('/products-by-warehouse', [PartnerReportController::class, 'getProductsByWarehouse']);
+
         });
         // Route::prefix('reports')->name('reports.')
         // ->middleware([\App\Http\Middleware\GlobalVariablesMiddleware::class])
@@ -450,6 +480,9 @@ Route::middleware(['web', 'auth'])->group(function () {
         // تقرير الحركات المخزنية
         Route::get('/inventory-transactions', [InventoryReportController::class, 'inventoryTransactions'])
             ->name('inventory-transactions');
+
+            // Route::get('/products', [InventoryReportController::class, 'productStockReport'])->name('products');
+
     });
 
     // Auditing
@@ -512,8 +545,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
     Route::post('/reports/get-fields', [ReportController::class, 'getFields'])->name('reports.get-fields');
-<<<<<<< HEAD
-    
+
     Route::prefix('returns/process')->name('returns_process.')->group(function () {
 
         Route::get('/', [ReturnOrderController::class, 'index'])->name('index'); // قائمة المرتجعات
@@ -524,7 +556,6 @@ Route::middleware(['web', 'auth'])->group(function () {
 
         // تعديل مرتجع
         Route::get('{id}/edit', [ReturnOrderController::class, 'edit'])->name('edit');
-=======
 
 // ...
     Route::prefix('returns-management')->name('returns-management.')->group(function () {
@@ -541,7 +572,6 @@ Route::middleware(['web', 'auth'])->group(function () {
         // تقارير المرتجعات
         Route::get('/reports', [ReturnOrderController::class, 'reports'])->name('reports'); 
         Route::get('/reports/customer', [ReturnOrderController::class, 'customerReports'])->name('reports.customer');
->>>>>>> eabc8b89 (تم حل تعارض الدمج في routes/web.php وإضافة التعديلات الجديدة)
     });
     
     // مسارات مرتجعات الموردين

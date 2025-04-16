@@ -61,7 +61,7 @@
 
             <div class="container mx-auto p-4">
                 <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
-                <div class="hide-on-print text-right mb-4 ">
+                <div class="hide-on-print text-right mt-2 mb-4 ">
                     <button onclick="window.print()"
                         class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
                         التقرير

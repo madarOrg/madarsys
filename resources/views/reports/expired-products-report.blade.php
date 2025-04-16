@@ -1,5 +1,19 @@
 <x-layout>
     <div class="container ">
+        <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
+        <div class="hide-on-print text-right mt-2 mb-4">
+            <button onclick="window.print()"
+                class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
+                التقرير
+            </button>
+        </div>
+
+        <!-- رأس التقرير -->
+        {{-- <x-reportHeader :company="$company" :warehouse="$warehouse"> --}}
+        <x-reportHeader>
+            <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المقاربة
+                لإنتهاء الصلاحية </h1>
+        </x-reportHeader>
 
         {{-- زر لفتح أو إغلاق القسم --}}
         <div x-data="{ open: true }">
@@ -76,20 +90,7 @@
 
 
     <div class="container mx-auto p-4">
-        <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
-        <div class="hide-on-print text-right mb-4">
-            <button onclick="window.print()"
-                class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
-                 التقرير
-            </button>
-        </div>
 
-        <!-- رأس التقرير -->
-        {{-- <x-reportHeader :company="$company" :warehouse="$warehouse"> --}}
-            <x-reportHeader>
-              <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير المنتجات المقاربة
-                لإنتهاء الصلاحية </h1>
-        </x-reportHeader>
 
         <!-- محتوى التقرير -->
         <main>
@@ -171,62 +172,60 @@
 
         </footer>
     </div>
-   
-   
+
+
 </x-layout>
 <script>
-    document.getElementById('resetFilters').addEventListener('click', function () {
-     // حفظ موضع التمرير لمنع اهتزاز الصفحة عند إعادة التعيين
-     const scrollY = window.scrollY;
- 
-     // إعادة تعيين جميع الحقول داخل النموذج
-     const form = document.getElementById('filter-form');
-     form.reset();
- 
-     // إعادة تعيين حقول التاريخ يدويًا (لأن reset() لا يعيدها)
-     form.querySelectorAll('input[type="date"]').forEach(input => {
-         input.value = '';
-     });
- 
-     // إعادة تعيين حقول checkbox يدويًا
-     form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
-         checkbox.checked = false;
-     });
- 
-     // إعادة تعيين الحقول التي تستخدم TomSelect
-     document.querySelectorAll('.tom-select').forEach(select => {
-         if (select.tomselect) {
-             select.tomselect.clear(); // يمسح جميع الاختيارات داخل TomSelect
-         }
-     });
- 
-     // إعادة موضع التمرير بعد إعادة التعيين
-     setTimeout(() => {
-         window.scrollTo(0, scrollY);
-     }, 50);
- });
- 
- 
-  document.addEventListener("DOMContentLoaded", function () {
-     const tomSelects = document.querySelectorAll('.tom-select');
-     document.getElementById('filter-form').reset();  
- 
-     tomSelects.forEach(select => {
-         if (!select.tomselect) {
-             new TomSelect(select, {
-                 onChange: function () {
-                     // حفظ موضع التمرير قبل التحديث
-                     const scrollY = window.scrollY;
- 
-                     // تأخير بسيط ثم إعادة التمرير إلى الموضع السابق
-                     setTimeout(() => {
-                         window.scrollTo(0, scrollY);
-                     }, 50);
-                 }
-             });
-         }
-     });
- });
- 
-  </script>
-  
+    document.getElementById('resetFilters').addEventListener('click', function() {
+        // حفظ موضع التمرير لمنع اهتزاز الصفحة عند إعادة التعيين
+        const scrollY = window.scrollY;
+
+        // إعادة تعيين جميع الحقول داخل النموذج
+        const form = document.getElementById('filter-form');
+        form.reset();
+
+        // إعادة تعيين حقول التاريخ يدويًا (لأن reset() لا يعيدها)
+        form.querySelectorAll('input[type="date"]').forEach(input => {
+            input.value = '';
+        });
+
+        // إعادة تعيين حقول checkbox يدويًا
+        form.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.checked = false;
+        });
+
+        // إعادة تعيين الحقول التي تستخدم TomSelect
+        document.querySelectorAll('.tom-select').forEach(select => {
+            if (select.tomselect) {
+                select.tomselect.clear(); // يمسح جميع الاختيارات داخل TomSelect
+            }
+        });
+
+        // إعادة موضع التمرير بعد إعادة التعيين
+        setTimeout(() => {
+            window.scrollTo(0, scrollY);
+        }, 50);
+    });
+
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const tomSelects = document.querySelectorAll('.tom-select');
+        document.getElementById('filter-form').reset();
+
+        tomSelects.forEach(select => {
+            if (!select.tomselect) {
+                new TomSelect(select, {
+                    onChange: function() {
+                        // حفظ موضع التمرير قبل التحديث
+                        const scrollY = window.scrollY;
+
+                        // تأخير بسيط ثم إعادة التمرير إلى الموضع السابق
+                        setTimeout(() => {
+                            window.scrollTo(0, scrollY);
+                        }, 50);
+                    }
+                });
+            }
+        });
+    });
+</script>

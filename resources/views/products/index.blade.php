@@ -2,10 +2,7 @@
     <section>
         <div class="relative mt-2 flex items-center">
             <x-title :title="'جميع المنتجات'"></x-title>
-                {{-- <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
-             هنا يتم ترميز المنتجات 
-                 </p> --}}
-                 <form method="GET" action="{{ route('products.index') }}" class="mb-4">
+                 <form method="GET" action="{{ route('products.index') }}" class="mb-2 mt-6">
                     <x-search-input id="custom-id" name="search" placeholder="ابحث عن المنتجات" :value="request()->input('search')" />
                     <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md"></button>
                 </form>
@@ -27,25 +24,12 @@
                                 <th class="px-6 py-3">اسم المنتج</th>
                                 <th class="px-6 py-3"> كود التخزين SKU</th>
                                 <th class="px-6 py-3" > الباركود</th>
-
                                 <th class="px-6 py-3">الفئة</th>
-                                <th class="px-6 py-3">المورد</th>
-                                {{-- <th class="px-6 py-3">سعر الشراء</th> --}}
-                                {{-- <th class="px-6 py-3">سعر البيع</th> --}}
-                                <th class="px-6 py-3">المخزون</th>
+                                <th class="px-6 py-3">المورد</th>                               
+                                <th class="px-6 py-3">كمية بداية المده</th>
                                 <th class="px-6 py-3">الحالة</th>
-                                {{-- <th class="px-6 py-3">تاريخ الشراء</th>
-                                <th class="px-6 py-3">تاريخ التصنيع</th>
-                                <th class="px-6 py-3">تاريخ الانتهاء</th> --}}
-                                {{-- <th class="px-6 py-3"> تاريخ احر تحديث </th>
-                                <th class="px-6 py-3">التخفيضات (%)</th>
-                                <th class="px-6 py-3">الضريبة (%)</th> --}}
                                 <th class="px-6 py-3">الحد الأدنى للطلب</th>
-                                <th class="px-6 py-3">الحد الأعلى للطلب</th>
-
-                                {{-- <th class="px-6 py-3">العلامة التجارية</th>
-                                <th class="px-6 py-3">الوحدة</th> --}}
-                                
+                                <th class="px-6 py-3">الحد الأعلى للطلب</th>        
                                 <th class="px-6 py-3">الإجراء</th>
                             </tr>
                         </thead>
@@ -60,14 +44,13 @@
                                     <td class="px-6 py-4 "> {{ $product->name }}</td>
                                     <td class="px-6 py-4 "> {{ $product->sku }}</td>
                                     <td class="px-6 py-4 "> {{ $product->barcode }}</td>
-
                                     <td class="px-6 py-4">{{ $product->category->name }}</td>
                                     <td class="px-6 py-4">{{ optional($product->supplier)->name ?? 'غير متوفر' }}</td>
                                     {{-- <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                                         ${{ number_format($product->purchase_price, 2) }}</td>
                                     <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                                         ${{ number_format($product->selling_price, 2) }}</td> --}}
-                                    <td class="px-6 py-4">{{ $product->stock_quantity }} {{ $product->unit_id }}</td>
+                                    <td class="px-6 py-4">{{ $product->stock_quantity }} {{ $product->unit->name}}</td>
                                     <td class="px-6 py-4">
                                         <span
                                             class="px-2 py-1 text-xs font-medium rounded-md {{ $product->is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' }}">
@@ -80,8 +63,8 @@
                                     <td class="px-6 py-4">{{ $product->updated_at }}</td> --}}
                                     {{-- <td class="px-6 py-4">{{ $product->discount }}%</td>
                                     <td class="px-6 py-4">{{ $product->tax }}%</td> --}}
-                                    <td class="px-6 py-4">{{ $product->min_stock_level }}</td>
-                                    <td class="px-6 py-4">{{ $product->max_stock_level }}</td>
+                                    <td class="px-6 py-4">{{ $product->min_stock_level }} {{ $product->unit->name}}</td>
+                                    <td class="px-6 py-4">{{ $product->max_stock_level }} {{ $product->unit->name}}</td>
 
                                     {{-- <td class="px-6 py-4">{{ $product->brand }}</td>
                                     <td class="px-6 py-4">{{ $product->unit->name }}</td> --}}
