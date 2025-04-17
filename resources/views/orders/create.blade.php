@@ -110,14 +110,14 @@
 
           
 
-           
-
-        </form>
-    <!-- زر إرسال النموذج -->
+            <!-- زر إرسال النموذج -->
     <div class="mt-4">
         <x-button class="" type="submit">
              إضافة
         </x-button>
+
+        </form>
+   
     </div>
 
     <!-- إضافة المنتجات Dynamically -->
