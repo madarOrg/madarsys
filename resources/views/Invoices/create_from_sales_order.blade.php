@@ -114,6 +114,7 @@
                                 <th class="py-2 px-4 border-b">الوحدة</th>
                                 <th class="py-2 px-4 border-b">الكمية</th>
                                 <th class="py-2 px-4 border-b">السعر</th>
+                                
                                 <th class="py-2 px-4 border-b">الإجمالي</th>
                             </tr>
                         </thead>

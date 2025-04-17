@@ -2,7 +2,7 @@
     <section class="relative mt-5 flex flex-col items-start">
         <x-title :title="'تفاصيل أمر الشراء'"></x-title>
         
-        <div class="w-full mt-5 bg-white p-6 rounded-lg shadow-md">
+        <div class="w-full mt-5  p-6 rounded-lg shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">أمر شراء رقم: {{ $purchaseOrder->order_number }}</h2>
                 <div class="flex space-x-2 space-x-reverse">
@@ -88,12 +88,12 @@
                     <table class="min-w-full bg-white border border-gray-300">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="py-2 px-4 border-b">#</th>
-                                <th class="py-2 px-4 border-b">المنتج</th>
-                                <th class="py-2 px-4 border-b">الوحدة</th>
-                                <th class="py-2 px-4 border-b">الكمية</th>
-                                <th class="py-2 px-4 border-b">السعر</th>
-                                <th class="py-2 px-4 border-b">الإجمالي</th>
+                                <th class="py-2 px-4 ">#</th>
+                                <th class="py-2 px-4 ">المنتج</th>
+                                <th class="py-2 px-4 ">الوحدة</th>
+                                <th class="py-2 px-4 ">الكمية</th>
+                                <th class="py-2 px-4 ">السعر</th>
+                                <th class="py-2 px-4 ">الإجمالي</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,19 +101,19 @@
                             @foreach($purchaseOrder->order->order_details as $index => $detail)
                                 @php $subtotal = $detail->quantity * $detail->price; $total += $subtotal; @endphp
                                 <tr>
-                                    <td class="py-2 px-4 border-b text-center">{{ $index + 1 }}</td>
-                                    <td class="py-2 px-4 border-b">{{ $detail->product->name ?? 'غير محدد' }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ $detail->unit->name ?? 'غير محدد' }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ $detail->quantity }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ number_format($detail->price, 2) }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ number_format($subtotal, 2) }}</td>
+                                    <td class="py-2 px-4  text-center">{{ $index + 1 }}</td>
+                                    <td class="py-2 px-4 ">{{ $detail->product->name ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4  text-center">{{ $detail->unit->name ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4  text-center">{{ $detail->quantity }}</td>
+                                    <td class="py-2 px-4  text-center">{{ number_format($detail->price, 2) }}</td>
+                                    <td class="py-2 px-4  text-center">{{ number_format($subtotal, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot>
                             <tr class="bg-gray-50">
-                                <td colspan="5" class="py-2 px-4 border-b text-left font-bold">الإجمالي</td>
-                                <td class="py-2 px-4 border-b text-center font-bold">{{ number_format($total, 2) }}</td>
+                                <td colspan="5" class="py-2 px-4  text-left font-bold">الإجمالي</td>
+                                <td class="py-2 px-4  text-center font-bold">{{ number_format($total, 2) }}</td>
                             </tr>
                         </tfoot>
                     </table>

@@ -22,33 +22,33 @@
                     <table class="min-w-full bg-white border border-gray-300">
                         <thead>
                             <tr class="bg-gray-100">
-                                <th class="py-2 px-4 border-b">رقم أمر الصرف</th>
-                                <th class="py-2 px-4 border-b">رقم الطلب</th>
-                                <th class="py-2 px-4 border-b">العميل</th>
-                                <th class="py-2 px-4 border-b">الحالة</th>
-                                <th class="py-2 px-4 border-b">تاريخ الإصدار</th>
-                                <th class="py-2 px-4 border-b">تاريخ التسليم المتوقع</th>
-                                <th class="py-2 px-4 border-b">الإجراءات</th>
+                                <th class="py-2 px-4 ">رقم أمر الصرف</th>
+                                <th class="py-2 px-4 ">رقم الطلب</th>
+                                <th class="py-2 px-4 ">العميل</th>
+                                <th class="py-2 px-4 ">الحالة</th>
+                                <th class="py-2 px-4 ">تاريخ الإصدار</th>
+                                <th class="py-2 px-4 ">تاريخ التسليم المتوقع</th>
+                                <th class="py-2 px-4 ">الإجراءات</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($salesOrders as $salesOrder)
                                 <tr>
-                                    <td class="py-2 px-4 border-b text-center">{{ $salesOrder->order_number }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ $salesOrder->order_id }}</td>
-                                    <td class="py-2 px-4 border-b">{{ $salesOrder->partner->name ?? 'غير محدد' }}</td>
-                                    <td class="py-2 px-4 border-b text-center">
+                                    <td class="py-2 px-4  text-center">{{ $salesOrder->order_number }}</td>
+                                    <td class="py-2 px-4  text-center">{{ $salesOrder->order_id }}</td>
+                                    <td class="py-2 px-4 ">{{ $salesOrder->partner->name ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4  text-center">
                                         <span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">معتمد</span>
                                     </td>
-                                    <td class="py-2 px-4 border-b text-center">{{ $salesOrder->issue_date }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ $salesOrder->expected_delivery_date ?? 'غير محدد' }}</td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="py-2 px-4  text-center">{{ $salesOrder->issue_date }}</td>
+                                    <td class="py-2 px-4  text-center">{{ $salesOrder->expected_delivery_date ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4 ">
                                         <div class="flex justify-center space-x-1 space-x-reverse">
                                             <a href="{{ route('sales-orders.show', $salesOrder->id) }}" class="bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600">
                                                 <i class="fas fa-eye"></i>
                                             </a>
                                             
-                                            <a href="{{ route('invoices.create-from-sales-order', $salesOrder->id) }}" class="bg-green-500 text-white px-2 py-1 rounded hover:bg-green-600">
+                                            <a href="{{ route('invoices.create-from-sales-order', $salesOrder->id) }}" class="bg-green-100 text-white px-2 py-1 rounded hover:bg-green-600">
                                                 <i class="fas fa-file-invoice"></i> إنشاء فاتورة
                                             </a>
                                             

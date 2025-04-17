@@ -107,20 +107,22 @@
                 
                 <div class="mt-6">
                     <h2 class="text-xl font-bold mb-4">تفاصيل الفاتورة</h2>
-                    <table class="min-w-full bg-white border border-gray-300">
-                        <thead>
-                            <tr class="bg-gray-100">
+                    <table class="min-w-full w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
                                 <th class="py-2 px-4 border-b">المنتج</th>
                                 <th class="py-2 px-4 border-b">الوحدة</th>
                                 <th class="py-2 px-4 border-b">الكمية</th>
-                                <th class="py-2 px-4 border-b">السعر</th>
-                                <th class="py-2 px-4 border-b">الإجمالي</th>
+                                <th class="py-2 px-4 ">السعر</th>
+                                <th class="px-6 py-3">تاريخ إنتاج المنتج </th>
+                                <th class="px-6 py-3">تاريخ إنتهاء المنتج </th>
+                                <th class="py-2 px-4 ">الإجمالي</th>
                             </tr>
                         </thead>
                         <tbody id="invoice-items">
                             @foreach($purchaseOrder->order->order_details as $index => $detail)
-                                <tr>
-                                    <td class="py-2 px-4 border-b">
+                            <tr  class="item-row bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                                <td class="py-2 px-4 ">
                                         <select name="items[{{ $index }}][product_id]" class="w-full p-2 border border-gray-300 rounded-md product-select" required>
                                             <option value="">اختر المنتج</option>
                                             @foreach($products as $product)
@@ -130,7 +132,7 @@
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="py-2 px-4 ">
                                         <select name="items[{{ $index }}][unit_id]" class="w-full p-2 border border-gray-300 rounded-md unit-select" required>
                                             <option value="">اختر الوحدة</option>
                                             @foreach($units as $unit)
@@ -138,22 +140,31 @@
                                             @endforeach
                                         </select>
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="py-2 px-4 ">
                                         <input type="number" name="items[{{ $index }}][quantity]" value="{{ $detail->quantity }}" min="1" step="1" class="w-full p-2 border border-gray-300 rounded-md quantity-input" required>
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="py-2 px-4 ">
                                         <input type="number" name="items[{{ $index }}][price]" value="{{ $detail->price }}" min="0.01" step="0.01" class="w-full p-2 border border-gray-300 rounded-md price-input" required>
                                     </td>
-                                    <td class="py-2 px-4 border-b">
+                                    <td class="">
+                                        <input type="date" name="items[{{ $index }}][production_date]"
+                                            class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                    </td>
+
+                                    <td class="">
+                                        <input type="date" name="items[{{ $index }}][expiration_date]"
+                                            class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                    </td>
+                                    <td class="py-2 px-4 ">
                                         <input type="text" readonly class="w-full p-2 bg-gray-100 border border-gray-300 rounded-md subtotal-display">
                                     </td>
                                 </tr>
                             @endforeach
                         </tbody>
                         <tfoot>
-                            <tr class="bg-gray-50">
-                                <td colspan="4" class="py-2 px-4 border-b text-left font-bold">الإجمالي</td>
-                                <td class="py-2 px-4 border-b">
+                            <tr  class="item-row bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                                <td colspan="4" class="py-2 px-4 border-b  text-left font-bold">الإجمالي</td>
+                                <td class="py-2 px-4">
                                     <input type="text" id="total-amount" readonly class="w-full p-2 bg-gray-100 border border-gray-300 rounded-md">
                                 </td>
                             </tr>
@@ -161,10 +172,10 @@
                     </table>
                 </div>
                 
-                <div class="mt-8 flex justify-center">
-                    <button type="submit" class="bg-blue-600 text-white font-bold py-3 px-10 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-500 focus:ring-opacity-75 transition duration-300 ease-in-out text-lg">
-                        <i class="fas fa-save mr-2"></i> حفظ الفاتورة وإنشاء حركة مخزنية
-                    </button>
+                <div class="mt-8 flex justify-end">
+                    <x-button type="submit">
+                       حفظ الفاتورة وإنشاء حركة مخزنية
+                    </x-button>
                 </div>
             </form>
         </div>

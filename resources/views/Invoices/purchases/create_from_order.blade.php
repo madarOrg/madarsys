@@ -203,34 +203,37 @@
                             <table class="min-w-full w-full text-sm text-right text-gray-500 dark:text-gray-400">
                                 <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                                     <tr>
-                                    <th class="px-4 py-2 border">المنتج</th>
-                                    <th class="px-4 py-2 border">الكمية</th>
-                                    <th class="px-4 py-2 border">السعر</th>
-                                    <th class="px-4 py-2 border">الوحدة</th>
-                                    <th class="px-4 py-2 border">الإجمالي</th>
+                                    <th class="px-4 py-2 ">المنتج</th>
+                                    <th class="px-4 py-2 ">الكمية</th>
+                                    <th class="px-4 py-2 ">السعر</th>
+                                    <th class="px-4 py-2 ">الوحدة</th>
+                                    <th class="px-6 py-3">تاريخ إنتاج المنتج </th>
+                                <th class="px-6 py-3">تاريخ إنتهاء المنتج </th>
+
+                                    <th class="px-4 py-2 ">الإجمالي</th>
                                 </tr>
                             </thead>
                             <tbody id="items-container">
                                 @foreach ($order->order_details as $index => $detail)
                                 <tr  class="item-row bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
 
-                                        <td class="px-4 py-2 border">
+                                        <td class="px-4 py-2 ">
                                             <input type="hidden" name="items[{{ $index }}][product_id]"
                                                 value="{{ $detail->product_id }}">
                                             <span>{{ $detail->product->name }}</span>
                                         </td>
-                                        <td class="px-4 py-2 border">
+                                        <td class="px-4 py-2 ">
                                             <input type="number" name="items[{{ $index }}][quantity]"
                                                 value="{{ $detail->quantity }}" min="1"
                                                 class="quantity-input w-full p-2 border rounded" required>
                                         </td>
-                                        <td class="px-4 py-2 border">
+                                        <td class="px-4 py-2 ">
                                             <input type="number" step="0.01"
                                                 name="items[{{ $index }}][price]"
                                                 value="{{ $detail->price }}" min="0"
                                                 class="price-input w-full p-2 border rounded" required>
                                         </td>
-                                        <td class="px-4 py-2 border">
+                                        <td class="px-4 py-2 ">
                                             <select name="items[{{ $index }}][unit_id]"
                                                 class="w-full p-2 border rounded" required>
                                                 @foreach ($units as $unit)
@@ -240,9 +243,19 @@
                                                 @endforeach
                                             </select>
                                         </td>
-                                        <td class="px-4 py-2 border">
+                                        <td class="">
+                                            <input type="date" name="items[{{ $index }}][production_date]"
+                                                class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                        </td>
+    
+                                        <td class="">
+                                            <input type="date" name="items[{{ $index }}][expiration_date]"
+                                                class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                        </td>
+                                        <td class="px-4 py-2 ">
                                             <span class="subtotal">{{ $detail->quantity * $detail->price }}</span>
                                         </td>
+                                      
                                     </tr>
                                 @endforeach
                             </tbody>
