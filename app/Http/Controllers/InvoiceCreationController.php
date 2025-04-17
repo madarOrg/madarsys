@@ -300,7 +300,8 @@ class InvoiceCreationController extends Controller
             // نوع الفاتورة (شراء أو بيع)
             $transactionType = $order->type === 'buy' ? 'purchase' : 'sale';
             $typeNumber = $order->type === 'buy' ? 1 : 2; // 1 للشراء، 2 للبيع
-            
+            $viewFolder = $transactionType === 'sale' ? 'sales' : 'purchases';
+
             // إنشاء الفاتورة
             $invoice = Invoice::create([
                 'invoice_code' => $invoiceCode,
@@ -398,9 +399,11 @@ class InvoiceCreationController extends Controller
             
             // توجيه المستخدم إلى صفحة قائمة الفواتير باستخدام مسار مطلق
             $invoiceType = $order->type === 'buy' ? 'purchase' : 'sale';
-            return redirect('/invoices?type=' . $invoiceType)
-                ->with('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح! كود الفاتورة: ' . $invoiceCode);
-                
+            // return redirect('/invoices?type=' . $invoiceType)
+            //     ->with('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح! كود الفاتورة: ' . $invoiceCode);
+            return redirect()->route('invoices.' . $viewFolder . '.index')
+            ->with('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح! كود الفاتورة: ' . $invoiceCode);
+                        
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'خطأ في إنشاء الفاتورة: ' . $e->getMessage());

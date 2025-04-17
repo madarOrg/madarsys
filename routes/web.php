@@ -554,6 +554,7 @@ Route::get('/welcome', function () {
         // إبقاء المسارات القديمة للتوافق مع الروابط القديمة
         Route::get('new-create-from-sales-order/{id}', [InvoiceCreationController::class, 'createFromSalesOrder'])->name('new-create-from-sales-order');
         Route::post('new-store-from-sales-order/{id}', [InvoiceCreationController::class, 'storeFromSalesOrder'])->name('new-store-from-sales-order');
+        
         Route::get('{type}', [InvoiceController::class, 'index'])->name('index'); // List invoices by type
         Route::get('{type}/create', [InvoiceController::class, 'create'])->name('create'); // Create form for invoice type
         Route::post('{type}', [InvoiceController::class, 'store'])->name('store'); // Store new invoice
