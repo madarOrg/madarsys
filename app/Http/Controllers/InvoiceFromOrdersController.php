@@ -52,7 +52,6 @@ class InvoiceFromOrdersController extends Controller
     {
         $purchaseOrder = PurchaseOrder::with(['order.order_details.product', 'partner'])
             ->findOrFail($id);
-        
         // التحقق من أن أمر الشراء معتمد
         if ($purchaseOrder->status !== 'approved') {
             return redirect()->route('invoices.purchase-orders')

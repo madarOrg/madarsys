@@ -19,7 +19,7 @@ class Order extends Model
         'partner_id',
         'purchase_order_number',
         'is_printed',
-        // 'inventory_transaction_id',
+         'inventory_transaction_id',
     ];
  
     // علاقة مع تفاصيل الطلب

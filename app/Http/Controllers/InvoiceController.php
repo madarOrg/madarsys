@@ -32,8 +32,10 @@ class InvoiceController extends Controller
             $query->where('type', $type);
         }
         
-        $orders = $query->with(['partner', 'branch', 'order_details.product'])->get();
+        // $orders = $query->with(['partner', 'branch', 'order_details.product'])->get();
         // dd($orders);
+        $orders = $query->with(['partner', 'branch', 'order_details.product'])->paginate(15);
+
         return view('invoices.purchases.confirmed_orders', compact('orders', 'type'));
     }
     public function index(Request $request, $type)

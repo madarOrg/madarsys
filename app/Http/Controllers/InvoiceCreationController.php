@@ -80,7 +80,7 @@ class InvoiceCreationController extends Controller
             }
             
             // إنشاء رمز الفاتورة
-            $invoiceCode = 'INV-' . time();
+            $invoiceCode = 'Sal-Ord-' . time();
             
             // حساب قيم الفاتورة
             $subtotal = 0;
@@ -158,7 +158,7 @@ class InvoiceCreationController extends Controller
                 'inventory_request_id' => null,
                 'secondary_warehouse_id' => null,
                 'notes' => $transactionNote,
-                'status' => 1
+                'status' => 0
             ]);
             
             // تأكد من تحميل عناصر الفاتورة بشكل كامل
@@ -220,7 +220,7 @@ class InvoiceCreationController extends Controller
     {
         $order = Order::with(['order_details.product', 'partner'])
             ->findOrFail($id);
-        
+        // DD($order);
         // التحقق من أن الطلب معتمد
         if ($order->status !== 'confirmed') {
             return redirect('/orders')
@@ -272,7 +272,7 @@ class InvoiceCreationController extends Controller
             }
             
             // إنشاء رمز الفاتورة
-            $invoiceCode = 'INV-' . time();
+            $invoiceCode = 'Pu-Ord-' . time();
             
             // حساب قيم الفاتورة
             $subtotal = 0;
