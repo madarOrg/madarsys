@@ -6,7 +6,7 @@
                 <x-button :href="route('invoices.create', ['type' => 'purchase'])" type="button" class="ml-2">
                     <i class="fas fa-plus mr-2"></i> إضافة فاتورة جديدة
                 </x-button>
-                <x-button :href="route('invoices.confirmed_orders')" type="button" class="bg-green-600 hover:bg-green-700">
+                <x-button :href="route('invoices.confirmed-orders')" type="button" class="bg-green-600 hover:bg-green-700">
                     <i class="fas fa-clipboard-check mr-2"></i> فواتير من طلبات الشراء
                 </x-button>
             </div>

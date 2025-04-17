@@ -535,13 +535,7 @@ Route::get('/welcome', function () {
     //     Route::delete('/{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
           //invoices routes
     Route::prefix('invoices')->name('invoices.')->group(function () {
-        Route::get('{type}', [InvoiceController::class, 'index'])->name('index'); // List invoices by type
-        Route::get('{type}/create', [InvoiceController::class, 'create'])->name('create'); // Create form for invoice type
-        Route::post('{type}', [InvoiceController::class, 'store'])->name('store'); // Store new invoice
-        Route::get('{type}/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit'); // Edit invoice
-        Route::put('{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
-        Route::delete('{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
-    
+       
         // مسارات إنشاء فاتورة من أمر شراء وأمر صرف
         Route::get('purchase-orders', [InvoiceFromOrdersController::class, 'purchaseOrders'])->name('purchase-orders');
         Route::get('sales-orders', [InvoiceFromOrdersController::class, 'salesOrders'])->name('sales-orders');
@@ -560,6 +554,14 @@ Route::get('/welcome', function () {
         // إبقاء المسارات القديمة للتوافق مع الروابط القديمة
         Route::get('new-create-from-sales-order/{id}', [InvoiceCreationController::class, 'createFromSalesOrder'])->name('new-create-from-sales-order');
         Route::post('new-store-from-sales-order/{id}', [InvoiceCreationController::class, 'storeFromSalesOrder'])->name('new-store-from-sales-order');
+        Route::get('{type}', [InvoiceController::class, 'index'])->name('index'); // List invoices by type
+        Route::get('{type}/create', [InvoiceController::class, 'create'])->name('create'); // Create form for invoice type
+        Route::post('{type}', [InvoiceController::class, 'store'])->name('store'); // Store new invoice
+        Route::get('{type}/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit'); // Edit invoice
+        Route::put('{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
+        Route::delete('{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
+    
+    
     });
     Route::get('/reports/create', [ReportController::class, 'create'])->name('reports.create');
     Route::post('/reports/generate', [ReportController::class, 'generate'])->name('reports.generate');
@@ -575,7 +577,7 @@ Route::get('/welcome', function () {
 
         // تعديل مرتجع
         Route::get('{id}/edit', [ReturnOrderController::class, 'edit'])->name('edit');
-
+    });
 // ...
     Route::prefix('returns-management')->name('returns-management.')->group(function () {
         // الصفحة الرئيسية للمرتجعات
@@ -742,6 +744,5 @@ Route::get('/welcome', function () {
         Route::post('/store-from-sales-order/{id}', [InvoiceFromOrdersController::class, 'storeFromSalesOrder'])->name('store-from-sales-order');
     });
 
-});
 });
 Route::get('/orders/check-confirmed', [OrderController::class, 'checkConfirmedOrders'])->name('orders.check-confirmed');

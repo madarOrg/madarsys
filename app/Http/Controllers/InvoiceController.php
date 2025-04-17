@@ -24,9 +24,8 @@ class InvoiceController extends Controller
      * عرض الطلبات المؤكدة التي يمكن إنشاء فواتير منها
      */
     public function confirmedOrders(Request $request)
-    {
-        $type = $request->input('type', 'all');
-        
+    {  $type = $request->input('type', 'all');
+        // dd($type);
         $query = \App\Models\Order::where('status', 'confirmed');
         
         if ($type !== 'all') {
@@ -34,8 +33,8 @@ class InvoiceController extends Controller
         }
         
         $orders = $query->with(['partner', 'branch', 'order_details.product'])->get();
-        
-        return view('invoices.confirmed_orders', compact('orders', 'type'));
+        // dd($orders);
+        return view('invoices.purchases.confirmed_orders', compact('orders', 'type'));
     }
     public function index(Request $request, $type)
     {    
@@ -609,7 +608,7 @@ private function storeInventoryTransaction($request, $invoiceCode, $items, $type
             'inventory_request_id' => null,
             'secondary_warehouse_id' => null,
             'notes' => $transactionNote,
-            'status' => 1
+            'status' => 0
         ]);
         
         // 2. إنشاء عنصر افتراضي لضمان وجود عنصر واحد على الأقل
