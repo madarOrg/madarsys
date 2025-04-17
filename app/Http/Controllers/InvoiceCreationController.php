@@ -204,9 +204,11 @@ class InvoiceCreationController extends Controller
             DB::commit();
             
             // توجيه المستخدم إلى صفحة قائمة الفواتير باستخدام مسار مطلق
-            return redirect('/invoices?type=sale')
-                ->with('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح! كود الفاتورة: ' . $invoiceCode);
-                
+            // return redirect('/invoices?type=sale')
+            //     ->with('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح! كود الفاتورة: ' . $invoiceCode);
+            return redirect()->route('invoices.sale' . '.index')
+            ->with('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح! كود الفاتورة: ' . $invoiceCode);
+       
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', 'خطأ في إنشاء الفاتورة: ' . $e->getMessage());

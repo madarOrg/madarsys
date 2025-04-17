@@ -25,7 +25,7 @@
                         </a>
                     @endif
                     
-                    <a href="{{ route('purchase-orders.print', $purchaseOrder->id) }}" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700" target="_blank">
+                    <a href="{{ route('purchase-orders.print', $purchaseOrder->id) }}" class="bg-green-200 text-white px-4 py-2 rounded-md hover:bg-green-200" target="_blank">
                         <i class="fas fa-print ml-1"></i> طباعة
                     </a>
                     
