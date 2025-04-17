@@ -1,21 +1,26 @@
 <x-layout dir="rtl">
-    <section class="mb-24 p-6 bg-white dark:bg-gray-900 shadow-md rounded-lg">
-        <div class="space-y-12 dark:bg-gray-900 mb-24">
-            <x-title :title="'فواتير المشتريات'"></x-title>
-            <div class="flex justify-start">
-                <x-button :href="route('invoices.create', ['type' => 'purchase'])" type="button" class="ml-2">
-                    <i class="fas fa-plus mr-2"></i> إضافة فاتورة جديدة
-                </x-button>
-                <x-button :href="route('invoices.confirmed-orders')" type="button" class="bg-green-600 hover:bg-green-700">
-                    <i class="fas fa-clipboard-check mr-2"></i> فواتير من طلبات الشراء
-                </x-button>
+    <section class=" p-3 bg-white dark:bg-gray-900 shadow-md rounded-lg">
+        <div class="space-y-12 dark:bg-gray-900 ">
+            <div class="flex mb-4">
+                <x-title :title="'فواتير المشتريات'"></x-title>
+            
+                <div class="flex space-x-2 rtl:space-x-reverse">
+                    <x-button :href="route('invoices.create', ['type' => 'purchase'])" class="">
+                        <i class="fas fa-plus mr-2"></i> إضافة فاتورة جديدة
+                    </x-button>
+                    <x-button :href="route('invoices.confirmed-orders')" class="">
+                        <i class="fas fa-clipboard-check mr-2"></i> فواتير من طلبات الشراء
+                    </x-button>
+                </div>
             </div>
+            
+            
 
             <!-- نموذج البحث -->
             <form method="GET" action="{{ route('invoices.index', ['type' => 'purchase']) }}">
                 <div x-data="{ open: true }">
                     <button type="button" @click="open = !open"
-                        class="text-indigo-600 hover:text-indigo-700 mt-4 mb-2 ml-4">
+                        class="text-indigo-600 hover:text-indigo-700  ml-4">
                         <span
                             x-html="open ? '<i class=\'fa-solid fa-magnifying-glass-minus fa-lg\'></i>' :'<i class=\'fa-solid fa-magnifying-glass-plus fa-lg\'></i>'">
                         </span>
@@ -86,19 +91,19 @@
         </div>
 
         <!-- جدول الفواتير -->
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg mt-4">
+        <div class="overflow-x-auto bg-white shadow-md rounded-lg ">
             <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-200">
                     <tr>
                         <th class="p-4">#</th>
                         <th class="px-6 py-3">رقم الفاتورة</th>
+                        <th class="px-6 py-3">الفرع</th>
+                        <th class="px-6 py-3">المستودع</th>
                         <th class="px-6 py-3">اسم العميل</th>
                         <th class="px-6 py-3">تاريخ الفاتورة</th>
                         <th class="px-6 py-3">المبلغ الإجمالي</th>
                         <th class="px-6 py-3">الخصم</th>
-                        <th class="px-6 py-3">الفرع</th>
                         <th class="px-6 py-3">طريقة الدفع</th>
-                        <th class="px-6 py-3">المستودع</th>
                         <th class="px-6 py-3">رقم الطلب</th>
                         <th class="px-6 py-3">الإجراءات</th>
                     </tr>
@@ -107,15 +112,15 @@
                     @forelse ($invoices as $invoice)
                         <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                             <td class="p-4">{{ $invoice->id }}</td>
-                            <td class="px-6 py-4">{{ $invoice->invoice_code }}</td>
-                            <td class="px-6 py-4">{{ optional($invoice->partner)->name ?? 'غير محدد' }}</td>
-                            <td class="px-6 py-4">{{ $invoice->invoice_date }}</td>
-                            <td class="px-6 py-4">{{ $invoice->total_amount }}</td>
-                            <td class="px-6 py-4">{{ $invoice->discount_amount }}</td>
-                            <td class="px-6 py-4">{{ optional($invoice->branch)->name ?? 'غير محدد' }}</td>
-                            <td class="px-6 py-4">{{ optional($invoice->paymentType)->name ?? 'غير محدد' }}</td>
-                            <td class="px-6 py-4">{{ optional($invoice->warehouse)->name ?? 'غير محدد' }}</td>
-                            <td class="px-6 py-4">
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $invoice->invoice_code }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($invoice->branch)->name ?? 'غير محدد' }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($invoice->warehouse)->name ?? 'غير محدد' }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($invoice->partner)->name ?? 'غير محدد' }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $invoice->invoice_date }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $invoice->total_amount }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $invoice->discount_amount }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($invoice->paymentType)->name ?? 'غير محدد' }}</td>
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">
                                 @if($invoice->order_id)
                                     @if($invoice->order && $invoice->order->type === 'purchase')
                                         <a href="{{ route('purchase-orders.show', $invoice->order_id) }}" class="text-blue-600 hover:underline">{{ $invoice->order_id }}</a>
@@ -128,18 +133,22 @@
                                     غير مرتبط بطلب
                                 @endif
                             </td>
-                            <td class="px-6 py-4 flex space-x-2">
-                                <x-button href="{{ route('invoices.edit', ['type' => 'purchase', 'invoice' => $invoice->id]) }}"
+                            <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap flex space-x-2">
+                                <div class="flex items-center space-x-3 rtl:space-x-reverse">
+
+                                <a href="{{ route('invoices.edit', ['type' => 'purchase', 'invoice' => $invoice->id]) }}"
                                     class="text-blue-600 hover:underline dark:text-blue-400">
-                                    <i class="fa-solid fa-pen"></i>
-                                </x-button>
-                                <form action="{{ route('invoices.destroy', ['type' => 'purchase', 'invoice' => $invoice->id]) }}" method="POST" class="inline-block">
-                                    @csrf
-                                    @method('DELETE')
-                                    <x-button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('هل أنت متأكد من حذف الفاتورة؟')">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </x-button>
-                                </form>
+                                     <i class="fa-solid fa-pen"></i>
+                                 </a>
+                                 
+                                 <form action="{{ route('invoices.destroy', ['type' => 'purchase', 'invoice' => $invoice->id]) }}" method="POST" class="inline-block">
+                                     @csrf
+                                     @method('DELETE')
+                                     <button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('هل أنت متأكد من حذف الفاتورة؟')">
+                                         <i class="fas fa-trash-alt"></i>
+                                     </button>
+                                 </form>
+                                </div>
                             </td>
                         </tr>
                     @empty

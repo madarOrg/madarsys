@@ -392,7 +392,7 @@ class InvoiceCreationController extends Controller
             ]);
             
             // إطلاق حدث إنشاء حركة مخزنية
-            event(new InventoryTransactionCreated($inventoryTransaction->toArray()));
+            // event(new InventoryTransactionCreated($inventoryTransaction->toArray()));
             
             DB::commit();
             
