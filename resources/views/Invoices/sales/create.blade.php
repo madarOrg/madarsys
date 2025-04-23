@@ -1,20 +1,23 @@
 <x-layout>
+    <form method="GET" action="{{ route('invoices.create',['type' => 'sale'])}}">
+        <select name="warehouse_id" onchange="this.form.submit()">
+            <option value="">اختر المستودع</option>
+            @foreach($Warehouses as $warehouse)
+                <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                    {{ $warehouse->name }}
+                </option>
+            @endforeach
+        </select>
+       
+      </div>
+      </form>
+    
     <section class="mb-1 p-6  shadow-md rounded-lg">
-        <form method="GET" action="{{ route('orders.create',['type' => 'sale'])}}">
-            <select name="warehouse_id" onchange="this.form.submit()">
-                <option value="">اختر المستودع</option>
-                @foreach($warehouses as $warehouse)
-                    <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
-                        {{ $warehouse->name }}
-                    </option>
-                @endforeach
-            </select>
-           
-          </div>
-          </form>
+      
         <form action="{{ route('invoices.store', ['type' => 'sale']) }}" method="POST">
             @csrf
             <div class="  dark:bg-gray-900 mb-24">
+                
                 <div class="">
                     <x-title :title="'إنشاء فاتورة مبيعات جديدة'"></x-title>
                 </div>

@@ -78,7 +78,7 @@
                                     <option value="">-- اختر المنتج --</option>
                                     @foreach($products as $product)
                                         <option value="{{ $product->id }}" data-stock="{{ $product->quantity }}">
-                                            {{ $product->name }} (المتاح: {{ $product->quantity }})
+                                            {{ $product->name }}- {{ $product->barcode }}- {{ $product->sku }} (المتاح: {{ $product->quantity }})
                                         </option>
                                     @endforeach
                                 </select>

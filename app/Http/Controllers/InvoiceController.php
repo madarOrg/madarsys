@@ -87,39 +87,16 @@ class InvoiceController extends Controller
         return view("invoices.$viewFolder.index", compact('products', 'invoices', 'branches', 'partners', 'paymentTypes', 'Warehouses',));
     }
 
-    public function create(Request $request,$type)
+    public function create($type)
     {
-        $products = collect();
-        $warehouseId = $request->get('warehouse_id'); 
-       
-
-        $products = InventoryProduct::with('product')
-                ->where('warehouse_id', $warehouseId)
-                ->where('quantity', '>', 0)
-                ->get()
-                ->map(function ($item) {
-                    return (object) [
-                        'id' => $item->product->id,
-                        'name' => $item->product->name,
-                        'barcode'=>$item->product->barcode,
-                        'sku'=>$item->product->sku,
-                        'selling_price' => $item->product->selling_price,
-                        'unit_id' => $item->product->unit_id,
-                        'production_date' => $item->production_date,
-                        'expiration_date' => $item->expiration_date,
-                    ];
-         });
-
-                
-        
-
+        $Warehouses = Warehouse::ForUserWarehouse()->get(); 
+      
         $viewFolder = $type === 'sale' ? 'sales' : 'purchases';
         $partners = Partner::select('id', 'name')->get();
-        // $products = Product::select('id', 'name', 'selling_price', 'unit_id', 'barcode', 'sku')->get();
+        $products = Product::select('id', 'name', 'selling_price', 'unit_id', 'barcode', 'sku')->get();
         $paymentTypes = PaymentType::select('id', 'name')->get();
         $Branches = Branch::select('id', 'name')->get();
         // $Warehouses = Warehouse::all();
-        $Warehouses = Warehouse::ForUserWarehouse()->get(); 
 
         $units = Unit::all();
         $currencies = Currency::all();

@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Models\Shipment;
 use App\Models\Product;
 use Illuminate\Http\Request;
@@ -14,24 +15,24 @@ class ShipmentController extends Controller
     //     return view('shipments.index', compact('shipments'));
     // }
     public function index()
-{
-    // التحقق من وجود قيمة بحث
-    $search = request('search');
-    
-    // جلب الشحنات مع البحث إذا كانت هناك قيمة في مربع البحث
-    $shipments = Shipment::with('product')
-                         ->when($search, function($query) use ($search) {
-                             return $query->where('shipment_number', 'like', '%'.$search.'%')
-                                          ->orWhereHas('product', function($query) use ($search) {
-                                              $query->where('name', 'like', '%'.$search.'%');
-                                          });
-                         })
-                         ->get();
+    {
+        // التحقق من وجود قيمة بحث
+        $search = request('search');
 
-    return view('shipments.index', compact('shipments'));
-}
+        // جلب الشحنات مع البحث إذا كانت هناك قيمة في مربع البحث
+        $shipments = Shipment::with('product')
+            ->when($search, function ($query) use ($search) {
+                return $query->where('shipment_number', 'like', '%' . $search . '%')
+                    ->orWhereHas('product', function ($query) use ($search) {
+                        $query->where('name', 'like', '%' . $search . '%');
+                    });
+            })
+            ->get();
 
-   
+        return view('shipments.index', compact('shipments'));
+    }
+
+
     public function create()
     {
         // عرض قائمة المنتجات عند إنشاء شحنة جديدة
@@ -120,13 +121,13 @@ class ShipmentController extends Controller
     public function showReceiveForm($id)
     {
         $shipment = Shipment::findOrFail($id);
-        
+
         // التحقق من أن الشحنة لم يتم استلامها بعد
         if ($shipment->status === 'delivered') {
             return redirect()->route('shipments.index')
                 ->with('error', 'تم استلام هذه الشحنة مسبقاً!');
         }
-        
+
         return view('shipments.receive', compact('shipment'));
     }
 
@@ -136,20 +137,20 @@ class ShipmentController extends Controller
     public function receive(Request $request, $id)
     {
         $shipment = Shipment::findOrFail($id);
-        
+
         // التحقق من أن الشحنة لم يتم استلامها بعد
         if ($shipment->status === 'delivered') {
             return redirect()->route('shipments.index')
                 ->with('error', 'تم استلام هذه الشحنة مسبقاً!');
         }
-        
+
         // التحقق من البيانات المدخلة
         $validated = $request->validate([
             'received_quantity' => 'required|integer|min:1|max:' . $shipment->quantity,
             'received_date' => 'required|date',
             'notes' => 'nullable|string',
         ]);
-        
+
         // تحديث حالة الشحنة
         $shipment->update([
             'status' => 'delivered', // تغيير من 'received' إلى 'delivered' لتتوافق مع تعريف ENUM
@@ -157,11 +158,11 @@ class ShipmentController extends Controller
             'received_date' => $validated['received_date'],
             'notes' => $validated['notes'] ?? null,
         ]);
-        
+
         // تحديث مخزون المنتج (إضافة الكمية المستلمة)
         $product = $shipment->product;
         $product->increment('stock_quantity', $validated['received_quantity']);
-        
+
         // إنشاء حركة مخزنية
         // $inventoryTransaction = new \App\Models\InventoryTransaction([
         //     'product_id' => $product->id,
@@ -174,7 +175,7 @@ class ShipmentController extends Controller
         //     'notes' => 'استلام شحنة رقم: ' . $shipment->shipment_number,
         // ]);
         // $inventoryTransaction->save();
-        
+
         return redirect()->route('shipments.index')
             ->with('success', 'تم استلام الشحنة !');
     }
@@ -188,7 +189,7 @@ class ShipmentController extends Controller
         $shipments = Shipment::with('product')
             ->where('status', '!=', 'delivered')
             ->get();
-        
+
         return view('shipments.receive_index', compact('shipments'));
     }
 
@@ -201,7 +202,7 @@ class ShipmentController extends Controller
         $shipments = Shipment::with('product')
             ->where('status', 'confirmed')
             ->get();
-        
+
         return view('shipments.send_index', compact('shipments'));
     }
 
@@ -212,26 +213,25 @@ class ShipmentController extends Controller
     // {
     //     // جلب جميع الشحنات للتتبع
     //     $shipments = Shipment::with('product')->get();
-        
+
     //     return view('shipments.track_index', compact('shipments'));
     // }
     public function trackIndex(Request $request)
-{
-    $query = Shipment::with('product');
+    {
+        $query = Shipment::with('product');
 
-    // فلترة برقم الشحنة إذا تم إدخاله
-    if ($request->filled('search')) {
-        $query->where('shipment_number', 'like', '%' . $request->search . '%');
+        // فلترة برقم الشحنة إذا تم إدخاله
+        if ($request->filled('search')) {
+            $query->where('shipment_number', 'like', '%' . $request->search . '%');
+        }
+
+        // فلترة بالحالة إذا تم تحديدها
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $shipments = $query->get();
+
+        return view('shipments.track_index', compact('shipments'));
     }
-
-    // فلترة بالحالة إذا تم تحديدها
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    $shipments = $query->get();
-
-    return view('shipments.track_index', compact('shipments'));
-}
-
 }
