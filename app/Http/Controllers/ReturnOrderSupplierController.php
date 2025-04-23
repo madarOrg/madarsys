@@ -60,6 +60,7 @@ class ReturnOrderSupplierController extends Controller
         $validatedData = $request->validate([
             'supplier_id' => 'required|exists:partners,id',
             'return_reason' => 'required|string',
+            'return_date' => 'required|date',
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -451,6 +452,7 @@ class ReturnOrderSupplierController extends Controller
             'reference_type' => 'App\Models\ReturnSuppliersOrderItem',
             'transaction_type_id' => 2, // خصم من المخزون
             'notes' => 'خصم مخزون من مرتجع المورد: ' . ($item->returnSuppliersOrder->supplier->name ?? 'غير محدد'),
+            'transaction_date' => now(),
             'created_user' => auth()->id() ?? 1,
             'updated_user' => auth()->id() ?? 1,
         ]);

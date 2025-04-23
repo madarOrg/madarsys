@@ -2,7 +2,7 @@
     <section class="relative mt-1 flex items-center">
         <x-title :title="'إضافة طلب جديد'"></x-title>
     </section>
-    <form method="GET" action="{{ route('orders.create') }}">
+    {{-- <form method="GET" action="{{ route('orders.create') }}">
       <select name="warehouse_id" onchange="this.form.submit()">
           <option value="">اختر المستودع</option>
           @foreach($warehouses as $warehouse)
@@ -21,14 +21,33 @@
             <option value="sell">بيع</option>
         </select>
     </div>
-    </form>
+    </form> --}}
     <!-- نموذج إضافة طلب جديد -->
     <form action="{{ route('orders.store') }}" method="POST" class="w-full mt-5">
         @csrf
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 border border-gray-300 p-4 rounded-md">
            
-
+          <form method="GET" action="{{ route('orders.create') }}">
+            <select name="warehouse_id" onchange="this.form.submit()">
+                <option value="">اختر المستودع</option>
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                        {{ $warehouse->name }}
+                    </option>
+                @endforeach
+            </select>
+             <!-- نوع الطلب -->
+             <div class="col-span-1">
+              <label for="type" class="block text-gray-700">نوع الطلب</label>
+              <select name="type" onchange="this.form.submit()" id="type" class="form-select-style w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 
+                 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors 
+                 duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1">
+                  <option value="buy">شراء</option>
+                  <option value="sell">بيع</option>
+              </select>
+          </div>
+      
             <!-- حالة الطلب -->
             <div class="col-span-1">
                 <label for="status" class="block text-gray-700">حالة الطلب</label>

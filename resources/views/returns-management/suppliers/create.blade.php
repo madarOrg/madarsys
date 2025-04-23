@@ -74,7 +74,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">المنتج <span class="text-red-600">*</span></label>
-                                <select name="items[0][product_id]" class="product-select w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                                <select name="items[0][product_id]" class="product-select tom-select w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
                                     <option value="">-- اختر المنتج --</option>
                                     @foreach($products as $product)
                                         <option value="{{ $product->id }}" data-stock="{{ $product->quantity }}">
