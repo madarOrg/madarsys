@@ -130,4 +130,8 @@ class Warehouse extends Model
     {
         return $this->hasMany(Zone::class);
     }
+    public function orders()
+{
+    return $this->hasMany(Order::class);
+}
 }

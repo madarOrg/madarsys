@@ -31,7 +31,10 @@ class InventoryAudit extends Model
 
         return "audit-{$date}-{$nextId}";
     }
-
+    public function audits()
+    {
+        return $this->hasMany(InventoryTransaction::class, 'inventory_transaction_id');
+    }
     /**
      * العلاقة مع المستخدمين المسؤولين عن الجرد (عدة مستخدمين).
      */

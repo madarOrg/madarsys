@@ -112,6 +112,7 @@
                                 <th class="border p-2">تاريخ الحركة</th>
                                 <th class="border p-2">نوع الحركة</th>
                                 <th class="border p-2">اسم المنتج</th>
+                            
                                 <th class="border p-2">الشريك</th>
                                 <th class="border p-2">المستودع</th>
                                 <th>المستخدم المدخل </th>
@@ -134,6 +135,7 @@
                                         {{ $movement->transactionType->name ?? 'غير معروف' }}
 
                                     </td>
+                                  
                                     <td class="border p-2 min-w-[250px] whitespace-nowrap">
 
                                         @if ($movement->items->isNotEmpty())
@@ -154,7 +156,7 @@
                                             غير متاح
                                         @endif
                                     </td>
-
+                                
                                     <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
                                         {{ $movement->partner->name ?? 'غير متاح' }}</td>
                                     <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">

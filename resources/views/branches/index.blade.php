@@ -18,7 +18,7 @@
                 <tr>
                     <th class="px-6 py-3">اسم الفرع</th>
                     <th class="px-6 py-3">العنوان</th>
-                    <th class="px-6 py-3">رقم الهاتف</th>
+                    <th class="px-6 py-3">بيانات الأتصال</th>
                     <th class="px-6 py-3">اسم الشركة</th>
                     <th class="px-6 py-3">الإجراء</th>
                 </tr>

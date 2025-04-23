@@ -53,7 +53,7 @@
                     <td class="px-6 py-4">{{ $order->customer->name ?? 'غير محدد' }}</td>
                     <td class="px-6 py-4">{{ Str::limit($order->return_reason, 30) }}</td>
                     <td class="px-6 py-4">{{ \Carbon\Carbon::parse($order->return_date)->format('Y-m-d') }}</td>
-                    <td class="px-6 py-4">
+                    {{-- <td class="px-6 py-4">
                         @if($order->status == 'pending')
                             <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">معلق</span>
                         @elseif($order->status == 'completed')
@@ -63,18 +63,19 @@
                         @else
                             <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ $order->status }}</span>
                         @endif
-                    </td>
+                    </td> --}}
+                    <td>{{ $order->status }}</td>
                     <td class="px-6 py-4 flex space-x-2 space-x-reverse">
-                        <x-button href="{{ route('returns-management.show', $order->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md">
+                        <button href="{{ route('returns-management.show', $order->id) }}" class="text-blue-500 hover:text-blue-600  p-2 rounded-md">
                             <i class="fas fa-eye"></i>
-                        </x-button>
-                        <x-button href="{{ route('returns-management.edit', $order->id) }}" class="bg-yellow-500 hover:bg-yellow-600 text-white p-2 rounded-md">
+                        </button>
+                        <button href="{{ route('returns-management.edit', $order->id) }}" class="text-yellow-500 hover:text-yellow-600  p-2 rounded-md">
                             <i class="fas fa-edit"></i>
-                        </x-button>
+                        </button>
                         <form action="{{ route('returns-management.destroy', $order->id) }}" method="POST" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المرتجع؟');">
                             @csrf
                             @method('DELETE')
-                            <button type="submit" class="bg-red-500 hover:bg-red-600 text-white p-2 rounded-md">
+                            <button type="submit" class="text-red-500 hover:text-red-600  p-2 rounded-md">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </form>

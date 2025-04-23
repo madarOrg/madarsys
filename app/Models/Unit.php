@@ -45,6 +45,9 @@ public function branch()
    {
        return $this->parent()->with('parentRecursive');
    }
-   
+   public function orderDetails()
+   {
+       return $this->hasMany(OrderDetail::class, 'unit_id');
+   }
 
 }

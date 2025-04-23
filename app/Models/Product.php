@@ -138,4 +138,5 @@ public function supplier()
     {
         return $this->belongsToMany(Warehouse::class, 'inventory_products', 'product_id', 'warehouse_id')->distinct();
     }
+    
 }

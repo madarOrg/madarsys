@@ -4,12 +4,12 @@
 
         <div class="flex items-center space-x-2 space-x-reverse">
             <!-- زر إنشاء مرتجع جديد -->
-            <x-button href="{{ route('returns-suppliers.create') }}" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+            <x-button href="{{ route('returns-suppliers.create') }}" class="">
                 <i class="fas fa-plus ml-1"></i> إنشاء مرتجع مورد جديد
             </x-button>
             
             <!-- زر تقارير المرتجعات -->
-            <x-button href="{{ route('returns.reports.supplier') }}" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md">
+            <x-button href="{{ route('returns.reports.supplier') }}" class="">
                 <i class="fas fa-chart-bar ml-1"></i> تقارير مرتجعات الموردين
             </x-button>
         </div>
@@ -68,7 +68,7 @@
                         @endif
                     </td>
                     <td class="px-6 py-4 flex space-x-2 space-x-reverse">
-                        <x-button href="{{ route('returns-suppliers.show', $order->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md">
+                        {{-- <x-button href="{{ route('returns-suppliers.show', $order->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white p-2 rounded-md">
                             <i class="fas fa-eye"></i>
                         </x-button>
                         
@@ -98,7 +98,39 @@
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </form>
+                        @endif --}}
+                        <a href="{{ route('returns-suppliers.show', $order->id) }}" class="text-blue-500 hover:text-blue-600  p-2 rounded-md inline-block">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        
+                        @if($order->status == 'pending')
+                            <a href="{{ route('returns-suppliers.edit', $order->id) }}" class="text-yellow-500 hover:text-yellow-600  p-2 rounded-md inline-block">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        
+                            <a href="#" onclick="event.preventDefault(); if(confirm('هل أنت متأكد من إرسال هذا المرتجع للمورد؟')) { document.getElementById('send-return-{{ $order->id }}').submit(); }" class="bg-green-500 hover:bg-green-600 text-white p-2 rounded-md inline-block">
+                                <i class="fas fa-paper-plane"></i>
+                            </a>
+                            <form id="send-return-{{ $order->id }}" action="{{ route('returns-suppliers.send', $order->id) }}" method="POST" class="hidden">
+                                @csrf
+                                @method('PUT')
+                            </form>
                         @endif
+                        
+                        <a href="{{ route('returns-suppliers.print', $order->id) }}" class="text-purple-500 hover:text-purple-600  p-2 rounded-md inline-block" target="_blank">
+                            <i class="fas fa-print"></i>
+                        </a>
+                        
+                        @if($order->status != 'completed')
+                            <a href="#" onclick="event.preventDefault(); if(confirm('هل أنت متأكد من حذف هذا المرتجع؟')) { document.getElementById('delete-return-{{ $order->id }}').submit(); }" class="text-red-500 hover:text-red-600  p-2 rounded-md inline-block">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            <form id="delete-return-{{ $order->id }}" action="{{ route('returns-suppliers.destroy', $order->id) }}" method="POST" class="hidden">
+                                @csrf
+                                @method('DELETE')
+                            </form>
+                        @endif
+                        
                     </td>
                 </tr>
             @empty

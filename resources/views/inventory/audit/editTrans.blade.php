@@ -1,7 +1,7 @@
 <x-layout>
     <div>
         <form id="transaction-view-form" method="POST"
-            action="{{ route('inventory.transactions.update', $selectedTransaction->id ?? 0) }}">
+            action="{{ route('inventory.audit.updateTrans', $selectedTransaction->id ?? 0) }}">
             @csrf
             @method('PUT')
 
@@ -72,6 +72,7 @@
                                         <th class="px-6 py-3">المنتج</th>
                                         <th class="px-6 py-3">الوحدة</th>
                                         <th class="px-6 py-3">الكمية</th>
+                                        <th class="px-6 py-3">الكمية المتوقعة</th>
                                         <th class="px-6 py-3">سعر الوحدة</th>
                                         <th class="px-6 py-3">الإجمالي</th>
                                         <th class="px-6 py-3">إجراءات</th>
@@ -87,6 +88,12 @@
                                                 <!-- حقل الكمية -->
                                                 <td class="px-6 py-3">
                                                     <input type="number" name="quantities[]" value="{{ $item->quantity }}"
+                                                        class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1"
+                                                        onchange="updateTotal(this)" />
+                                                </td>
+                                                  <!-- حقل الكمية -->
+                                                  <td class="px-6 py-3">
+                                                    <input type="number" name="quantities_expected[]" value="{{ $item->expected_audit_quantity }}"
                                                         class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1"
                                                         onchange="updateTotal(this)" />
                                                 </td>
@@ -162,7 +169,8 @@
                         <select name="units[]" class="border rounded w-full">${unitOptions}</select>
                     </td>
                     <td class="px-6 py-3"><input type="number" name="quantities[]" class="border rounded w-full" oninput="updateTotal(this)"/></td>
-                    <td class="px-6 py-3"><input type="number" name="unit_prices[]" class="border rounded w-full" oninput="updateTotal(this)"/></td>
+                    <td class="px-6 py-3"><input type="number" name="quantities_expected[]" class="border rounded w-full" oninput="updateTotal(this)"/></td>
+                      <td class="px-6 py-3"><input type="number" name="unit_prices[]" class="border rounded w-full" oninput="updateTotal(this)"/></td>
                     <td class="px-6 py-3 total">0</td>
                     <td class="px-6 py-3">
                         <input type="hidden" name="totals[]" value="0" /> <!-- حقل مخفي للاحتفاظ بالقيمة الإجمالية -->

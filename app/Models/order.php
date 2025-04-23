@@ -5,10 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
+use App\Traits\HasBranch;
+use App\Traits\HasUser;
 
 class Order extends Model
 {
-    use HasFactory;
+    use 
+    HasBranch,
+    HasUser,
+    HasFactory;
 
     // الحقول القابلة للتعيين
     protected $fillable = [
@@ -20,6 +25,7 @@ class Order extends Model
         'purchase_order_number',
         'is_printed',
          'inventory_transaction_id',
+         'warehouse_id'
     ];
  
     // علاقة مع تفاصيل الطلب
@@ -40,7 +46,7 @@ class Order extends Model
 
     public function order_details() 
     {
-        return $this->hasMany(OrderDetail::class);
+        return $this->hasMany(OrderDetail::class,'order_id');
     }
 
     // علاقة مع الفاتورة
@@ -72,4 +78,9 @@ class Order extends Model
     {
         return $this->hasMany(SalesOrder::class);
     }
+   public function warehouse()
+{
+    return $this->belongsTo(Warehouse::class);
+}
+
 }

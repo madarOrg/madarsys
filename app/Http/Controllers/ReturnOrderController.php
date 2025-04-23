@@ -430,6 +430,7 @@ class ReturnOrderController extends Controller
             'notes' => 'إضافة مخزون من مرتجع العميل: ' . ($item->returnOrder->customer->name ?? 'غير محدد'),
             'created_user' => auth()->id() ?? 1,
             'updated_user' => auth()->id() ?? 1,
+            'transaction_date'     => now(), 
         ]);
         
         // تحديث كمية المنتج في المخزون

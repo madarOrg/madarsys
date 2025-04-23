@@ -136,35 +136,14 @@ class InventoryTransactionController extends Controller
         }
     }
 
-    // عرض صفحة تعديل العملية المخزنية
-    // public function edit($id)
-    // {
-    //     try {
-    //         // $transaction = InventoryTransaction::findOrFail($id);
-    //         // $transactionTypes = TransactionType::all();
-    //         // $partners = Partner::all();
-    //         // $departments = Department::all();
-    //         // // $warehouses = Warehouse::all();
-    //         $warehouses = Warehouse::ForUserWarehouse()->get();
-    //         $units = Unit::all(); // جلب جميع الوحدات
-
-    //         $products = Product::all();
-    //         // $warehouseLocations = WarehouseLocation::all();
-    //         $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($id);
-    //         $items = $selectedTransaction->items()->paginate(6);
-
-    //         return view('inventory.transactions.edit', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
-    //     } catch (\Exception $e) {
-    //         return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
-    //     }
-    // }
     public function edit($id)
     {
         try {
             $warehouses = Warehouse::ForUserWarehouse()->get();
             $units = Unit::all(); // جلب جميع الوحدات
             $products = Product::all();
-            
+            $warehouseLocations = WarehouseLocation::all();
+
             // جلب العملية المخزنية مع تفاصيل النوع والفرعي
             $selectedTransaction = InventoryTransaction::with(['transactionType', 'subtype', 'items.product', 'items.unit'])->find($id);
             $items = $selectedTransaction->items()->paginate(6);

@@ -254,6 +254,7 @@
 
         function addProductRow() {
             const tableBody = document.getElementById('transaction-items');
+            index++; 
             const newRow = `
                <tr class="product-row border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
     <td class="px-0 py-2">

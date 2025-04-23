@@ -245,10 +245,38 @@ class InventoryProductController extends Controller
         ]);
     }
 
+    // public function getProductInventory($transactionId)
+    // {
+    //     // جلب تفاصيل المنتج مع الكمية من جدول InventoryTransactionItem
+    //     $transaction = InventoryTransactionItem::with('product.unit')->find($transactionId);
+    
+    //     if (!$transaction) {
+    //         return response()->json(['error' => 'Transaction not found'], 404);
+    //     }
+    
+    //     // البحث عن الكمية المتبقية في المستودع
+    //     $remainingQuantity = DB::table('inventory_products')
+    //         ->where('product_id', $transaction->product_id)
+    //         ->where('warehouse_id', $transaction->warehouse_id)
+    //         ->select(DB::raw('SUM(converted_quantity * distribution_type) as total_quantity'))
+    //         ->value('total_quantity');
+    
+    //     // إذا لم يتم العثور على قيمة، يتم استخدام الكمية الأصلية
+    //     $quantity = $remainingQuantity !== null ? $remainingQuantity : $transaction->quantity;
+     
+    //         return response()->json([
+    //             'product_id' => $transaction->product_id,
+    //             'product_name' => $transaction->product->name,
+    //             'quantity' => $quantity,
+    //             'production_date' => $transaction->production_date,
+    //             'expiration_date' => $transaction->expiration_date,
+    //             'unit_name' => $transaction->product->unit?->name, // هنا اسم الوحدة
+    //         ]);
+    //     }
     public function getProductInventory($transactionId)
     {
         // جلب تفاصيل المنتج مع الكمية من جدول InventoryTransactionItem
-        $transaction = InventoryTransactionItem::with('product.unit')->find($transactionId);
+        $transaction = InventoryTransactionItem::with('product.unit', 'unit')->find($transactionId);
     
         if (!$transaction) {
             return response()->json(['error' => 'Transaction not found'], 404);
@@ -263,29 +291,41 @@ class InventoryProductController extends Controller
     
         // إذا لم يتم العثور على قيمة، يتم استخدام الكمية الأصلية
         $quantity = $remainingQuantity !== null ? $remainingQuantity : $transaction->quantity;
-     
-            return response()->json([
-                'product_id' => $transaction->product_id,
-                'product_name' => $transaction->product->name,
-                'quantity' => $quantity,
-                'production_date' => $transaction->production_date,
-                'expiration_date' => $transaction->expiration_date,
-                'unit_name' => $transaction->product->unit?->name, // هنا اسم الوحدة
-            ]);
-        }
     
+        return response()->json([
+            'product_id' => $transaction->product_id,
+            'product_name' => $transaction->product->name,
+            'quantity' => $quantity,
+            'production_date' => $transaction->production_date,
+            'expiration_date' => $transaction->expiration_date,
+            'unit_name' => $transaction->product->unit?->name, // اسم وحدة المنتج
+            'transaction_unit_name' => $transaction->unit ? $transaction->unit->name : '---', // اسم وحدة الحركة
+        ]);
+    }
+        
     public function create(Request $request)
     {
 
         $transactions = collect();
+
         $products = InventoryTransaction::with('items.product.unit')
-        ->get()
-        ->flatMap(function ($transaction) {
-            return $transaction->items->map(function ($item) {
-                return $item->product;
-            });
-        })
-        ->unique('id');
+    ->get()
+    ->flatMap(function ($transaction) {
+        return $transaction->items->map(function ($item) {
+            return $item->product; // تأكد أنه يعود كنموذج Eloquent مع العلاقات
+        });
+    })
+    ->unique('id')
+    ->values(); // إعادة ترتيب الفهارس
+
+    $transactions = InventoryTransactionItem::with('product.unit', 'inventoryTransaction')
+    ->whereHas('inventoryTransaction', function ($query) use ($request) {
+        if ($request->warehouse_id) {
+            $query->where('warehouse_id', $request->warehouse_id);
+        }
+    })
+    ->get();
+
     
         // $products = $transactions->unique('product_id')->values(); // تجنب التكرار واسترجاع القيم
 

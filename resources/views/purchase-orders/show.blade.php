@@ -13,7 +13,7 @@
                     @if($purchaseOrder->status === 'pending')
                         <form action="{{ route('purchase-orders.approve', $purchaseOrder->id) }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                            <button type="submit" class="bg-green-600 text-gray-600 px-4 py-2 rounded-md hover:bg-green-700">
                                 <i class="fas fa-check ml-1"></i> اعتماد
                             </button>
                         </form>
@@ -25,17 +25,17 @@
                         </a>
                     @endif
                     
-                    <a href="{{ route('purchase-orders.print', $purchaseOrder->id) }}" class="bg-green-200 text-white px-4 py-2 rounded-md hover:bg-green-200" target="_blank">
+                    <a href="{{ route('purchase-orders.print', $purchaseOrder->id) }}" class="bg-green-200 text-gray-600 px-4 py-2 rounded-md hover:bg-green-200" target="_blank">
                         <i class="fas fa-print ml-1"></i> طباعة
                     </a>
                     
-                    <a href="{{ route('purchase-orders.edit', $purchaseOrder->id) }}" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">
+                    {{-- <a href="{{ route('purchase-orders.edit', $purchaseOrder->id) }}" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">
                         <i class="fas fa-edit ml-1"></i> تعديل
-                    </a>
+                    </a> --}}
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-2 gap-6 mb-6 rounded-md border border-gray-300">
                 <div class="bg-gray-50 p-4 rounded-md">
                     <h3 class="text-lg font-semibold mb-3">معلومات أمر الشراء</h3>
                     <div class="grid grid-cols-2 gap-4">
@@ -64,7 +64,7 @@
                     </div>
                 </div>
                 
-                <div class="bg-gray-50 p-4 rounded-md">
+                <div class=" p-4 rounded-md">
                     <h3 class="text-lg font-semibold mb-3">معلومات المورد</h3>
                     <div>
                         <p class="font-semibold">اسم المورد: <span class="font-normal">{{ $purchaseOrder->partner->name ?? 'غير محدد' }}</span></p>
@@ -85,9 +85,9 @@
             <div class="mt-6">
                 <h3 class="text-lg font-semibold mb-3">تفاصيل الطلب</h3>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300">
-                        <thead>
-                            <tr class="bg-gray-100">
+                    <table class="min-w-full w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
                                 <th class="py-2 px-4 ">#</th>
                                 <th class="py-2 px-4 ">المنتج</th>
                                 <th class="py-2 px-4 ">الوحدة</th>
@@ -100,9 +100,9 @@
                             @php $total = 0; @endphp
                             @foreach($purchaseOrder->order->order_details as $index => $detail)
                                 @php $subtotal = $detail->quantity * $detail->price; $total += $subtotal; @endphp
-                                <tr>
+                                <tr  class="item-row bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                                     <td class="py-2 px-4  text-center">{{ $index + 1 }}</td>
-                                    <td class="py-2 px-4 ">{{ $detail->product->name ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4 ">{{ $detail->product->name ?? 'غير محدد' }}-{{ $detail->product->barcode ?? 'غير محدد' }}-{{ $detail->product->sku ?? 'غير محدد' }}</td>
                                     <td class="py-2 px-4  text-center">{{ $detail->unit->name ?? 'غير محدد' }}</td>
                                     <td class="py-2 px-4  text-center">{{ $detail->quantity }}</td>
                                     <td class="py-2 px-4  text-center">{{ number_format($detail->price, 2) }}</td>

@@ -233,16 +233,17 @@
                                                 value="{{ $detail->price }}" min="0"
                                                 class="price-input w-full p-2 border rounded" required>
                                         </td>
-                                        <td class="px-4 py-2 ">
-                                            <select name="items[{{ $index }}][unit_id]"
-                                                class="w-full p-2 border rounded" required>
+                                        <td class="px-4 py-2">
+                                            <select name="items[{{ $index }}][unit_id]" class="w-full p-2 border rounded" required>
                                                 @foreach ($units as $unit)
                                                     <option value="{{ $unit->id }}"
-                                                        {{ $detail->product->unit_id == $unit->id ? 'selected' : '' }}>
-                                                        {{ $unit->name }}</option>
+                                                        {{ $detail->unit_id == $unit->id ? 'selected' : '' }}>
+                                                        {{ $unit->name }}
+                                                    </option>
                                                 @endforeach
                                             </select>
                                         </td>
+                                        
                                         <td class="">
                                             <input type="date" name="items[{{ $index }}][production_date]"
                                                 class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />

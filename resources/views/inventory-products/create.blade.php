@@ -11,15 +11,22 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-4">
                     <input type="hidden" name="distribution_type" value="1">
 
-                    <div class="mb-4">
+                    {{-- <div class="mb-4">
                         <label for="batch_number" class="form-label">رقم الدفعة</label>
                         <div class="form-control bg-light" id="batch_number">
                             {{ $batch_number ?? 'يتم توليده تلقائيًا' }}
                         </div>
+                    </div> --}}
+                    <div class="mb-4">
+                        <label for="batch_number" class="block text-sm font-medium text-gray-700 form-label">رقم الدفعة</label>
+                        <input type="text" class="form-control bg-light w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1" id="batch_number" name="batch_number"
+                               value="{{ $batch_number ?? 'يتم توليده تلقائيًا' }}" readonly>
                     </div>
                     
+                    
                     <!-- اختيار المستودع -->
-                    <div class="mb-4">
+                    <div class="mt-2">
+                        <label for="warehouse_id" class=" block text-sm font-medium text-gray-700">المستودع</label>
                         <select id="warehouse_id" name="warehouse_id" class="tom-select w-full">
                             <option value="">اختر مستودعًا</option>
                             @foreach ($warehouses as $warehouse)
@@ -31,8 +38,9 @@
 
                     <!-- اختيار الحركة المخزنية -->
                     <div class="mb-4">
-                        <div class="mb-4">
-                            
+                        <div class="mt-2">
+                            <label for="inventory_transaction_item_id"
+                            class="block text-sm font-medium text-gray-700">الحركة المخزنية</label>
                             <select id="inventory_transaction_item_id" name="inventory_transaction_item_id"
                                 class="tom-select w-full"
                                 data-route="{{ url('/get-inventory-transactions/${warehouseId}') }}">
@@ -45,6 +53,8 @@
                                     </option>
                                 @endforeach
                             </select>
+                            <span id="productUnitName">{{  $transaction->unit->name ?? '---' }}</span>
+
                         </div>
 
                     </div>
@@ -60,26 +70,15 @@
                         <x-file-input type="timestamp" id="expiration_date" name="expiration_date" label="تاريخ الانتهاء"  />
                     </div>
                     
-                    <!-- اختيار المنتج -->
-                    {{-- <div class="mb-4">
-                        <x-select name="product_id" :options="$products->toArray()" :route="url('/api/search/products')" />
-
-                    </div> --}}
-
-                    {{-- <div class="mb-4">
-                        <x-file-input type="date" id="production_date" name="production_date"
-                            label="تاريخ الإنتاج" />
-                    </div>
-                    <div class="mb-4">
-                        <x-file-input type="date" id="expiration_date" name="expiration_date"
-                            label="تاريخ الانتهاء" />
-                    </div> --}}
+                   
                     <div class="mb-4 flex items-center gap-2">
                         <x-file-input type="number" id="quantity" name="quantity" label="الكمية" required min="1" />
-                        <span class="text-lg font-semibold">/</span>
-                        <span id="quantityOfProduct" class="px-3 py-2-200 rounded-md text-center min-w-[50px]">0</span>
-                        <span id="productUnitName">---</span>
-                    </div>
+                        <span style="font-size: 60px; font-weight: bold;" class="mt-4">/</span>
+                        <span id="quantityOfProduct"  class=" bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-4"
+                        >0</span>
+                        <span id="transactionUnitName" class="text-sm text-gray-500 dark:text-gray-400 ml-2"></span>
+
+                     </div>
                     
 
                     <!-- اختيار المنطقة التخزينية -->
@@ -129,7 +128,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const productionDateInput = document.getElementById('production_date');
     const expirationDateInput = document.getElementById('expiration_date');
     const quantityInput = document.getElementById('quantityOfProduct'); // إضافة الكمية
+    const unitNameSpan = document.getElementById('productUnitName');
 
+    
     // دالة لجلب الحركات المخزنية بناءً على المستودع المحدد
     async function loadTransactions(warehouseId) {
         if (!warehouseId) {
@@ -197,6 +198,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     unitNameSpan.innerText = product.unit_name || '---'; // عرض اسم الوحدة
 
                     // document.getElementById('quantityOfProduct').innerText = product.quantity || '0';
+document.getElementById('transactionUnitName').innerText = product.transaction_unit_name || '---';
 
                     console.log('fetching product:', product.quantity );
 

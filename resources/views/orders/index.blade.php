@@ -15,10 +15,10 @@
         </div>
          <div class="flex">
                 <x-button :href="route('orders.pending-approval')" type="button" class=" ">
-                    <i class="fas fa-clipboard-list mr-2"></i> طلبات الشراء المعلقة
+                    <i class="fas fa-clipboard-list mr-2"></i> الطلبات المعلقة
                 </x-button>
                 <x-button :href="route('orders.check-confirmed')" type="button" class="">
-                    <i class="fas fa-clipboard-check mr-2"></i> طلبات الشراء المؤكدة
+                    <i class="fas fa-clipboard-check mr-2"></i> الطلبات المؤكدة
                 </x-button>
                 <x-button :href="route('orders.create')" type="button" class="">
                     <i class="fas fa-plus mr-2"></i> إضافة طلب جديد
@@ -30,7 +30,7 @@
             <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                         <th class="">رقم الطلب</th>
-                        <th class="px-6 py-3">الفرع</th>
+                        {{-- <th class="px-6 py-3">الفرع</th> --}}
                         <th class="px-6 py-3">المستودع</th>
                         <th class="px-6 py-3">نوع الطلب</th>
                         <th class="px-6 py-3">حالة الطلب</th>
@@ -45,15 +45,20 @@
                     @foreach($orders as $order)
                     <tr  class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
 
-                        <td class="p-4">{{ $order->id }}</td>
-                            <td class="px-6 py-4">{{ $order->branch->name ?? 'لايوجد' }}</td>
+                        <td class="p-2">{{ $order->id }}</td>
+                            {{-- <td class="px-6 py-4">{{ $order->branch->name ?? 'لايوجد' }}</td> --}}
                             <td class="px-6 py-4">{{ $order->warehouse->name ?? 'لايوجد' }}</td>
 
                             <td class="px-6 py-4">{{ $order->type == 'buy' ? 'شراء' : 'بيع' }}</td>
                             <td class="px-6 py-4">{{ $order->status }}</td>
-                            @foreach($order->order_details as $detail)
-                            <td class="px-6 py-4">{{ $detail->product->name ?? 'لايوجد' }}</td>
-                            @endforeach
+                            <td class="px-6 py-4">
+                                @foreach($order->order_details as $detail)
+                                    • {{ $detail->product->name ?? 'لا يوجد' }} - {{ $detail->product->barcode ?? 'لا يوجد' }} - {{ $detail->product->sku ?? 'لا يوجد' }}  
+                                    ({{ $detail->quantity }}  
+                                    {{ $detail->unit->name ?? 'بدون وحدة' }})<br>
+                                @endforeach
+                            </td>
+                        
                             <td class="px-6 py-4">{{ $order->paymentType->name ?? 'لايوجد' }}</td>
                             <td class="px-6 py-4">
                                 <a href="{{ route('orders.edit', $order->id) }}"
@@ -69,7 +74,10 @@
                         </tr>
                     @endforeach
                 </tbody>
-            </table>
+                
+            </table>  <x-pagination-links :paginator="$orders" />
+          
+
         </div>
 
         <!-- إضافة pagination -->
@@ -77,4 +85,4 @@
             {{ $orders->links() }}
         </div>
     </section>
-</x-layout>
+</x-layout> 

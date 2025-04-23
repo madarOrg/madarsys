@@ -207,12 +207,18 @@ class InventoryTransactionDistributeLivewire extends Component
             ->get();
 
         // Automatically set the first transaction after search
-        if ($this->transactions->isNotEmpty()) {
+        if ($this->transaction->isNotEmpty()) {
             $this->selectedTransactionId = $this->transactions[0]->id;
             $this->loadTransactionDetails();
         }
     }
-
+    // public function updated($propertyName)
+    // {
+    //     if ($propertyName === 'search') {
+    //         $this->searchTransactions();
+    //     }
+    // }
+    
  public function toggleDistribution($transactionId)
 {
     // ابحث عن المعاملة في المصفوفة

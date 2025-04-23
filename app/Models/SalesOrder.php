@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Order;
 
 class SalesOrder extends Model
 {
@@ -25,9 +26,10 @@ class SalesOrder extends Model
     // علاقة مع الطلب الأصلي
     public function order()
     {
-        return $this->belongsTo(Order::class);
+        return $this->belongsTo(Order::class, 'order_id');
     }
-
+    
+    
     // علاقة مع العميل/الشريك
     public function partner()
     {

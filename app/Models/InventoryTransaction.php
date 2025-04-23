@@ -4,11 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\
-{
-HasBranch,
-HasUser
-};
+use App\Traits\HasBranch;
+use App\Traits\HasUser;
 
 class InventoryTransaction extends Model
 {
@@ -32,6 +29,7 @@ class InventoryTransaction extends Model
         'created_user', 
         'updated_user',
         'status',
+        'transaction_date',   
     ];
     
     protected $casts = [
@@ -63,7 +61,11 @@ class InventoryTransaction extends Model
     {
         return $this->hasMany(InventoryTransactionItem::class);
     }
-    
+    public function audit()
+    {
+        return $this->belongsTo(InventoryAudit::class, 'id','inventory_transaction_id');
+    }
+  
     public function transactionType()
     {
         return $this->belongsTo(TransactionType::class, 'transaction_type_id');

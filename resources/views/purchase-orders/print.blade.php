@@ -135,7 +135,7 @@
                         @php $subtotal = $detail->quantity * $detail->price; $total += $subtotal; @endphp
                         <tr>
                             <td class="border p-2 text-center">{{ $index + 1 }}</td>
-                            <td class="border p-2">{{ $detail->product->name ?? 'غير محدد' }}</td>
+                            <td class="border p-2">{{ $detail->product->name ?? 'غير محدد' }}-{{ $detail->product->barcode ?? 'غير محدد' }}-{{ $detail->product->sku ?? 'غير محدد' }}</td>
                             <td class="border p-2 text-center">{{ $detail->unit->name ?? 'غير محدد' }}</td>
                             <td class="border p-2 text-center">{{ $detail->quantity }}</td>
                             <td class="border p-2 text-center">{{ number_format($detail->price, 2) }}</td>

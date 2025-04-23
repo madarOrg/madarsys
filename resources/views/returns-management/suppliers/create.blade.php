@@ -3,10 +3,10 @@
         <x-title title="إنشاء مرتجع مورد جديد"></x-title>
 
         <div class="flex items-center space-x-2 space-x-reverse">
-            <button type="submit" form="supplier-return-form" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+            <x-button type="submit" form="supplier-return-form" class="">
                 <i class="fas fa-save ml-1"></i> حفظ المرتجع
-            </button>
-            <x-button href="{{ route('returns-suppliers.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
+            </x-button>
+            <x-button href="{{ route('returns-suppliers.index') }}" class="">
                 <i class="fas fa-arrow-right ml-1"></i> العودة إلى مرتجعات الموردين
             </x-button>
         </div>
@@ -106,7 +106,7 @@
                         </div>
                         
                         <button type="button" class="remove-item mt-2 text-red-600 hover:text-red-800" style="display: none;">
-                            <i class="fas fa-trash"></i> إزالة
+                            <i class="fas fa-trash"></i> 
                         </button>
                     </div>
                 </div>
@@ -117,9 +117,9 @@
             </div>
             
             <div class="mt-8 flex justify-end">
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
+                <x-button type="submit" class="">
                     <i class="fas fa-save ml-1"></i> حفظ المرتجع
-                </button>
+                </x-button>
             </div>
         </form>
     </div>

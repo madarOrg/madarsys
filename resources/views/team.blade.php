@@ -8,7 +8,7 @@
             <div class="grid gap-8 lg:gap-16 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 <div class="text-center text-gray-500 dark:text-gray-400">
                     {{-- <img class="mx-auto mb-4  w-24 h-24 rounded-full" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/joseph-mcfall.png" alt="Imad Avatar"> --}}
-                    <img class="mx-auto mb-4 w-16 h-16 rounded-full object-cover" src="{{ asset('storage/images/emad.jpg') }}" alt="emad Avatar">
+                    <img class="mx-auto mb-4 w-16 h-16 rounded-full object-cover" src="{{ asset('storage/images/img-emad.jpg') }}" alt="emad Avatar">
 
                     <h3 class="mb-1 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
                         <a href="#">د.عماد العزعزي</a>
@@ -68,11 +68,13 @@
                     </ul>
                 </div>
                 <div class="text-center text-gray-500 dark:text-gray-400">
-                    <img class="mx-auto mb-4 w-16 h-16 rounded-full object-cover" src="{{ asset('storage/images/Kawther.jpg') }}" alt="Kawther Avatar">
+                    {{-- <img class="mx-auto mb-4  w-24 h-24 rounded-full" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/sofia-mcguire.png" alt="Sofia Avatar"> --}}
+                    <img class="mx-auto mb-4 w-16 h-16 rounded-full object-cover" src="{{ asset('storage/images/esraa.jpg') }}" alt="esraa Avatar">
+
                     <h3 class="mb-1 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        <a href="#"> كوثر العشاوي</a>
+                        <a href="#">اسراء الشميري</a>
                     </h3>
-                    <p>Analyst and Designer</p>
+                    <p>Web Designer</p>
                     <ul class="flex justify-center mt-4 space-x-4">
                         <li>
                             <a href="#" class="text-[#39569c] hover:text-gray-900 dark:hover:text-white">
@@ -96,6 +98,7 @@
                         </li> 
                     </ul>
                 </div>
+               
                 <div class="text-center text-gray-500 dark:text-gray-400">
                     {{-- <img class="mx-auto mb-4  w-24 h-24 rounded-full" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/sofia-mcguire.png" alt="Sofia Avatar"> --}}
                     <img class="mx-auto mb-4 w-16 h-16 rounded-full object-cover" src="{{ asset('storage/images/wfa.jpg') }}" alt="wfa Avatar">
@@ -128,13 +131,11 @@
                     </ul>
                 </div>
                 <div class="text-center text-gray-500 dark:text-gray-400">
-                    {{-- <img class="mx-auto mb-4  w-24 h-24 rounded-full" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/avatars/sofia-mcguire.png" alt="Sofia Avatar"> --}}
-                    <img class="mx-auto mb-4 w-16 h-16 rounded-full object-cover" src="{{ asset('storage/images/esraa.jpg') }}" alt="esraa Avatar">
-
+                    <img class="mx-auto mb-4 w-16 h-16 rounded-full object-cover" src="{{ asset('storage/images/Kawther.jpg') }}" alt="Kawther Avatar">
                     <h3 class="mb-1 text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-                        <a href="#">اسراء الشميري</a>
+                        <a href="#"> كوثر العشاوي</a>
                     </h3>
-                    <p>Web Designer</p>
+                    <p>Analyst and Designer</p>
                     <ul class="flex justify-center mt-4 space-x-4">
                         <li>
                             <a href="#" class="text-[#39569c] hover:text-gray-900 dark:hover:text-white">

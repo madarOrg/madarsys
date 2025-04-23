@@ -1,5 +1,17 @@
 <x-layout>
     <section class="mb-1 p-6  shadow-md rounded-lg">
+        <form method="GET" action="{{ route('orders.create',['type' => 'sale'])}}">
+            <select name="warehouse_id" onchange="this.form.submit()">
+                <option value="">اختر المستودع</option>
+                @foreach($warehouses as $warehouse)
+                    <option value="{{ $warehouse->id }}" {{ request('warehouse_id') == $warehouse->id ? 'selected' : '' }}>
+                        {{ $warehouse->name }}
+                    </option>
+                @endforeach
+            </select>
+           
+          </div>
+          </form>
         <form action="{{ route('invoices.store', ['type' => 'sale']) }}" method="POST">
             @csrf
             <div class="  dark:bg-gray-900 mb-24">
@@ -15,7 +27,7 @@
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-4 items-end w-full">
                 
-                    <div class="mb-2">
+                    {{-- <div class="mb-2">
                         <label for="warehouse_id"
                             class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع</label>
                         <select name="warehouse_id" id="warehouse_id" class="tom-select w-full " required>
@@ -24,7 +36,7 @@
                                 <option value="{{ $Warehouse->id }}">{{ $Warehouse->name }}</option>
                             @endforeach
                         </select>
-                    </div>
+                    </div> --}}
 
                     <!-- partner Selection -->
                     <div class="mb-2">

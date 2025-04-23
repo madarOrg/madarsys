@@ -67,7 +67,7 @@
                             @foreach($order->order_details as $detail)
                                 <tr
                                 class="bg-gray-200  dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
-                                    <td class="py-2 px-4 ">{{ $detail->product->name ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4 ">{{ $detail->product->name ?? 'غير محدد' }}-{{ $detail->product->barcode ?? 'غير محدد' }}-{{ $detail->product->sku ?? 'غير محدد' }}</td>
                                     <td class="py-2 px-4  text-center">{{ $detail->quantity }}</td>
                                     <td class="py-2 px-4  text-center">{{ $detail->price }}</td>
                                     <td class="py-2 px-4  text-center">{{ $detail->quantity * $detail->price }}</td>
@@ -85,10 +85,10 @@
                     </table>
                 </div>
                 
-                <div class="mt-8 flex justify-center">
-                    <button type="submit" class="bg-green-600 text-white font-bold py-3 px-10 rounded-lg shadow-lg hover:bg-green-700 focus:outline-none focus:ring-4 focus:ring-green-500 focus:ring-opacity-75 transition duration-300 ease-in-out text-lg">
-                        <i class="fas fa-save mr-2"></i> حفظ أمر الصرف
-                    </button>
+                <div class="mt-8 flex justify-end">
+                    <x-button type="submit" class="">
+                        حفظ أمر الصرف
+                    </x-button>
                 </div>
             </form>
         </div>

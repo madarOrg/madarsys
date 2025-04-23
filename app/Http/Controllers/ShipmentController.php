@@ -7,13 +7,31 @@ use Illuminate\Http\Request;
 
 class ShipmentController extends Controller
 {
+    // public function index()
+    // {
+    //     // عرض جميع الشحنات
+    //     $shipments = Shipment::with('product')->get();
+    //     return view('shipments.index', compact('shipments'));
+    // }
     public function index()
-    {
-        // عرض جميع الشحنات
-        $shipments = Shipment::with('product')->get();
-        return view('shipments.index', compact('shipments'));
-    }
+{
+    // التحقق من وجود قيمة بحث
+    $search = request('search');
+    
+    // جلب الشحنات مع البحث إذا كانت هناك قيمة في مربع البحث
+    $shipments = Shipment::with('product')
+                         ->when($search, function($query) use ($search) {
+                             return $query->where('shipment_number', 'like', '%'.$search.'%')
+                                          ->orWhereHas('product', function($query) use ($search) {
+                                              $query->where('name', 'like', '%'.$search.'%');
+                                          });
+                         })
+                         ->get();
 
+    return view('shipments.index', compact('shipments'));
+}
+
+   
     public function create()
     {
         // عرض قائمة المنتجات عند إنشاء شحنة جديدة
@@ -145,20 +163,20 @@ class ShipmentController extends Controller
         $product->increment('stock_quantity', $validated['received_quantity']);
         
         // إنشاء حركة مخزنية
-        $inventoryTransaction = new \App\Models\InventoryTransaction([
-            'product_id' => $product->id,
-            'quantity' => $validated['received_quantity'],
-            'type' => 'shipment_receive',
-            'reference_id' => $shipment->id,
-            'reference_type' => 'App\Models\Shipment',
-            'transaction_type_id' => 1, // نوع الحركة: استلام شحنة
-            'warehouse_id' => 1, // المخزن الافتراضي
-            'notes' => 'استلام شحنة رقم: ' . $shipment->shipment_number,
-        ]);
-        $inventoryTransaction->save();
+        // $inventoryTransaction = new \App\Models\InventoryTransaction([
+        //     'product_id' => $product->id,
+        //     'quantity' => $validated['received_quantity'],
+        //     'type' => 'shipment_receive',
+        //     'reference_id' => $shipment->id,
+        //     'reference_type' => 'App\Models\Shipment',
+        //     'transaction_type_id' => 1, // نوع الحركة: استلام شحنة
+        //     'warehouse_id' => 1, // المخزن الافتراضي
+        //     'notes' => 'استلام شحنة رقم: ' . $shipment->shipment_number,
+        // ]);
+        // $inventoryTransaction->save();
         
         return redirect()->route('shipments.index')
-            ->with('success', 'تم استلام الشحنة وتحديث المخزون بنجاح!');
+            ->with('success', 'تم استلام الشحنة !');
     }
 
     /**
@@ -190,11 +208,30 @@ class ShipmentController extends Controller
     /**
      * عرض صفحة تتبع الشحنات
      */
-    public function trackIndex()
-    {
-        // جلب جميع الشحنات للتتبع
-        $shipments = Shipment::with('product')->get();
+    // public function trackIndex()
+    // {
+    //     // جلب جميع الشحنات للتتبع
+    //     $shipments = Shipment::with('product')->get();
         
-        return view('shipments.track_index', compact('shipments'));
+    //     return view('shipments.track_index', compact('shipments'));
+    // }
+    public function trackIndex(Request $request)
+{
+    $query = Shipment::with('product');
+
+    // فلترة برقم الشحنة إذا تم إدخاله
+    if ($request->filled('search')) {
+        $query->where('shipment_number', 'like', '%' . $request->search . '%');
     }
+
+    // فلترة بالحالة إذا تم تحديدها
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    $shipments = $query->get();
+
+    return view('shipments.track_index', compact('shipments'));
+}
+
 }

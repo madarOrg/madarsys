@@ -43,25 +43,27 @@
                         {{-- <td class="px-6 py-4">{{ $shipment->address }}</td> --}}
                         <td class="px-6 py-4 flex space-x-2">
                             <!-- زر استلام الشحنة -->
-                            @if($shipment->status !== 'received')
-                            <x-button href="{{ route('shipments.receive.form', $shipment->id) }}" class="text-green-600 hover:underline ml-2">
-                                <i class="fas fa-check-circle"></i>
-                            </x-button>
-                            @endif
-                            
-                            <!-- زر التعديل -->
-                            <x-button href="{{ route('shipments.edit', $shipment->id) }}" class="text-yellow-600 hover:underline">
-                                <i class="fas fa-pen"></i>
-                            </x-button>
+                           <!-- رابط الاستلام -->
+@if ($shipment->status != 'received')
+<a href="{{ route('shipments.receive.form', $shipment->id) }}" class="text-green-600 hover:underline ml-4 text-lg">
+    <i class="fas fa-check-circle"></i>
+</a>
+@endif
 
-                            <!-- زر الحذف -->
-                            <form action="{{ route('shipments.destroy', $shipment->id) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <x-button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('هل أنت متأكد من حذف هذه الشحنة؟')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </x-button>
-                            </form>
+<!-- رابط التعديل -->
+<a href="{{ route('shipments.edit', $shipment->id) }}" class="text-blue-600 hover:underline mx-4 text-lg">
+<i class="fas fa-pen"></i>
+</a>
+
+<!-- رابط الحذف -->
+<form action="{{ route('shipments.destroy', $shipment->id) }}" method="POST" class="inline-block">
+@csrf
+@method('DELETE')
+<a href="#" onclick="event.preventDefault(); if(confirm('هل أنت متأكد من حذف هذه الشحنة؟')) this.closest('form').submit();" class="text-red-600 hover:text-red-800 mx-4 text-lg">
+    <i class="fas fa-trash-alt"></i>
+</a>
+</form>
+
                         </td>
                     </tr>
                 @endforeach

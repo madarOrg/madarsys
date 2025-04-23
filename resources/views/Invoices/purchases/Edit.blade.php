@@ -29,7 +29,7 @@
                              class="block text-sm font-medium text-gray-600 dark:text-gray-400">المستودع</label>
                          <select name="warehouse_id" id="warehouse_id" class="tom-select w-full" required>
                              <option value="" selected>اختر المستودع</option>
-                             @foreach ($Warehouses as $Warehouse)
+                             @foreach ($warehouses as $Warehouse)
                                  <option value="{{ $Warehouse->id }}"
                                      {{ $invoice->warehouse_id == $Warehouse->id ? 'selected' : '' }}>
                                      {{ $Warehouse->name }}

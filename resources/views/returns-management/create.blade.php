@@ -3,9 +3,9 @@
         <x-title :title="'إنشاء مرتجع جديد'"></x-title>
 
         <div class="flex items-center space-x-2 space-x-reverse">
-            <button type="submit" form="return-form" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md">
+            <x-button type="submit" form="return-form" class="">
                 <i class="fas fa-save ml-1"></i> حفظ المرتجع
-            </button>
+            </x-button>
             <x-button href="{{ route('returns-management.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
                 <i class="fas fa-arrow-right ml-1"></i> العودة إلى المرتجعات
             </x-button>

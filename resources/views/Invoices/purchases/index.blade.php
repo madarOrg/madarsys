@@ -8,7 +8,7 @@
                     <x-button :href="route('invoices.create', ['type' => 'purchase'])" class="">
                         <i class="fas fa-plus mr-2"></i> إضافة فاتورة جديدة
                     </x-button>
-                    <x-button :href="route('invoices.confirmed-orders')" class="">
+                    <x-button :href="route('invoices.purchase-orders')" class="">
                         <i class="fas fa-clipboard-check mr-2"></i> فواتير من طلبات الشراء
                     </x-button>
                 </div>
@@ -91,7 +91,7 @@
         </div>
 
         <!-- جدول الفواتير -->
-        <div class="overflow-x-auto bg-white shadow-md rounded-lg ">
+        <div class="overflow-x-auto  shadow-md rounded-lg ">
             <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
                 <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-200">
                     <tr>
@@ -110,7 +110,7 @@
                 </thead>
                 <tbody>
                     @forelse ($invoices as $invoice)
-                        <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                        <tr class=" border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                             <td class="p-4">{{ $invoice->id }}</td>
                             <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $invoice->invoice_code }}</td>
                             <td class=" p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($invoice->branch)->name ?? 'غير محدد' }}</td>
@@ -158,6 +158,8 @@
                     @endforelse
                 </tbody>
             </table>
+            <x-pagination-links :paginator="$invoices" />
+
         </div>
     </section>
 </x-layout>

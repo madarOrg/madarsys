@@ -41,7 +41,7 @@
                                 <th class="p-2 border">يمكن الإضافة</th>
                                 <th class="p-2 border">يمكن التحديث</th>
                                 <th class="p-2 border">يمكن الحذف</th>
-                                <th class="p-2 border">الحالة</th>
+                                {{-- <th class="p-2 border">الحالة</th> --}}
                             </tr>
                         </thead>
                         <tbody class="bg-white dark:bg-gray-800 dark:text-gray-200">
@@ -73,14 +73,14 @@
                                             {{ isset($existing['can_delete']) && $existing['can_delete'] ? 'checked' : '' }}
                                             class="text-red-600 border-gray-300 rounded dark:bg-gray-800 dark:border-gray-600">
                                     </td>
-                                    <td class="p-2 border">
+                                    {{-- <td class="p-2 border">
                                         <select name="permissions[{{ $permission->id }}][status]"
                                             class="w-full border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600 dark:text-white">
                                             <option value="">-- اختر --</option>
                                             <option value="1" {{ isset($existing['status']) && $existing['status'] == 1 ? 'selected' : '' }}>مفعل</option>
                                             <option value="0" {{ isset($existing['status']) && $existing['status'] == 0 ? 'selected' : '' }}>غير مفعل</option>
                                         </select>
-                                    </td>
+                                    </td> --}}
                                 </tr>
                             @endforeach
                         </tbody>

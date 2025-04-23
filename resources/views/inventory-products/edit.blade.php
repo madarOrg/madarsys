@@ -30,9 +30,9 @@
 
                     <!-- المستودع -->
                     <div class="mb-4">
-                        <label for="warehouse_id" class="block text-sm font-medium text-gray-700">المستودع</label>
+                        <label for="warehouse_id" class=" block text-sm font-medium text-gray-700">المستودع</label>
                         <input type="text" id="warehouse_id" value="{{ $product->warehouse->name }}"
-                            class="form-control" readonly />
+                            class="form-control w-full" readonly />
                     </div>
 
                     <!-- الحركة المخزنية -->
@@ -41,7 +41,7 @@
                             class="block text-sm font-medium text-gray-700">الحركة المخزنية</label>
                         <input type="text" id="inventory_transaction_item_id"
                             value="{{ $product->transactionItem->inventoryTransaction->reference }}"
-                            class="form-control" readonly />
+                            class="form-control w-full" readonly />
                     </div>
 
                     <!-- تاريخ الإنتاج -->

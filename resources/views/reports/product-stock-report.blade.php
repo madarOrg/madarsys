@@ -157,6 +157,7 @@
                             <th class="border p-2">الباركود</th>
                             <th class="border p-2">الشركة المصنعة</th>
                             <th class="border p-2">البراند</th>
+                            <th class="border p-2"> الكمية المتاحة</th>
                             <th class="border p-2">المورد</th>
                             <th class="border p-2">الحد الأدنى</th>
                             <th class="border p-2">الحد الأقصى</th>
@@ -178,25 +179,27 @@
                                     @endif
                                 </td>
                                 
-                                <td class="border p-2">{{ $product->name }}</td>
-                                <td class="border p-2">{{ $product->sku }}</td>
-                                <td class="border p-2">{{ $product->barcode }}</td>
-                                <td class="border p-2">{{ optional($product->manufacturer)->name ?? 'غير متاح' }}</td>
-                                <td class="border p-2">{{ optional($product->brand)->name ?? 'غير متاح' }}</td>
-                                <td class="border p-2">{{ optional($product->supplier)->name ?? 'غير متاح' }}</td>
-                                <td class="border p-2">{{ $product->min_quantity ?? 'غير محدد' }}</td>
-                                <td class="border p-2">{{ $product->max_quantity ?? 'غير محدد' }}</td>
-                                <td class="border p-2">
-                                    @if (!empty($product->components))
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->name }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->sku }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->barcode }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product->manufacturingCountry)->name ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product->brand)->name ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product)->total_quantity ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product->supplier)->name ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->min_stock_level ?? 'غير محدد' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->max_stock_level ?? 'غير محدد' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
+                                    @if (!empty($product->ingredients))
                                         <ul class="list-disc list-inside">
-                                            @foreach ($product->components as $component)
-                                                <li>{{ $component }}</li>
+                                            @foreach (explode('،', $product->ingredients) as $ingredient)
+                                                <li>{{ trim($ingredient) }}</li>
                                             @endforeach
                                         </ul>
                                     @else
                                         لا توجد مكونات
                                     @endif
                                 </td>
+                                
                             </tr>
                         @endforeach
                     </tbody>

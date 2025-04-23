@@ -95,9 +95,9 @@
                                                 <i class="fas fa-file-invoice mr-1"></i> تكوين أمر شراء
                                             </a>
                                            
-                                            <a href="{{ route('invoices.create-from-order', $order->id) }}" class="bg-green-100 text-gray-600 px-3 py-1 rounded hover:bg-green-100">
+                                            {{-- <a href="{{ route('invoices.create-from-order', $order->id) }}" class="bg-green-100 text-gray-600 px-3 py-1 rounded hover:bg-green-100">
                                                 <i class="fas fa-file-invoice-dollar mr-1"></i> إنشاء فاتورة شراء
-                                            </a>
+                                            </a> --}}
                                             <a href="{{ route('orders.print-purchase-order', $order->id) }}" class="text-gray-600  px-3 py-1 rounded " target="_blank">
                                                 <i class="fas fa-print mr-1 text-xl"></i>   
                                             </a>
@@ -106,9 +106,9 @@
                                                 <i class="fas fa-file-invoice mr-1"></i> تكوين أمر صرف
                                             </a>
                                            
-                                            <a href="{{ route('invoices.create-from-order', $order->id) }}" class="bg-green-100 text-gray-600 px-3 py-1 rounded hover:bg-green-100">
+                                            {{-- <a href="{{ route('invoices.create-from-sales-order-create', $order->id) }}" class="bg-green-100 text-gray-600 px-3 py-1 rounded hover:bg-green-100">
                                                 <i class="fas fa-file-invoice-dollar mr-1"></i> إنشاء فاتورة بيع
-                                            </a>
+                                            </a> --}}
                                             <a href="{{ route('orders.print-sales-order', $order->id) }}" class="text-gray-600  px-3 py-1 rounded " target="_blank">
                                                 <i class="fas fa-print mr-1 text-xl"></i>   
                                             </a>

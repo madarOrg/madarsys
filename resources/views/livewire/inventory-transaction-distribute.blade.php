@@ -5,10 +5,19 @@
  
     <form id="transaction-view-form">
         <div class="p-4 rounded-lg shadow w-full overflow-x-auto">
-            <x-title :title="'بحث عن عملية مخزنية'" />
-            <input type="text" wire:model="search" wire:keydown.enter="searchTransactions"
-                placeholder="ابحث برقم المرجع، الشريك، القسم، أو المستودع..." class="w-full p-2 border rounded-lg">
+            <div class="flex flex-wrap md:flex-nowrap  gap-4">
+                <div class="!w-auto">
+                    <x-title :title="'مراقبة حالة المخزون'" />
+                </div>
+        
+                <div class="!w-auto">
+
+            <x-search-input id="custom-id" name="search"
+            placeholder="ابحث برقم المرجع، الشريك، القسم، أو المستودع..."
+            :value="request()->input('search')" />
         </div>
+        </div>
+    </div>
 
         <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
             <!-- قسم بيانات العملية -->
@@ -31,8 +40,8 @@
                         value="{{ $selectedTransaction->reference }}" disabled="true" />
                     <x-file-input id="partner_name" name="partner_name" label="الشريك" type="text"
                         value="{{ $selectedTransaction->partner->name ?? '' }}" disabled="true" />
-                    <x-file-input id="department_name" name="department_name" label="القسم" type="text"
-                        value="{{ $selectedTransaction->department->name ?? '' }}" disabled="true" />
+                    {{-- <x-file-input id="department_name" name="department_name" label="القسم" type="text"
+                        value="{{ $selectedTransaction->department->name ?? '' }}" disabled="true" /> --}}
                         <x-file-input id="warehouse_name" name="warehouse_name" label="من المستودع" type="text"
                         value="{{ $selectedTransaction->warehouse->name ?? 'لم يتم تحديد المستودع' }}" disabled="true" />
                     
@@ -76,11 +85,11 @@
                                 @foreach ($selectedTransaction->items as $item)
                                     <tr id="item_{{ $item->id }}"
                                         class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700 text-gray-900 dark:text-white">
-                                        <td class="px-6 py-3">{{ $item->product->name ?? '' }}</td>
+                                        <td class="px-6 py-3">{{ $item->product->name ?? '' }}-{{ $item->product->barcode ?? '' }}-{{ $item->product->sku ?? '' }}</td>
                                         <td class="px-6 py-3">{{ $item->unit->name ?? '' }}</td>
                                         <td class="px-6 py-3">{{ $item->quantity }}</td>
                                         <td class="px-6 py-3">{{ $item->unit_prices }}</td>
-                                        <td class="px-6 py-3">{{ $item->total }}</td>
+                                        <td class="px-6 py-3"> {{ number_format($item->total, 2) }}</td>
                                     </tr>
                                 @endforeach
                                 @else
