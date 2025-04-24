@@ -321,9 +321,9 @@ class InvoiceFromOrdersController extends Controller
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
+                    'quantity' => $item['quantity']*-1,
                     'price' => $item['price'],
-                    'subtotal' => $item['quantity'] * $item['price'],
+                    'subtotal' => $item['quantity'] * $item['price']*-1,
                     'unit_id' => $item['unit_id'],
                     'production_date' => $item['production_date'],
                     'expiration_date' => $item['expiration_date'],

@@ -33,7 +33,9 @@ class InventoryProduct extends Model
         'distribution_type',
         'unit_id',
         'unit_product_id',
-        'converted_quantity'
+        'converted_quantity',
+        'item_source_id'
+
     ];
 
 

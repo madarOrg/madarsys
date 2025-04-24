@@ -129,6 +129,7 @@ class InvoiceController extends Controller
         try {
             // تحديد نوع الفاتورة (بيع أو شراء)
             $typeNumber = ($type === 'sale') ? 1 : 2;
+            $effect = ($type === 'sale') ? -1 : 1;
             $prefix = $typeNumber === 1 ? 'Sa-Inv-' : 'Pu-Inv-';
             $lastInvoice = Invoice::where('type', $typeNumber)->latest('id')->first();
             $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_code, strlen($prefix))) + 1 : 1;
@@ -168,7 +169,7 @@ class InvoiceController extends Controller
               
                 $invoice->items()->create([
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
+                    'quantity' => $item['quantity']*$effect,
                     'price' => $item['price'],
                     'subtotal' => $item['quantity'] * $item['price'],
                     'unit_id' => $item['unit_id'],
@@ -281,6 +282,7 @@ class InvoiceController extends Controller
                 'currency_id' => $request->currency_id,
                 'exchange_rate' => $request->exchange_rate,
             ]);
+            $effect = ($type === 'sale') ? -1 : 1;
 
             // Process each item from the request
             foreach ($request->items as $item) {
@@ -295,7 +297,7 @@ class InvoiceController extends Controller
                     // Create the new item
                     $newItem = $invoice->items()->create([
                         'product_id' => $item['product_id'],
-                        'quantity' => $item['quantity'],
+                        'quantity' => $item['quantity']*$effect,
                         'price' => $item['price'],
                         'subtotal' => $item['quantity'] * $item['price'],
                         'unit_id' => $item['unit_id'],

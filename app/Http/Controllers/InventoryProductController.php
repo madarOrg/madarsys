@@ -449,6 +449,11 @@ class InventoryProductController extends Controller
         // جلب الكمية الأصلية من جدول inventory_transaction_items
         $transactionItem = InventoryTransactionItem::findOrFail($request->inventory_transaction_item_id);
 
+        // // تحقق من تطابق نوع العملية مع التأثير
+        // if ((int)$request->distribution_type !== (int)$transactionItem->effect) {
+        //     return redirect()->back()->withErrors(['distribution_type' => 'نوع التوزيع لا يتطابق مع تأثير الحركة المخزنية المحددة.']);
+        // }
+        
         $originalQuantity = $transactionItem->converted_quantity;
 
         /////mange distribution batch Quantity
@@ -462,7 +467,7 @@ class InventoryProductController extends Controller
 
         $batchConvertedQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($batchQuantity, $unitId, $baseUnitId);
 
-        $batchPrice = ($batchQuantity * $request->total) / $originalQuantity;
+        $batchPrice = ($batchQuantity * $request->total) / $originalQuantity; 
 // dd($batchConvertedQuantity);
         //   dd($request->inventory_transaction_item_id );
         // حساب الكمية التي تم توزيعها لهذا المنتج في نفس المستودع ونفس الحركة المخزنية
@@ -477,7 +482,7 @@ class InventoryProductController extends Controller
             ->where('warehouse_id', $request->warehouse_id)
             ->where('distribution_type', -1)
             ->sum('converted_quantity');
-        //   dump($distributedQuantity);
+        //   dump($distributedQuantity,$distributedOutQuantity);
         // / اجمع كل الكميات المدخلة من نفس المنتج ونفس رقم الدفعة في نفس المستودع
         $totalOutQuantity = InventoryProduct::where('product_id', $request->product_id)
             ->where('batch_number', $request->batch_number)
@@ -489,21 +494,61 @@ class InventoryProductController extends Controller
             ->where('warehouse_id', $request->warehouse_id)
             ->where('distribution_type', 1)
             ->sum('converted_quantity');
+        
+        
 
-        $totalBatchQuantity = $totalInQuantity - $totalOutQuantity;
-        //  dd($totalBatchQuantity,$request->quantity);
-        // التحقق من الكمية المتبقية ومنع الإخراج الزائد
-        if ($request->distribution_type == -1) {  // إخراج من المخزون
-            if ($batchConvertedQuantity > $totalBatchQuantity) {
-                return redirect()->back()->withErrors(['quantity' => 'الكمية المطلوبة للإخراج تتجاوز الكمية المتبقية من هذه الدفعة.']);
-            }
-        }
-        // التحقق من الكمية المتبقية ومنع الإخراج الزائد
-        if ($request->distribution_type == -1) {  // إخراج من المخزون
-            if ($batchConvertedQuantity > $distributedQuantity - $distributedOutQuantity) {
-                return redirect()->back()->withErrors(['quantity' => 'الكمية المطلوبة للإخراج تتجاوز الكمية المتبقية من هذه الحركة.']);
-            }
-        }
+// 1) اجلب كل معرفات المصادر التي سُحب منها من قبل (distribution_type = -1)
+$productId = $request->product_id;
+
+$sourceIds = InventoryProduct::query()
+    ->where('product_id', $productId)
+    ->where('distribution_type', -1)
+    ->pluck('item_source_id')
+    ->filter()
+    ->unique()
+    ->toArray();
+
+// 2) حدد هذه الحركات الأصلية التي لم يكتمل سحبها
+$availableSources = InventoryTransactionItem::query()
+    ->where('status', 1)
+    ->whereIn('id', $sourceIds)
+    ->withSum(['inventoryProducts as withdrawn_sum' => function($q) {
+        $q->where('distribution_type', -1);
+    }], 'converted_quantity')
+    ->havingRaw('IFNULL(withdrawn_sum,0) < converted_quantity')
+    ->get();
+// dd($availableSources);
+// 3) هل الحركة نفسها (المختارة في الطلب) حركة سحب جديدة لم يُسحب منها شيء؟
+$isFreshOwn = InventoryTransactionItem::query()
+    // ->where('id', $request->inventory_transaction_item_id)
+    ->where('quantity','<',0)      // أو ->where('quantity','<',0)
+    ->where('status', 1)
+    ->whereDoesntHave('inventoryProducts', function($q) {
+        $q->where('distribution_type', -1);
+    })
+    ->exists();
+    // dd($isFreshOwn);
+
+// 4) احسب مجموع الكمية المتبقية من المصادر القديمة
+$totalRemaining = $availableSources->sum(function($src) {
+    return $src->converted_quantity - ($src->withdrawn_sum ?? 0);
+});
+
+// 5) إذا كانت هذه حركة سحب جديدة ولم تُسحب منها شيء بعد، أضف كامل كميتها الأصلية
+if ($isFreshOwn) {
+    // $transactionItem هو الحركة الأصلية (effect = -1) نفسها
+    $totalRemaining += $transactionItem->converted_quantity;
+}
+
+// 6) إذا طلب السحب أكبر من المتبقي، امنع العملية
+if ($request->distribution_type == -1 && $batchConvertedQuantity > $totalRemaining) {
+    return redirect()->back()->withErrors([
+        'quantity' => 'الكمية المطلوبة للسحب تتجاوز الكمية المتاحة من حركات السحب المصرح بها.'
+    ]);
+}
+
+// إذا اجتاز هذا الفحص، تابع حفظ حركة السحب...
+
         // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
         if ($request->distribution_type == 1) {
             $quantityInvertory = $batchConvertedQuantity;
@@ -528,6 +573,9 @@ class InventoryProductController extends Controller
         InventoryProduct::create([
             'product_id' => $transactionItem->product_id, // استخراج المنتج من الحركة المخزنية
             'branch_id' => $request->input('branch_id'),
+            'item_source_id'       => $distributionType == -1
+            ? $availableSources
+            : null,            
             'warehouse_id' => $request->input('warehouse_id'),
             'storage_area_id' => $request->input('storage_area_id'),
             'location_id' => $request->input('location_id'),

@@ -748,6 +748,9 @@ Route::get('/welcome', function () {
         Route::get('/create-from-sales-order/{id}', [InvoiceFromOrdersController::class, 'createFromSalesOrder'])->name('create-from-sales-order');
         Route::post('/store-from-sales-order/{id}', [InvoiceFromOrdersController::class, 'storeFromSalesOrder'])->name('store-from-sales-order');
     });
+    // web.php
+Route::get('/orders/products', [OrderController::class, 'getProducts']);
+
 
 });
 Route::get('/orders/check-confirmed', [OrderController::class, 'checkConfirmedOrders'])->name('orders.check-confirmed');

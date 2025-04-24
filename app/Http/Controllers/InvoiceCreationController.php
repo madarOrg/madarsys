@@ -230,6 +230,8 @@ class InvoiceCreationController extends Controller
             $typeNumber = 1; // بيع
             $prefix = 'Sa-Inv-';
             $transactionType = 'sale';
+            $effect =  $transactionType === 'sale' ? -1 : 1;
+
             $lastInvoice = Invoice::where('type', $typeNumber)->latest('id')->first();
             $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_code, strlen($prefix))) + 1 : 1;
             $invoiceCode = $prefix . $nextNumber;
@@ -276,9 +278,9 @@ class InvoiceCreationController extends Controller
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
+                    'quantity' => $item['quantity']* $effect,
                     'price' => $item['price'],
-                    'subtotal' => $item['quantity'] * $item['price'],
+                    'subtotal' => $item['quantity'] * $item['price'] * $effect,
                     'unit_id' => $item['unit_id'],
                     'production_date' => $item['production_date'],
                     'expiration_date' => $item['expiration_date'],
@@ -404,6 +406,8 @@ class InvoiceCreationController extends Controller
 
             // نوع الفاتورة (شراء أو بيع)
             $transactionType = $order->type === 'buy' ? 'purchase' : 'sale';
+            $effect =  $order->type === 'buy' ? 1 : -1;
+
             $typeNumber = $order->type === 'buy' ? 1 : 2; // 1 للشراء، 2 للبيع
             $viewFolder = $transactionType === 'sale' ? 'sales' : 'purchases';
 
@@ -432,7 +436,7 @@ class InvoiceCreationController extends Controller
                 $invoiceItem = InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
+                    'quantity' => $item['quantity']*$effect,
                     'price' => $item['price'],
                     'subtotal' => $item['quantity'] * $item['price'],
                     'unit_id' => $item['unit_id'],

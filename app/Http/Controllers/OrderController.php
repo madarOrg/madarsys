@@ -17,6 +17,33 @@ use DB;
 
 class OrderController extends Controller
 {
+    // OrderController.php
+public function getProducts(Request $request)
+{
+    $type = $request->get('type');
+    $warehouseId = $request->get('warehouse_id');
+
+    if ($type === 'buy') {
+        $products = Product::select('id', 'name', 'selling_price', 'barcode', 'sku')->get();
+    } else {
+        $products = InventoryProduct::with('product')
+            ->where('warehouse_id', $warehouseId)
+            ->where('quantity', '>', 0)
+            ->get()
+            ->map(function ($item) {
+                return [
+                    'id' => $item->product->id,
+                    'name' => $item->product->name,
+                    'barcode' => $item->product->barcode,
+                    'sku' => $item->product->sku,
+                    'selling_price' => $item->product->selling_price,
+                ];
+            });
+    }
+
+    return response()->json(['products' => $products]);
+}
+
     // دالة لعرض جميع الطلبات
     public function index(Request $request)
     {
