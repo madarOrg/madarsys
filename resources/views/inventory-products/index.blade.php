@@ -1,7 +1,7 @@
 <x-layout>
 
     <form action="{{ route('inventory-products.search') }}" method="GET" class="p-1 rounded-lg shadow ">
-        <div x-data="{ open: true }">
+        <div x-data="{ open: false }"> <!-- تغيير القيمة من true إلى false -->
             <!-- زر لفتح أو إغلاق القسم -->
             <button type="button" @click="open = !open" class="text-indigo-600 hover:text-indigo-700 mb-2 ml-4">
                 <span
@@ -85,20 +85,25 @@
 
 
     <section>
-        <div class="flex items-center ">
+        <div class="flex items-center justify-between ">
             <x-title :title="'إدارة المنتجات في المستودعات'"></x-title>
 
-            <x-button :href="route('inventory-products.create')" type="button" class="ml-4">
+            <x-button :href="route('inventory-products.create')" type="button" class="ml-8">
                 <i class="fas fa-plus mr-2"></i> إضافة منتج جديد إلى مستودع
             </x-button>
             {{-- <div class="sm:col-span-6 flex justify-start mt-6">
                 <x-button type="button" id="distribute-btn" data-type="1"> <i class="fas fa-plus mr-2"></i> توزيع منتج</x-button>
                 <x-button type="button" id="withdraw-btn" data-type="-1"> <i class="fas fa-minus mr-2"></i> سحب منتج</x-button>
             </div> --}}
-            
-        </div>
+            @if (isset($transactions))
+            @include('inventory-products.approve', ['transactions' => $transactions])
+        @endif
+    </div>
+   
 
-        {{-- <p class="text-sm ">
+    {{-- @include('inventory-products.approve', ['transactions' => $transactions]) --}}
+
+    {{-- <p class="text-sm ">
             يرجى اختيار المستودع لعرض المنتجات المخزنة داخله.
         </p> --}}
         @if ($products->isEmpty())

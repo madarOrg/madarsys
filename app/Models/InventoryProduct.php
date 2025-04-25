@@ -86,6 +86,11 @@ class InventoryProduct extends Model
         );
     }
 
+public function withdrawals()
+{
+    return $this->hasMany(InventoryProduct::class, 'item_source_id')
+                ->where('distribution_type', -1);
+}
     /**
      * العلاقات مع الجداول الأخرى
      */

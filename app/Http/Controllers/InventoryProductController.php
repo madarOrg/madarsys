@@ -163,10 +163,15 @@ class InventoryProductController extends Controller
             return [$location->id => $location->rack_code];
         });
 
+
+        $transactions = InventoryTransaction::with('items')
+        ->where('effect', -1)
+        ->where('status', '!=', 0)
+        ->get();        
         // dd($warehouses);
 
         // عرض النتائج مع الفلاتر
-        return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities'));
+        return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities','transactions'));
     }
 
     public function index(Request $request)
@@ -220,8 +225,13 @@ class InventoryProductController extends Controller
             return [$location->id => $location->rack_code];
         });
 
+        $transactions = InventoryTransaction::with('items')
+        ->where('effect', -1)
+        ->where('status', 1)
+        ->get();
+    
         // إرجاع البيانات إلى العرض
-        return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities'));
+        return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities','transactions'));
     }
     /**
      * عرض صفحة إضافة حركة مخزنية جديدة.
@@ -423,7 +433,7 @@ class InventoryProductController extends Controller
     public function store(Request $request)
     {
 
-
+        $itemSourceId=null;
         $distributionType = $request->input('distribution_type'); // Default to '1' (توزيع)
         //  dd($distributionType);
         // التحقق من البيانات المدخلة
@@ -519,31 +529,51 @@ $availableSources = InventoryTransactionItem::query()
     ->get();
 // dd($availableSources);
 // 3) هل الحركة نفسها (المختارة في الطلب) حركة سحب جديدة لم يُسحب منها شيء؟
-$isFreshOwn = InventoryTransactionItem::query()
-    // ->where('id', $request->inventory_transaction_item_id)
-    ->where('quantity','<',0)      // أو ->where('quantity','<',0)
-    ->where('status', 1)
-    ->whereDoesntHave('inventoryProducts', function($q) {
-        $q->where('distribution_type', -1);
-    })
-    ->exists();
-    // dd($isFreshOwn);
 
+    // dd($isFreshOwn);
+    $withdrawal = InventoryTransactionItem::query()
+    ->where('quantity', '<', 0)
+    ->where('status', 1)
+    ->withSum(['inventoryProducts as withdrawn_sum' => function($q) {
+        $q->where('distribution_type', -1);
+    }], 'converted_quantity')
+    // هنا نستخدم ABS(converted_quantity) لأن quantity سالبة في جدول المعاملة
+    ->havingRaw('IFNULL(withdrawn_sum, 0) < ABS(converted_quantity)')
+    ->orderBy('created_at')    // يمكنك تعديل الترتيب حسب أولويّتك
+    ->first();
+
+// 2) إما لا توجد حركة سحب متاحة:
+if ($request->distribution_type == -1 && !$withdrawal) {
+    return redirect()->back()->withErrors([
+        'withdrawal_check' => 'لا توجد حركة سحب متاحة أو تم سحب كامل كميتها.'
+    ]);
+}
+
+
+// dd($withdrawal);
+// 3) عندها يمكنك معرفة الكمية المتبقية للسحب منها:
+$convertedQuantity = $withdrawal->converted_quantity ?? 0;
+$withdrawnSum = $withdrawal->withdrawn_sum ?? 0;
+$remaining = abs($convertedQuantity) - $withdrawnSum;
+// dd($remaining);
+// مثال: في حال رغبت بربط السحب القادم بهذا المصدر:
+
+// dd($itemSourceId);
 // 4) احسب مجموع الكمية المتبقية من المصادر القديمة
 $totalRemaining = $availableSources->sum(function($src) {
     return $src->converted_quantity - ($src->withdrawn_sum ?? 0);
 });
-
-// 5) إذا كانت هذه حركة سحب جديدة ولم تُسحب منها شيء بعد، أضف كامل كميتها الأصلية
-if ($isFreshOwn) {
-    // $transactionItem هو الحركة الأصلية (effect = -1) نفسها
-    $totalRemaining += $transactionItem->converted_quantity;
-}
+// dd($batchConvertedQuantity);
 
 // 6) إذا طلب السحب أكبر من المتبقي، امنع العملية
-if ($request->distribution_type == -1 && $batchConvertedQuantity > $totalRemaining) {
+if ($request->distribution_type == -1 && $batchConvertedQuantity > ($totalRemaining+$remaining)) {
     return redirect()->back()->withErrors([
         'quantity' => 'الكمية المطلوبة للسحب تتجاوز الكمية المتاحة من حركات السحب المصرح بها.'
+    ]);
+}
+if ($distributionType == -1 && ($withdrawal->withdrawn_sum >= abs($withdrawal->converted_quantity))) {
+    return redirect()->back()->withErrors([
+        'withdrawal_check' => 'لا يمكن السحب من هذه الحركة لأنها مكتملة بالفعل.'
     ]);
 }
 
@@ -552,13 +582,16 @@ if ($request->distribution_type == -1 && $batchConvertedQuantity > $totalRemaini
         // التحقق من أن الكمية الجديدة لا تتجاوز الكمية الأصلية في حالة التوزيع
         if ($request->distribution_type == 1) {
             $quantityInvertory = $batchConvertedQuantity;
+            $itemSourceId =  null;
 
+// dd($distributedQuantity , $batchConvertedQuantity , $originalQuantity);
             // في حالة التوزيع (إدخال)
             if (($distributedQuantity + $batchConvertedQuantity) > $originalQuantity) {
                 return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات الموزعة يتجاوز الكمية الأصلية المتاحة في الحركة المخزنية.']);
             }
         } elseif ($request->distribution_type == -1) {
             $quantityInvertory = -$batchConvertedQuantity;
+            $itemSourceId = $withdrawal->id ?? null;
 
             // dd($distributedQuantity ,$request->quantity ,($distributedQuantity + $quantityInvertory), $originalQuantity,$quantityInvertory);
             // في حالة الإخراج (تخفيض الكمية
@@ -568,62 +601,97 @@ if ($request->distribution_type == -1 && $batchConvertedQuantity > $totalRemaini
                 return redirect()->back()->withErrors(['quantity' => 'إجمالي الكميات المسحوبة أكثر من الكمية المطلوبة للإخراج.']);
             }
         }
-        // dd($distributionType); 
-        // إنشاء حركة مخزنية جديدة باستخدام المنتج المستخرج من العملية المخزنية
-        InventoryProduct::create([
-            'product_id' => $transactionItem->product_id, // استخراج المنتج من الحركة المخزنية
-            'branch_id' => $request->input('branch_id'),
-            'item_source_id'       => $distributionType == -1
-            ? $availableSources
-            : null,            
-            'warehouse_id' => $request->input('warehouse_id'),
-            'storage_area_id' => $request->input('storage_area_id'),
-            'location_id' => $request->input('location_id'),
-            'created_user' => Auth::id(),
-            'updated_user' => Auth::id(),
-            'quantity' => $request->input('quantity'),
-            'production_date' => $request->input('production_date'),
-            'expiration_date' => $request->input('expiration_date'),
-            'batch_number' => $request->input('batch_number'),
-            'inventory_transaction_item_id' => $request->input('inventory_transaction_item_id'),
-            'distribution_type' =>  $distributionType,
-            'unit_id' => $unitId,
-            'unit_product_id' => $baseUnitId,
-            'converted_quantity' => $batchConvertedQuantity,
-            'price' => $batchPrice
+// dd('k',$request->distribution_type); 
+        // // إنشاء حركة مخزنية جديدة باستخدام المنتج المستخرج من العملية المخزنية
+        // InventoryProduct::create([
+        //     'product_id' => $transactionItem->product_id, // استخراج المنتج من الحركة المخزنية
+        //     'branch_id' => $request->input('branch_id'),
+        //     'item_source_id'       => $distributionType == -1
+        //     ? $availableSources
+        //     : null,            
+        //     'warehouse_id' => $request->input('warehouse_id'),
+        //     'storage_area_id' => $request->input('storage_area_id'),
+        //     'location_id' => $request->input('location_id'),
+        //     'created_user' => Auth::id(),
+        //     'updated_user' => Auth::id(),
+        //     'quantity' => $request->input('quantity'),
+        //     'production_date' => $request->input('production_date'),
+        //     'expiration_date' => $request->input('expiration_date'),
+        //     'batch_number' => $request->input('batch_number'),
+        //     'inventory_transaction_item_id' => $request->input('inventory_transaction_item_id'),
+        //     'distribution_type' =>  $distributionType,
+        //     'unit_id' => $unitId,
+        //     'unit_product_id' => $baseUnitId,
+        //     'converted_quantity' => $batchConvertedQuantity,
+        //     'price' => $batchPrice
 
-        ]);
-        // استدعاء دالة updateInventoryStock من الخدمة
+        // ]);
+        // قبل الإنشاء
+
+        DB::beginTransaction();
 
         try {
+            // 1) إنشاء حركة السحب
+            $inventoryProduct = InventoryProduct::create([
+                'product_id'                     => $transactionItem->product_id,
+                'branch_id'                      => $request->input('branch_id'),
+                'item_source_id'                 => $itemSourceId ?? null,
+                'warehouse_id'                   => $request->input('warehouse_id'),
+                'storage_area_id'                => $request->input('storage_area_id'),
+                'location_id'                    => $request->input('location_id'),
+                'created_user'                   => Auth::id(),
+                'updated_user'                   => Auth::id(),
+                'quantity'                       => $request->input('quantity'),
+                'production_date'                => $request->input('production_date'),
+                'expiration_date'                => $request->input('expiration_date'),
+                'batch_number'                   => $request->input('batch_number'),
+                'inventory_transaction_item_id'  => $request->input('inventory_transaction_item_id'),
+                'distribution_type'              => $distributionType,
+                'unit_id'                        => $unitId,
+                'unit_product_id'                => $baseUnitId,
+                'converted_quantity'             => $batchConvertedQuantity,
+                'price'                          => $batchPrice,
+            ]);
+    
+            // 2) محاولة تحديث المخزون
+          
+    // dd($quantityInvertory);
             $this->inventoryService->updateInventoryStock(
                 $request->warehouse_id,
                 $transactionItem->product_id,
-                $batchConvertedQuantity,
+                $quantityInvertory,
                 $batchPrice
             );
-        } catch (\Exception $e) {
+    
+            // إذا نجح كل شيء نلتزم المعاملة
+            DB::commit();
+    
+            return redirect()->route('inventory-products.search')
+                             ->with('success', 'تم إضافة موقع المخزون بنجاح');
+        }
+        catch (\Exception $e) {
+            // 1) نلغي أي تغييرات سابقة في المعاملة
+            DB::rollBack();
+    
+            // 2) نسجّل الخطأ
             \DB::table('inventory_update_errors')->insert([
                 'inventory_transaction_item_id' => $request->input('inventory_transaction_item_id'),
-                'product_id' => $request->input('product_id'),
-                'warehouse_id' => $request->input('warehouse_id'),
-                'quantity' => $quantityInvertory,
-                'error_message' => $e->getMessage(),
-                'created_at' => now(),
-                'updated_at' => now(),
+                'product_id'                    => $request->input('product_id'),
+                'warehouse_id'                  => $request->input('warehouse_id'),
+                'quantity'                      => $quantityInvertory,
+                'error_message'                 => $e->getMessage(),
+                'created_at'                    => now(),
+                'updated_at'                    => now(),
             ]);
-
-            return redirect()->back()->withErrors([
-                'inventory_update' => 'تمت إضافة حركة المنتج، ولكن هناك خطأ أثناء تحديث المخزون. الرجاء مراجعة السجل.',
-            ])->withInput();
+    
+            // 3) نعيد التوجيه مع رسالة الخطأ
+            return redirect()->back()
+                             ->withErrors(['inventory_update' => 'حدث خطأ أثناء تحديث المخزون، تم التراجع عن العملية.'])
+                             ->withInput();
         }
-
-
-        // إعادة التوجيه بعد حفظ البيانات
-        return redirect()->route('inventory-products.search')->with('success', 'تم إضافة موقع المخزون بنجاح');
-    }
-    public function edit(Request $request, $id)
-    {
+    }  
+    
+    public function edit(Request $request, $id){
         $oldProduct = InventoryProduct::with([
             'transactionItem.inventoryTransaction',
             'warehouse:id,name',

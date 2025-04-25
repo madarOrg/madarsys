@@ -16,6 +16,7 @@ class InventoryTransactionDistributeLivewire extends Component
     public $selectedTransaction = null;
     public $search = '';
     protected $listeners = ['transactionUpdated' => '$refresh']; 
+    public $filterStatus = null;
     
     public function __construct()
     {
@@ -125,6 +126,23 @@ class InventoryTransactionDistributeLivewire extends Component
     }
 }
 
+public function filterTransactions($status)
+{
+    $this->filterStatus = $status;
+
+    $this->transactions = InventoryTransaction::with(['partner', 'department', 'warehouse', 'items'])
+        ->when($this->filterStatus !== null, fn($query) => $query->where('status', $this->filterStatus))
+        ->get();
+
+    if ($this->transactions->isNotEmpty()) {
+        $this->selectedTransactionId = $this->transactions[0]->id;
+        $this->loadTransactionDetails(); // ⬅️ أضف هذه السطر لتحميل تفاصيل أول حركة
+    } else {
+        $this->selectedTransaction = null; // لتفريغ التفاصيل إذا لم توجد بيانات
+    }
+}
+
+
     // دالة لحفظ التوزيع بعد التعديل
     public function saveDistribution()
     {
@@ -228,6 +246,8 @@ class InventoryTransactionDistributeLivewire extends Component
         // تحديث الحالة في قاعدة البيانات
         $transaction = InventoryTransaction::findOrFail($transactionId);
         $transaction->status = $transaction->status == 0 ? 1 : 0;
+        $transaction->approved_at = now();
+
         $transaction->save();
     
         // تحديث الحالة في المصفوفة مباشرة لتحديث الواجهة

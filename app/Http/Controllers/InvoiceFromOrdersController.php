@@ -321,9 +321,9 @@ class InvoiceFromOrdersController extends Controller
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity']*-1,
+                    'quantity' => $item['quantity'],
                     'price' => $item['price'],
-                    'subtotal' => $item['quantity'] * $item['price']*-1,
+                    'subtotal' => $item['quantity'] * $item['price'],
                     'unit_id' => $item['unit_id'],
                     'production_date' => $item['production_date'],
                     'expiration_date' => $item['expiration_date'],
@@ -376,6 +376,7 @@ class InvoiceFromOrdersController extends Controller
             'notes' => $transactionNote,
             'status' => 0
         ]);
+        $effect = ($type === 'sale') ? -1 : 1,
 
         if ($items) {
             $isCollection = is_object($items) && method_exists($items, 'isEmpty');
@@ -416,12 +417,12 @@ class InvoiceFromOrdersController extends Controller
                         'unit_id' => $unitId,
                         'unit_product_id' => $baseUnitId,
                         'target_warehouse_id' => $request->warehouse_id,
-                        'converted_quantity' => $convertedOutQuantity,
+                        'converted_quantity' => $effect*$convertedOutQuantity,
                         'product_id' => $productId,
-                        'unit_prices' => $price,
-                        'quantity' => $quantity,
-                        'total' => $quantity * $price,
-                        'converted_price' => $price,
+                        'unit_prices' => $effect*$price,
+                        'quantity' => $effect*$quantity,
+                        'total' => $effect*$quantity * $price,
+                        'converted_price' => $effect*$price,
                         'branch_id' => $request->branch_id,
                         'reference_item_id' => $itemId,
                         'production_date' =>$productionDate,

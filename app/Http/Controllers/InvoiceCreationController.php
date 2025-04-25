@@ -20,9 +20,16 @@ use App\Models\InventoryTransaction;
 use App\Models\InventoryTransactionItem;
 use App\Events\InventoryTransactionCreated;
 use Illuminate\Support\Facades\DB;
+use App\Services\InventoryTransaction\InventoryCalculationService;
 
 class InvoiceCreationController extends Controller
 {
+    protected $inventoryCalculationService;
+
+    public function __construct(InventoryCalculationService $inventoryCalculationService)
+    {
+        $this->inventoryCalculationService = $inventoryCalculationService;
+    }
     /**
      * عرض نموذج إنشاء فاتورة من أمر صرف
      */
@@ -63,140 +70,6 @@ class InvoiceCreationController extends Controller
             'currencies'
         ));
     }
-
-    /**
-     * حفظ فاتورة من أمر صرف
-     */
-    // public function storeFromSalesOrder(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'partner_id' => 'required|exists:partners,id',
-    //         'invoice_date' => 'required|date',
-    //         'payment_type_id' => 'required|exists:payment_types,id',
-    //         'branch_id' => 'required|exists:branches,id',
-    //         'warehouse_id' => 'required|exists:warehouses,id',
-    //         'items' => 'required|array',
-    //         'items.*.product_id' => 'required|exists:products,id',
-    //         'items.*.quantity' => 'required|integer|min:1',
-    //         'items.*.price' => 'required|numeric|min:0',
-    //         'items.*.unit_id' => 'required|exists:units,id',
-    //         'discount_type' => 'required|integer|in:1,2',
-    //         'discount_value' => 'required|numeric|min:0',
-    //     ]);
-
-    //     DB::beginTransaction();
-    //     try {
-    //         // جلب أمر الصرف
-    //         $salesOrder = Order::findOrFail($id);
-    //         // dd('in store',$salesOrder);
-    //         // التحقق من أن أمر الصرف معتمد
-    //         // dd($salesOrder->status);
-    //         // dd($salesOrder->status);
-    //         if ($salesOrder->status !== 'confirmed') {
-    //             return redirect()->back()->with('error', 'يمكن إنشاء فواتير فقط من أوامر الصرف المعتمدة');
-    //         }
-
-    //         // إنشاء رمز الفاتورة
-    //         $invoiceCode = 'Sal-Ord-' . time();
-
-    //         // حساب قيم الفاتورة
-    //         $subtotal = 0;
-
-    //         foreach ($request->items as $item) {
-    //             $subtotal += $item['quantity'] * $item['price'];
-    //         }
-
-    //         // حساب الخصم
-    //         $discountAmount = 0;
-    //         $discountPercentage = 0;
-
-    //         if ($request->discount_type == 1) { // نسبة مئوية
-    //             $discountPercentage = $request->discount_value;
-    //             $discountAmount = ($subtotal * $discountPercentage) / 100;
-    //         } else { // قيمة ثابتة
-    //             $discountAmount = $request->discount_value;
-    //             if ($subtotal > 0) {
-    //                 $discountPercentage = ($discountAmount / $subtotal) * 100;
-    //             }
-    //         }
-
-    //         // حساب الإجمالي بعد الخصم
-    //         $total = $subtotal - $discountAmount;
-
-    //         // نوع الفاتورة (بيع)
-    //         $transactionType = 'sale';
-    //         $typeNumber = 2; // 1 للشراء، 2 للبيع
-    //         // إنشاء الفاتورة
-    //         $invoice = Invoice::create([
-    //             'invoice_code' => $invoiceCode,
-    //             'partner_id' => $request->partner_id,
-    //             'invoice_date' => $request->invoice_date,
-    //             'payment_type_id' => $request->payment_type_id,
-    //             'branch_id' => $request->branch_id,
-    //             'subtotal' => $subtotal,
-    //             'discount_amount' => $discountAmount,
-    //             'total' => $total,
-    //             // 'total_amount' => $totalAmount - $discountAmount,
-
-    //             'total_amount' => $total, // إضافة حقل total_amount المطلوب
-    //             'discount_percentage' => $discountPercentage,
-    //             'type' => $typeNumber,
-    //             'warehouse_id' => $request->warehouse_id,
-    //             'currency_id' => $request->currency_id,
-    //             'exchange_rate' => $request->exchange_rate,
-    //             'department_id' => $request->department_id,
-    //             'order_id' => $salesOrder->order_id, // ربط الفاتورة بالطلب الأصلي
-    //             'sales_order_id' => $salesOrder->id, // ربط الفاتورة بأمر الصرف
-    //         ]);
-
-    //         // إنشاء عناصر الفاتورة
-    //         foreach ($request->items as $item) {
-    //             $invoiceItem = InvoiceItem::create([
-    //                 'invoice_id' => $invoice->id,
-    //                 'product_id' => $item['product_id'],
-    //                 'quantity' => $item['quantity'],
-    //                 'price' => $item['price'],
-    //                 'subtotal' => $item['quantity'] * $item['price'],
-    //                 'unit_id' => $item['unit_id'],
-    //             ]);
-    //         }
-
-    //         // إنشاء حركة مخزنية
-    //         $transactionNote = 'فاتورة بيع مرتبطة بأمر صرف رقم: ' . $salesOrder->order_number;
-
-    //         $invoice->refresh(); // تحميل العناصر المضافة
-
-
-    //         // هنا تم تعريف $items بشكل صحيح
-    //         $items = $invoice->items;
-    //         $transactionNote = 'فاتورة بيع مرتبطة بأمر صرف رقم: ' . $salesOrder->order_number;
-
-    //         $inventoryTransaction = $this->storeInventoryTransaction(
-    //             $request,
-    //             $invoiceCode,
-    //             $request->items,
-    //             $transactionType,
-    //             $transactionNote
-    //         );
-    //         $invoice->update([
-    //             'inventory_transaction_id' => $inventoryTransaction->id,
-    //         ]);
-    //         $salesOrder->update([
-    //             'status' => 'completed',
-    //         ]);
-
-
-
-
-    //         DB::commit();
-
-    //         session()->flash('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح!');
-    //         return redirect('invoices.sale.index');
-    //     } catch (\Exception $e) {
-    //         DB::rollBack();
-    //         return redirect()->back()->with('error', 'خطأ في إنشاء الفاتورة: ' . $e->getMessage());
-    //     }
-    // }
 
     /**
      * حفظ فاتورة جديدة من أمر صرف
@@ -436,7 +309,7 @@ class InvoiceCreationController extends Controller
                 $invoiceItem = InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity']*$effect,
+                    'quantity' => $item['quantity'],
                     'price' => $item['price'],
                     'subtotal' => $item['quantity'] * $item['price'],
                     'unit_id' => $item['unit_id'],
@@ -548,14 +421,22 @@ class InvoiceCreationController extends Controller
                             throw new \Exception($result);
                         }
                     }
+                    $effect = $type === 'sale'?-1:1;
+                    
+                    $baseUnitId = $item->unit_id;
+    
+                    if ($unitId) {
+                        $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantity, $unitId, $baseUnitId);
+                    }
                     InventoryTransactionItem::create([
                         'inventory_transaction_id' => $inventoryTransaction->id,
                         'unit_id' => $unitId,
-                        'unit_product_id' => $unitId,
-                        'converted_quantity' => 0,
+                        'unit_product_id' => $baseUnitId,
+                        'target_warehouse_id' => $request->warehouse_id,
+                        'converted_quantity' => $convertedOutQuantity*$effect,
                         'product_id' => $productId,
-                        'unit_prices' => $price,
-                        'quantity' => $quantity,
+                        'unit_prices' => $price*$effect,
+                        'quantity' => $quantity*$effect,
                         'total' => $quantity * $price,
                         'converted_price' => $price,
                         'branch_id' => $request->branch_id,

@@ -129,7 +129,6 @@ class InvoiceController extends Controller
         try {
             // تحديد نوع الفاتورة (بيع أو شراء)
             $typeNumber = ($type === 'sale') ? 1 : 2;
-            $effect = ($type === 'sale') ? -1 : 1;
             $prefix = $typeNumber === 1 ? 'Sa-Inv-' : 'Pu-Inv-';
             $lastInvoice = Invoice::where('type', $typeNumber)->latest('id')->first();
             $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_code, strlen($prefix))) + 1 : 1;
@@ -169,7 +168,7 @@ class InvoiceController extends Controller
               
                 $invoice->items()->create([
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity']*$effect,
+                    'quantity' => $item['quantity'],
                     'price' => $item['price'],
                     'subtotal' => $item['quantity'] * $item['price'],
                     'unit_id' => $item['unit_id'],
@@ -297,7 +296,7 @@ class InvoiceController extends Controller
                     // Create the new item
                     $newItem = $invoice->items()->create([
                         'product_id' => $item['product_id'],
-                        'quantity' => $item['quantity']*$effect,
+                        'quantity' => $item['quantity'],
                         'price' => $item['price'],
                         'subtotal' => $item['quantity'] * $item['price'],
                         'unit_id' => $item['unit_id'],
@@ -331,7 +330,7 @@ class InvoiceController extends Controller
                                 return $result; // إرجاع رسالة الخطأ إذا الكمية غير متوفرة
                             }
                         }
-
+                        
                         // Update the existing invoice item
                         $invoiceItem->update([
                             'product_id' => $item['product_id'],
@@ -340,15 +339,22 @@ class InvoiceController extends Controller
                             'subtotal' => $item['quantity'] * $item['price'],
                             'unit_id' => $item['unit_id'],
                         ]);
-
+                     $effect = $type == 1?-1:1;
+                     
+                     $baseUnitId = $item->unit_id;
+    
+                        if ($item->unit_id) {
+                            $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantity, $unitId, $baseUnitId);
+                        }
                         // Update the item in the inventory transaction
                         InventoryTransactionItem::where('reference_item_id', $invoiceItem->id)
                             ->update([
                                 'unit_id' => $item['unit_id'],
                                 'product_id' => $item['product_id'],
                                 'unit_prices' => $item['price'],
-                                'quantity' => $item['quantity'],
-                                'total' => $item['quantity'] * $item['price'],
+                                'quantity' => $item['quantity']*$effect,
+                                'converted_quantity' => $convertedOutQuantity*$effect,
+                                'total' => $item['quantity'] * $item['price']*$effect,
                                 'converted_price' => $item['price'],
                                 'unit_product_id' => $item['unit_id'],
                             ]);
@@ -486,7 +492,7 @@ class InvoiceController extends Controller
         $typeNumber = $order->type === 'buy' ? 2 : 1;
         $prefix = $order->type === 'buy' ? 'Pu-Inv-' : 'Sa-Inv-';
         $transactionType = $order->type === 'buy' ? 'purchase' : 'sale';
-
+         $effect= $transactionType==='sale'?-1:1;
         // توليد رقم الفاتورة التالي
         $lastInvoice = Invoice::where('type', $typeNumber)->latest('id')->first();
         $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_code, strlen($prefix))) + 1 : 1;
@@ -579,7 +585,7 @@ class InvoiceController extends Controller
             $isSale = $type === 'sale' || $type === 1;
             $transactionTypeId = $isSale ? 7 : 1;
             $effect = $isSale ? -1 : 1;
-    
+
             // إنشاء الحركة الرئيسية
             $inventoryTransaction = InventoryTransaction::create([
                 'transaction_type_id' => $transactionTypeId,
@@ -595,7 +601,7 @@ class InvoiceController extends Controller
                 'notes' => $transactionNote,
                 'status' => 0
             ]);
-   
+
             // معالجة العناصر
             if ($items && ((is_object($items) && method_exists($items, 'isEmpty') && !$items->isEmpty()) || (is_array($items) && !empty($items)))) {
                 foreach ($items as $item) {
@@ -615,6 +621,7 @@ class InvoiceController extends Controller
     
                         // تحقق من توفر الكمية فقط عند البيع
                         if ($isSale) {
+
                             $result = $this->isQuantityAvailable($request);
                             if ($result !== true) {
                                 return $result;
@@ -630,21 +637,22 @@ class InvoiceController extends Controller
                         //  dd($product);
     
                         $baseUnitId = $product->unit_id;
-    
+
                         if ($unitId) {
                             $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantity, $unitId, $baseUnitId);
                         }
+                        // dd($effect);
                         InventoryTransactionItem::create([
                             'inventory_transaction_id' => $inventoryTransaction->id,
                             'unit_id' => $unitId,
                             'unit_product_id' => $baseUnitId,
                             'target_warehouse_id' => $request->warehouse_id,
-                            'converted_quantity' => $convertedOutQuantity,
+                            'converted_quantity' => $convertedOutQuantity*$effect,
                             'product_id' => $productId,
                             'unit_prices' => $price,
-                            'quantity' => $quantity,
-                            'total' => $quantity * $price,
-                            'converted_price' => $price,
+                            'quantity' => $quantity*$effect,
+                            'total' => $quantity * $price*$effect,
+                            'converted_price' => $price*$effect,
                             'branch_id' => $request->branch_id,
                             'reference_item_id' => $itemId,
                             'production_date' => $productionDate,
@@ -681,6 +689,7 @@ class InvoiceController extends Controller
             'inventory' => "قيمة الخصم ({$request->discount_amount}) لا يمكن أن تكون أكبر أو يساوي إجمالي الفاتورة قبل الخصم ({$request->amount_before_discount})."
         ])->withInput();
     }
+    // dd($requestedTotalAmount);
 
 
     foreach ($request->items as $item) {
@@ -699,6 +708,8 @@ class InvoiceController extends Controller
             return redirect()->back()->withErrors([
                 'inventory' => "الكمية المطلوبة للمنتج رقم {$productId} غير متوفرة (المتوفر: {$availableQty})."
             ])->withInput();
+            throw new \Exception('خطأ في إنشاء حركة المخزون: ' . $e->getMessage());
+
         }
     }
     return true;

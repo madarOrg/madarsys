@@ -5,8 +5,10 @@ use App\Livewire\WarehouseReports;
 use App\Models\Product;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\InvoiceCreationController;
+use App\Http\Controllers\InventoryOut;
 
 use App\Http\Controllers\{
+    
     AuthController,
     SignupController,
     PasswordController,
@@ -751,6 +753,12 @@ Route::get('/welcome', function () {
     // web.php
 Route::get('/orders/products', [OrderController::class, 'getProducts']);
 
+Route::get('/transactions/approve', function () {
+    return view('inventory-products.approve');
+})->name('transactions.approve.form');
+
+Route::post('/transactions/approve', [InventoryOut::class, 'approveTransactionManual'])->name('transactions.approve');
+Route::get('/inventory/withdrawals/print/{id}', [InventoryOut::class, 'printWithdrawal'])->name('inventory.withdraw.print');
 
 });
 Route::get('/orders/check-confirmed', [OrderController::class, 'checkConfirmedOrders'])->name('orders.check-confirmed');

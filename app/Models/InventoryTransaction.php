@@ -30,6 +30,7 @@ class InventoryTransaction extends Model
         'updated_user',
         'status',
         'transaction_date',   
+        'approved_at',
     ];
     
     protected $casts = [
