@@ -759,6 +759,9 @@ Route::get('/transactions/approve', function () {
 
 Route::post('/transactions/approve', [InventoryOut::class, 'approveTransactionManual'])->name('transactions.approve');
 Route::get('/inventory/withdrawals/print/{id}', [InventoryOut::class, 'printWithdrawal'])->name('inventory.withdraw.print');
+Route::get('/withdrawals/print', [InventoryOut::class, 'printAllWithdrawals'])->name('withdrawals.print');
+
+Route::get('/inventory/transaction/{id}/batches', [InventoryOut::class, 'getTransactionBatches']);
 
 });
 Route::get('/orders/check-confirmed', [OrderController::class, 'checkConfirmedOrders'])->name('orders.check-confirmed');

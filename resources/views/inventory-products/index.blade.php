@@ -87,18 +87,20 @@
     <section>
         <div class="flex items-center justify-between ">
             <x-title :title="'إدارة المنتجات في المستودعات'"></x-title>
-
+        <div class="border b-20">
             <x-button :href="route('inventory-products.create')" type="button" class="ml-8">
                 <i class="fas fa-plus mr-2"></i> إضافة منتج جديد إلى مستودع
             </x-button>
+        </div>
+    </div>
+
             {{-- <div class="sm:col-span-6 flex justify-start mt-6">
                 <x-button type="button" id="distribute-btn" data-type="1"> <i class="fas fa-plus mr-2"></i> توزيع منتج</x-button>
                 <x-button type="button" id="withdraw-btn" data-type="-1"> <i class="fas fa-minus mr-2"></i> سحب منتج</x-button>
             </div> --}}
             @if (isset($transactions))
-            @include('inventory-products.approve', ['transactions' => $transactions])
-        @endif
-    </div>
+                @include('inventory-products.approve', ['transactions' => $transactions])
+            @endif
    
 
     {{-- @include('inventory-products.approve', ['transactions' => $transactions]) --}}

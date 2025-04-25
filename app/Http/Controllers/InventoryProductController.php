@@ -164,12 +164,29 @@ class InventoryProductController extends Controller
         });
 
 
-        $transactions = InventoryTransaction::with('items')
+        $transactions = InventoryTransaction::with('items.product')
         ->where('effect', -1)
         ->where('status', '!=', 0)
         ->get();        
         // dd($warehouses);
+        // $transactions = InventoryTransaction::with(['items.product'])->get();
 
+        // foreach ($transactions as $transaction) {
+        //     foreach ($transaction->items as $item) {
+        //         $item->available_batches = InventoryProduct::with(['withdrawals' => function ($query) {
+        //                 $query->where('distribution_type', -1);
+        //             }])
+        //             ->where('product_id', $item->product_id)
+        //             ->where('warehouse_id', $transaction->warehouse_id)
+        //             ->where('distribution_type', 1)
+        //             ->get()
+        //             ->filter(function ($batch) {
+        //                 $withdrawnQty = abs($batch->withdrawals->sum('quantity'));
+        //                 return ($batch->quantity - $withdrawnQty) > 0;
+        //             });
+        //     }
+        // }
+        
         // عرض النتائج مع الفلاتر
         return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities','transactions'));
     }
@@ -225,11 +242,17 @@ class InventoryProductController extends Controller
             return [$location->id => $location->rack_code];
         });
 
-        $transactions = InventoryTransaction::with('items')
+        // $transactions = InventoryTransaction::with('items')
+        // ->where('effect', -1)
+        // ->where('status', 1)
+        // ->get();
+        $transactions = InventoryTransaction::with('items.product')
         ->where('effect', -1)
-        ->where('status', 1)
-        ->get();
-    
+        ->where('status', '!=', 0)
+        ->get();        
+        // dd($warehouses);
+
+       
         // إرجاع البيانات إلى العرض
         return view('inventory-products.index', compact('warehouses', 'products', 'storageAreas', 'locations', 'distributedQuantities','transactions'));
     }
