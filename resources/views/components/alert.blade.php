@@ -1,6 +1,7 @@
 <div id="targetElement" class="fixed top-2 left-1/2 transform -translate-x-1/2 z-50 w-11/12 md:w-1/2">
     {{-- عرض أخطاء التحقق من صحة البيانات --}}
     @if ($errors->any())
+    
     <div class="flex items-center justify-between p-4 mb-4 text-sm text-red-800 border border-red-300 rounded-lg bg-red-50 dark:bg-gray-800 dark:text-red-400 dark:border-red-800" role="alert">
         <div class="flex items-center">
                 <svg class="shrink-0 inline w-4 h-4 me-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">

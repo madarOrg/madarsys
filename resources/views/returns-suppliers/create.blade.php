@@ -59,11 +59,11 @@
 
                 <div class="flex justify-start mt-4">
                     <x-button type="button" id="add-item"
-                        class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">إضافة منتج</x-button>
+                        class="">إضافة منتج</x-button>
                 </div>
 
                 <div class="flex justify-start mt-4">
-                    <x-button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"> إرسال
+                    <x-button type="submit" class=""> إرسال
                         الطلب</x-button>
                 </div>
             </div>

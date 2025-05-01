@@ -1,6 +1,9 @@
 <x-layout>
     <div class="container">
-        <form method="GET" action="{{ route('inventory.audit.report') }}" class="mb-4">
+        <form method="GET" action="{{ route('inventory.audit.report') }}" class="mb-3">
+            <x-reportHeader>
+                <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقارير قوائم الجرد</h1>
+            </x-reportHeader>
             <div x-data="{ open: true }">
                 <!-- زر لفتح أو إغلاق القسم -->
                 <button type="button" @click="open = !open"
@@ -13,7 +16,7 @@
                 <!-- الحقول القابلة للطي -->
                 <div x-show="open" x-transition>
                     <!-- فلترة حسب حالة المخزون -->
-                    <div class="flex flex-wrap gap-4">
+                    <div class="flex flex-wrap gap-2">
                         <div class="w-1/5">
                             <label class="form-label">حالة المخزون:</label>
                             <select name="stock_status"
@@ -88,7 +91,7 @@
             </div>
     </div>
     </form>
-    <div class="container mx-auto p-4">
+    <div class="container ">
         <!-- زر الطباعة - يظهر فقط عند العرض العادي -->
         <div class="hide-on-print text-right mb-4">
             <button onclick="window.print()"
@@ -97,9 +100,7 @@
             </button>
 
         </div>
-        <x-reportHeader>
-            <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقارير قوائم الجرد</h1>
-        </x-reportHeader>
+   
 
         <div class="overflow-x-auto">
             <table class="w-full border-collapse border border-gray-300 text-sm">

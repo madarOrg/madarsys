@@ -38,10 +38,7 @@ class Warehouse extends Model
         'is_active',
         'created_user', 'updated_user'
     ];
-    // protected static function booted()
-    // {
-    //     static::addGlobalScope(new UserAccessScope);
-    // }
+    
 
     public function scopeForUserWarehouse($query)
     {
@@ -130,4 +127,8 @@ class Warehouse extends Model
     {
         return $this->hasMany(Zone::class);
     }
+    public function orders()
+{
+    return $this->hasMany(Order::class);
+}
 }

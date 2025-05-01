@@ -17,7 +17,7 @@
                     <th class="px-6 py-3">اسم المستخدم</th>
                     <th class="px-6 py-3">الأدوار الحالية</th>
                     <th class="px-6 py-3">إضافة دور</th>
-                    <th class="px-6 py-3">الإجراءات</th>
+                    {{-- <th class="px-6 py-3">الإجراءات</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -57,9 +57,9 @@
                             </form>
                         </td>
 
-                        <td class="px-6 py-4 flex flex-wrap gap-2">
+                        {{-- <td class="px-6 py-4 flex flex-wrap gap-2">
                             <!-- يمكن إضافة إجراءات إضافية هنا -->
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
             </tbody>

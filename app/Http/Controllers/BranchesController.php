@@ -28,7 +28,7 @@ class BranchesController extends Controller
                             $q->where('name', 'LIKE', "%{$search}%"); // البحث في اسم الشركة
                         });
                 })
-                ->get();
+                ->paginate(10);
 
             // إرجاع النتائج إلى الـ view
             return view('branches.index', compact('branches', 'search'));

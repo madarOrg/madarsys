@@ -32,6 +32,7 @@
                                     تحديث
                                 </a>
                             </div>
+                        
                         @endisset
                     </div>
                 </div>
@@ -40,15 +41,15 @@
                             type="datetime-local"
                             value="{{ optional($selectedTransaction->transaction_date)->format('Y-m-d\TH:i') }}"
                             disabled="true" />
-
+                            <x-file-input id="transaction_type_id" name="transaction_type_id" label="نوع الحركة " type="text"
+                value="{{ $selectedTransaction->transactionType->name }}" disabled="true" />
                         <x-file-input id="reference" name="reference" label="الرقم المرجعي" type="text"
                             value="{{ $selectedTransaction->reference }}" disabled="true" />
 
                         <x-file-input id="partner_name" name="partner_name" label="الشريك" type="text"
                             value="{{ $selectedTransaction->partner->name ?? '' }}" disabled="true" />
 
-                        <x-file-input id="department_name" name="department_name" label="القسم" type="text"
-                            value="{{ $selectedTransaction->department->name ?? '' }}" disabled="true" />
+                      
 
                         <x-file-input id="warehouse_name" name="warehouse_name" label="المستودع" type="text"
                             value="{{ $selectedTransaction->warehouse->name ?? '' }}" disabled="true" />
@@ -71,7 +72,7 @@
                                     <th class="px-6 py-3">الكمية</th>
                                     <th class="px-6 py-3">سعر الوحدة</th>
                                     <th class="px-6 py-3">الإجمالي</th>
-                                    <th class="px-6 py-3">موقع التخزين</th>
+                                    {{-- <th class="px-6 py-3">موقع التخزين</th> --}}
                                 </tr>
                             </thead>
                             <tbody>
@@ -79,12 +80,13 @@
                                     @foreach ($selectedTransaction->items as $item)
                                         <tr id="item_{{ $item->id }}"
                                             class="border-b bg-gray-100 dark:bg-gray-800 dark:border-gray-700">
-                                            <td class="px-6 py-3">{{ $item->product->name ?? '' }}</td>
+                                            <td class="px-6 py-3">{{ $item->product->name ?? '' }} -{{ $item->product->barcode ?? '' }}- {{ $item->product->sku ?? '' }}</td>
                                             <td class="px-6 py-3">{{ $item->unit->name ?? '' }}</td>
                                             <td class="px-6 py-3">{{ $item->quantity }}</td>
                                             <td class="px-6 py-3">{{ $item->unit_prices }}</td>
                                             <td class="px-6 py-3">{{ number_format($item->total, 2) }}</td>
-                                            <td class="px-6 py-3">{{ $item->warehouse_location->name ?? '' }}</td>
+                                            <td class="hidden">
+                                                {{ $item->warehouse_location->name ?? '' }}</td>
                                         </tr>
                                     @endforeach
                                 @endisset

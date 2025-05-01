@@ -22,7 +22,8 @@
                     class="w-full p-2 border rounded @error('product_id') border-red-500 @enderror" required>
                     @foreach($products as $product)
                         <option value="{{ $product->id}}" @selected(old('product_id') == $product->id)>
-                            {{ $product->name }} (المخزن: {{ $product->quantity }})
+                            {{ $product->name }}-{{ $product->barcode }} -{{ $product->sku }}  
+                            {{-- (المخزن: {{ $product->quantity }}) --}}
                         </option>
                     @endforeach
                 </select>

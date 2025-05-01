@@ -28,10 +28,16 @@ class PartnerType extends Model
     {
         return $this->hasMany(Partner::class, 'type', 'id');
     }
-     // العلاقة مع المنتجات
-     public function products()
-     {
-         return $this->hasMany(Product::class, 'supplier_id');
-     }
+   // في Partner.php
+public function inventoryTransactions()
+{
+    return $this->hasMany(InventoryTransaction::class);
+}
+
+public function products()
+{
+    return $this->hasMany(Product::class);
+}
+
  
 }

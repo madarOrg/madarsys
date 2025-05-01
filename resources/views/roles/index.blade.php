@@ -53,7 +53,7 @@
                         <a href="{{ route('roles.show', $role->id) }}" class="text-gray-600 hover:underline dark:text-gray-300">
                             <i class="fas fa-eye"></i>
                         </a>
-                        <form action="{{ route('roles.destroy', $role->id) }}" method="POST" class="inline-block">
+                        <form action="{{ route('role-permissions.destroy', $role->id) }}" method="POST">
                             @csrf
                             @method('DELETE')
                             <button type="submit" class="text-red-600 hover:text-red-800">

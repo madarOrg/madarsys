@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    'fontDir' => base_path('vendor/dompdf/dompdf/lib/fonts/'),
+    'fontDir' => [base_path('vendor/dompdf/dompdf/lib/fonts/'), public_path('fonts/')],
     'fontCache' => storage_path('framework/cache/pdf-fonts'),
     'defaultFont' => 'dejavu sans',
     'tempDir' => sys_get_temp_dir(),
@@ -15,6 +15,9 @@ return array(
     'font_cache' => storage_path('framework/cache/pdf-fonts'),
     'options' => [
         'defaultFont' => 'dejavu sans',
+        'defaultPaperSize' => 'a4',
+        'enable_arabic' => true,
+        'enable_remote' => true,
         'isRemoteEnabled' => true,
         'isFontSubsettingEnabled' => true,
         'isHtml5ParserEnabled' => true,

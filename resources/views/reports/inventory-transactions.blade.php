@@ -1,6 +1,17 @@
 <x-layout>
     <div class="container mx-auto p-4">
 
+        <div class="container mx-auto p-4">
+            <div class="hide-on-print text-right mt-2 mb-4">
+                <button onclick="window.print()"
+                    class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
+                    التقرير</button>
+            </div>
+            <x-reportHeader >
+                <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300">تقرير الحركات 
+                    المخزنية</h1>
+            </x-reportHeader>
+            
         <div x-data="{ open: true }">
             <button type="button" @click="open = !open"
                 class=" hide-on-print text-indigo-600 hover:text-indigo-700 mb-2 flex-1 min-w-[200px] ml-4">
@@ -89,16 +100,7 @@
         </div>
 
 
-        <div class="container mx-auto p-4">
-            <div class="hide-on-print text-right mb-4">
-                <button onclick="window.print()"
-                    class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
-                    التقرير</button>
-            </div>
-            <x-reportHeader >
-                <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300">تقرير الحركات 
-                    المخزنية</h1>
-            </x-reportHeader>
+        
             @if (empty($inventoryMovements) || count($inventoryMovements) === 0)
                 <p class="text-center text-red-500">لا توجد حركات مخزنية.</p>
             @else
@@ -110,6 +112,7 @@
                                 <th class="border p-2">تاريخ الحركة</th>
                                 <th class="border p-2">نوع الحركة</th>
                                 <th class="border p-2">اسم المنتج</th>
+                            
                                 <th class="border p-2">الشريك</th>
                                 <th class="border p-2">المستودع</th>
                                 <th>المستخدم المدخل </th>
@@ -132,6 +135,7 @@
                                         {{ $movement->transactionType->name ?? 'غير معروف' }}
 
                                     </td>
+                                  
                                     <td class="border p-2 min-w-[250px] whitespace-nowrap">
 
                                         @if ($movement->items->isNotEmpty())
@@ -152,7 +156,7 @@
                                             غير متاح
                                         @endif
                                     </td>
-
+                                
                                     <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
                                         {{ $movement->partner->name ?? 'غير متاح' }}</td>
                                     <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">

@@ -18,11 +18,16 @@ use App\Models\InventoryProduct; // تأكد من استيراد الموديل
 
 class InventoryReportController extends Controller
 {
-    
+
 
     public function productStockReport(Request $request)
     {
-        // نحصل فقط على الـ product_id الموجودة في جدول inventory_products لهذا المستودع
+        $expiredFilter = $request->filled('expired') && $request->expired == 1;
+        $nearExpiryFilter = $request->filled('near_expiry') && $request->near_expiry == 1;
+        $reorderFilter = $request->filled('reorder') && $request->reorder == 1;
+        $surplusFilter = $request->filled('surplus') && $request->surplus == 1;
+    
+        // نحصل على المنتجات الموجودة في المستودع المحدد
         $inventoryProductQuery = InventoryProduct::query();
     
         if ($request->filled('warehouse_id')) {
@@ -38,40 +43,73 @@ class InventoryReportController extends Controller
             'brand',
             'manufacturingCountry',
             'supplier',
-            'inventory' => function ($q) use ($request) {
+            'productOfWarehouses' => function ($q) use ($request) {
                 if ($request->filled('warehouse_id')) {
                     $q->where('warehouse_id', $request->warehouse_id);
                 }
             }
         ])
-        ->withSum(['inventory as total_quantity' => function ($q) use ($request) {
-            if ($request->filled('warehouse_id')) {
-                $q->where('warehouse_id', $request->warehouse_id);
-            }
-        }], 'quantity')
-        ->whereIn('id', $productIds); // فقط المنتجات الموجودة في المستودع
+        ->whereIn('id', $productIds);
     
-        // تصفية بحسب منتجات محددة
+        // تطبيق الفلاتر الأساسية
         if ($request->filled('products')) {
             $query->whereIn('id', $request->products);
         }
     
-        // تصفية بحسب البراند
         if ($request->filled('brand_id')) {
             $query->where('brand_id', $request->brand_id);
         }
     
-        // تصفية بحسب الشركة المصنعة
         if ($request->filled('manufacturer_id')) {
             $query->where('manufacturing_country_id', $request->manufacturer_id);
         }
     
-        // تصفية بحسب المورد
         if ($request->filled('supplier_id')) {
             $query->where('supplier_id', $request->supplier_id);
         }
     
         $products = $query->get();
+    
+        // احسب إجمالي الكمية لكل منتج
+        foreach ($products as $product) {
+            $product->total_quantity = $product->productOfWarehouses->sum(function ($warehouse) {
+                return $warehouse->pivot->quantity ?? 0;
+            });
+        }
+    
+        // فلترة حسب تواريخ انتهاء الصلاحية والكميات
+        $filteredProducts = $products->filter(function ($product) use ($expiredFilter, $nearExpiryFilter, $reorderFilter, $surplusFilter) {
+            $now = now();
+            $nearExpiryThreshold = now()->addDays(30);
+            $passes = true;
+    
+            foreach ($product->productOfWarehouses as $warehouse) {
+                $quantity = $warehouse->pivot->quantity;
+                $expiration = $warehouse->pivot->expiration_date;
+    
+                // منتهي الصلاحية
+                if ($expiredFilter && $expiration && $expiration < $now) {
+                    return true;
+                }
+    
+                // قريب الانتهاء
+                if ($nearExpiryFilter && $expiration && $expiration >= $now && $expiration <= $nearExpiryThreshold) {
+                    return true;
+                }
+    
+                // أقل من الحد الأدنى
+                if ($reorderFilter && $product->min_stock_level !== null && $quantity < $product->min_stock_level) {
+                    return true;
+                }
+    
+                // أكثر من الحد الأقصى
+                if ($surplusFilter && $product->max_stock_level !== null && $quantity > $product->max_stock_level) {
+                    return true;
+                }
+            }
+    
+            return $passes && !$expiredFilter && !$nearExpiryFilter && !$reorderFilter && !$surplusFilter;
+        });
     
         // البيانات المساعدة
         $warehouses = Warehouse::all();
@@ -79,15 +117,18 @@ class InventoryReportController extends Controller
         $brands = Brand::all();
         $suppliers = Partner::all();
     
-        return view('reports.product-stock-report', compact(
-            'products',
-            'warehouses',
-            'manufacturers',
-            'brands',
-            'suppliers'
-        ));
+        return view('reports.product-stock-report', [
+            'products' => $filteredProducts,
+            'warehouses' => $warehouses,
+            'manufacturers' => $manufacturers,
+            'brands' => $brands,
+            'suppliers' => $suppliers
+        ]);
     }
     
+    
+    
+
 
     /**
      * عرض تقرير المنتجات مع تواريخ انتهاء الصلاحية.

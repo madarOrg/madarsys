@@ -33,7 +33,9 @@ class InventoryProduct extends Model
         'distribution_type',
         'unit_id',
         'unit_product_id',
-        'converted_quantity'
+        'converted_quantity',
+        'item_source_id'
+
     ];
 
 
@@ -84,12 +86,21 @@ class InventoryProduct extends Model
         );
     }
 
+public function withdrawals()
+{
+    return $this->hasMany(InventoryProduct::class, 'item_source_id')
+                ->where('distribution_type', -1);
+}
     /**
      * العلاقات مع الجداول الأخرى
      */
     public function product()
     {
         return $this->belongsTo(Product::class, 'product_id');
+    }
+    public function unit()
+    {
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
     
     public function branch()

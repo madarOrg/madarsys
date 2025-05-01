@@ -33,7 +33,7 @@
                 @foreach ($shipments as $shipment)
                     <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                         <td class="p-4">{{ $shipment->shipment_number }}</td>
-                        <td class="px-6 py-4">{{ $shipment->product->name }}</td>
+                        <td class="px-6 py-4">{{ $shipment->product->name }}-{{ $shipment->product->barcode }}-{{ $shipment->product->sku }}</td>
                         <td class="px-6 py-4">{{ $shipment->status }}</td>
                         <td class="px-6 py-4">{{ $shipment->quantity }}</td>
 
@@ -42,19 +42,28 @@
                         {{-- <td class="px-6 py-4">{{ $shipment->company_name }}</td> <!-- إذا كانت هناك شركة --> --}}
                         {{-- <td class="px-6 py-4">{{ $shipment->address }}</td> --}}
                         <td class="px-6 py-4 flex space-x-2">
-                            <!-- زر التعديل -->
-                            <x-button href="{{ route('shipments.edit', $shipment->id) }}" class="text-yellow-600 hover:underline">
-                                <i class="fas fa-pen"></i>
-                            </x-button>
+                            <!-- زر استلام الشحنة -->
+                           <!-- رابط الاستلام -->
+@if ($shipment->status != 'received')
+<a href="{{ route('shipments.receive.form', $shipment->id) }}" class="text-green-600 hover:underline ml-4 text-lg">
+    <i class="fas fa-check-circle"></i>
+</a>
+@endif
 
-                            <!-- زر الحذف -->
-                            <form action="{{ route('shipments.destroy', $shipment->id) }}" method="POST" class="inline-block">
-                                @csrf
-                                @method('DELETE')
-                                <x-button type="submit" class="text-red-600 hover:text-red-800" onclick="return confirm('هل أنت متأكد من حذف هذه الشحنة؟')">
-                                    <i class="fas fa-trash-alt"></i>
-                                </x-button>
-                            </form>
+<!-- رابط التعديل -->
+<a href="{{ route('shipments.edit', $shipment->id) }}" class="text-blue-600 hover:underline mx-4 text-lg">
+<i class="fas fa-pen"></i>
+</a>
+
+<!-- رابط الحذف -->
+<form action="{{ route('shipments.destroy', $shipment->id) }}" method="POST" class="inline-block">
+@csrf
+@method('DELETE')
+<a href="#" onclick="event.preventDefault(); if(confirm('هل أنت متأكد من حذف هذه الشحنة؟')) this.closest('form').submit();" class="text-red-600 hover:text-red-800 mx-4 text-lg">
+    <i class="fas fa-trash-alt"></i>
+</a>
+</form>
+
                         </td>
                     </tr>
                 @endforeach

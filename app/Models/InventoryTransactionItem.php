@@ -41,7 +41,7 @@ class InventoryTransactionItem extends Model
     protected static function boot()
     {
         parent::boot();
-    
+
         static::creating(function ($product) {
             // توليد رقم الدفعة تلقائيًا إذا لم يتم إدخاله
             if (!$product->batch_code) {
@@ -50,7 +50,7 @@ class InventoryTransactionItem extends Model
             }
         });
     }
-    
+
     /**
      * توليد رقم الدفعة
      */
@@ -68,27 +68,28 @@ class InventoryTransactionItem extends Model
         // if (!$this->product) {
         //     throw new \Exception('Product relationship is not loaded');
         // }
-    
+
         // جلب آخر دفعة لنفس المنتج والمستودع وتاريخ الانتهاء
         $lastBatch = self::where('product_id', $this->product_id)
-        ->where('target_warehouse_id', $warehouseId) // البحث حسب المستودع
-        // ->where('expiration_date', $expirationDate)
-        ->orderBy('id', 'desc')
-        ->value('batch_code');
-    
+            ->where('target_warehouse_id', $warehouseId) // البحث حسب المستودع
+            // ->where('expiration_date', $expirationDate)
+            ->orderBy('id', 'desc')
+            ->value('batch_code');
+
         //استخراج الرقم التسلسلي من آخر دفعة
         $lastSerial = $lastBatch ? (int)substr($lastBatch, -3) : 0;
         $newSerial = str_pad($lastSerial + 1, 6, '0', STR_PAD_LEFT);
-    
+
         // تكوين رقم الدفعة
-        return sprintf('%s-%s-%s',
+        return sprintf(
+            '%s-%s-%s',
             $this->warehouse->code ?? '000',
             $this->product->sku ?? '000',
             // $datePart,
             $newSerial
         );
     }
-      
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);
@@ -102,10 +103,13 @@ class InventoryTransactionItem extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    // في موديل InventoryTransactionItem
     public function unit()
     {
-        return $this->belongsTo(unit::class);
+        return $this->belongsTo(Unit::class, 'unit_id');
     }
+
+
     public function warehouseLocation()
     {
         return $this->belongsTo(WarehouseLocation::class);

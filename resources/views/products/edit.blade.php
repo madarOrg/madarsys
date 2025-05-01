@@ -47,7 +47,7 @@
                             :value="old('sku', $product->sku)" />
                     </div>
                     <div class="">
-                        <x-file-input id="stock_quantity" name="stock_quantity" label="الكمية المتوفرة" type="number"
+                        <x-file-input id="stock_quantity" name="stock_quantity" label="بداية المدة" type="number"
                             value="{{ old('stock_quantity', $product->stock_quantity) }}" required />
                     </div>
 
@@ -149,26 +149,26 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-5 border border-gray-300 p-4 rounded-md">
 
-                    <x-file-input 
-                    id="purchase_date" 
-                    name="purchase_date" 
-                    label="تاريخ الشراء" 
-                    type="date" 
-                    value="{{ old('purchase_date', $product->purchase_date ? \Carbon\Carbon::parse($product->purchase_date)->format('Y-m-d') : '') }}" 
-                    required 
-                />
-                    <div class="">
+                   
+                    {{-- <div class="">
                         <x-file-input id="manufacturing_date" name="manufacturing_date" label="تاريخ الإنتاج"
                             type="date" value="{{ old('manufacturingDate', $product->manufacturing_date) }}" />
                     </div>
                     <div class="">
                         <x-file-input id="expiration_date" name="expiration_date" label="تاريخ إنتهاء المنتج"
                             type="date" value="{{ old('expirationDate', $product->expiration_date) }}" />
-                    </div>
+                    </div> --}}
                     <x-textarea id="ingredients" name="ingredients" label="المكونات" :value="old('ingredients', $product->ingredients)" />
                         <x-textarea id="description" name="description" label="الوصف" :value="old('description', $product->description)" />
                         <x-textarea id="notes" name="notes" label="ملاحظات إضافية" :value="old('notes', $product->notes)" />
-                        
+                            <x-file-input 
+                            id="purchase_date" 
+                            name="purchase_date" 
+                            label="تاريخ الشراء" 
+                            type="date" 
+                            value="{{ old('purchase_date', $product->purchase_date ? \Carbon\Carbon::parse($product->purchase_date)->format('Y-m-d') : '') }}" 
+                            required 
+                        />
                     <div class="flex items-center">
                         <input type="checkbox" id="is_active" name="is_active" value="1" 
                             {{ old('is_active', $product->is_active) ? 'checked' : '' }} />

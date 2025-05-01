@@ -38,10 +38,11 @@ class Product extends Model
         'discount',          // التخفيضات (%)
         'supplier_contact',  // رقم المورد
         'purchase_date',     // تاريخ الشراء
-        'manufacturing_date',// تاريخ التصنيع
+        'manufacturing_date', // تاريخ التصنيع
         'expiration_date',   // تاريخ انتهاء المنتج
         'last_updated',      // تاريخ آخر تحديث
-        'created_user', 'updated_user'
+        'created_user',
+        'updated_user'
     ];
 
     protected static function boot()
@@ -70,12 +71,7 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
-    // العلاقة مع المورد
-    public function supplier()
-    {
-        return $this->belongsTo(Partner::class, 'supplier_id');
-    }
-
+   
     // العلاقة مع الوحدة
     public function unit()
     {
@@ -88,36 +84,59 @@ class Product extends Model
         return $this->hasMany(Shipment::class);
     }
     public function inventoryTransactionItems()
+    {
+        return $this->hasMany(InventoryTransactionItem::class, 'product_id');
+    }
+    public function inventory()
+    {
+        return $this->hasOne(Inventory::class, 'product_id');
+    }
+
+    public function inventoryTransactions()
+    {
+        return $this->hasManyThrough(
+            InventoryTransaction::class,
+            InventoryTransactionItem::class,
+            'product_id',                // المفتاح الأجنبي في InventoryTransactionItem يشير إلى Product
+            'id',                        // المفتاح الرئيسي في InventoryTransaction
+            'id',                        // المفتاح الرئيسي في Product
+            'inventory_transaction_id'   // المفتاح الأجنبي في InventoryTransactionItem يشير إلى InventoryTransaction
+        );
+    }
+    protected $dates = ['purchase_date', 'manufacturing_date', 'expiration_date', 'last_updated'];
+
+    public function brand()
+    {
+        return $this->belongsTo(Brand::class);
+    }
+ // العلاقة مع المورد
+ // العلاقة مع المورد
+public function supplier()
 {
-    return $this->hasMany(InventoryTransactionItem::class, 'product_id');
-}
-public function inventory()
-{
-    return $this->hasOne(Inventory::class, 'product_id');
+    return $this->belongsTo(Partner::class, 'supplier_id', 'id'); // تأكد من أن المفتاح الأجنبي هو supplier_id
 }
 
-public function inventoryTransactions()
-{
-    return $this->hasManyThrough(
-        InventoryTransaction::class,
-        InventoryTransactionItem::class,
-        'product_id',                // المفتاح الأجنبي في InventoryTransactionItem يشير إلى Product
-        'id',                        // المفتاح الرئيسي في InventoryTransaction
-        'id',                        // المفتاح الرئيسي في Product
-        'inventory_transaction_id'   // المفتاح الأجنبي في InventoryTransactionItem يشير إلى InventoryTransaction
-    );
-}
-protected $dates = ['purchase_date', 'manufacturing_date', 'expiration_date', 'last_updated'];
 
-public function brand()
-{
-    return $this->belongsTo(Brand::class);
-}
+    public function manufacturingCountry()
+    {
+        return $this->belongsTo(ManufacturingCountry::class);
+    }
+    public function productOfWarehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'inventory_products')
+                    ->withPivot(['quantity', 'expiration_date'])
+                    ->withTimestamps();
+    }
+    public function quantityOfProductOfWarehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'inventory_products')
+                    ->withPivot(['quantity'])
+                    ->withTimestamps();
+    }
 
-public function manufacturingCountry()
-{
-    return $this->belongsTo(ManufacturingCountry::class);
-}
-
-
+    public function warehouses()
+    {
+        return $this->belongsToMany(Warehouse::class, 'inventory_products', 'product_id', 'warehouse_id')->distinct();
+    }
+    
 }
