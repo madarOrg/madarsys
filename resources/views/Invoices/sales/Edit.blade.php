@@ -175,59 +175,80 @@
                              </tr>
                          </thead>
                          <tbody id="transaction-items">
-                            @foreach ($invoice->items as $index => $item)
-                            <input type="hidden" name="items[{{ $index }}][item_id]" value="{{ $item->id ?? 0 }}">
+                             @foreach ($invoice->items as $index => $item)
+                                 <input type="hidden" name="items[{{ $index }}][item_id]"
+                                     value="{{ $item->id ?? 0 }}">
 
-                                <tr class="product-row border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
-                                    <td class="px-0 py-4">
-                                        <select name="items[{{ $index }}][product_id]" class="w-full product-select tom-select min-w-[250px] border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                                            <option value="">اختر منتج</option>
-                                            @foreach ($products as $product)
-                                                <option value="{{ $product->id }}" @if ($product->id == $item->product_id) selected @endif>
-                                                    {{ $product->id }} - {{ $product->name }} - SKU: {{ $product->sku }} - Barcode: {{ $product->barcode }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                        
-                                    <td class="px-6 py-4">
-                                        <select name="items[{{ $index }}][unit_id]" class="w-full units-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
-                                            <option value="">اختر وحدة</option>
-                                            @foreach ($units as $unit)
-                                                <option value="{{ $unit->id }}" @if ($unit->id == $item->unit_id) selected @endif>{{ $unit->name }}</option>
-                                            @endforeach
-                                        </select>
-                                    </td>
-                        
-                                    <td>
-                                        <input type="number" name="items[{{ $index }}][quantity]" value="{{ $item->quantity }}" class="w-full quantity-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
-                                    </td>
-                        
-                                    <td>
-                                        <input type="number" name="items[{{ $index }}][price]" value="{{ $item->price }}" class="w-full price-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" min="0" step="0.01" />
-                                    </td>
-                        
-                                    <td>
-                                        <input type="number" name="items[{{ $index }}][total]" value="{{ $item->subtotal }}" class="w-full total-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" min="0" step="0.01" />
-                                    </td>
-                        
-                                    <td>
-                                        <input type="date" name="items[{{ $index }}][production_date]" value="{{ $item->production_date }}" class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
-                                    </td>
-                        
-                                    <td>
-                                        <input type="date" name="items[{{ $index }}][expiration_date]" value="{{ $item->expiration_date }}" class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
-                                    </td>
-                        
-                                    <td class="px-6 py-4">
-                                        <button type="button" class="remove-row-btn text-red-600 hover:text-red-800" onclick="removeProductRow(this)">
-                                            <i class="fas fa-trash-alt"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                        
+                                 <tr
+                                     class="product-row border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
+                                     <td class="px-0 py-4">
+                                         <select name="items[{{ $index }}][product_id]"
+                                             class="w-full product-select tom-select min-w-[250px] border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                             <option value="">اختر منتج</option>
+                                             @foreach ($products as $product)
+                                                 <option value="{{ $product->id }}"
+                                                     @if ($product->id == $item->product_id) selected @endif>
+                                                     {{ $product->id }} - {{ $product->name }} - SKU:
+                                                     {{ $product->sku }} - Barcode: {{ $product->barcode }}
+                                                 </option>
+                                             @endforeach
+                                         </select>
+                                     </td>
+
+                                     <td class="px-6 py-4">
+                                         <select name="items[{{ $index }}][unit_id]"
+                                             class="w-full units-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                                             <option value="">اختر وحدة</option>
+                                             @foreach ($units as $unit)
+                                                 <option value="{{ $unit->id }}"
+                                                     @if ($unit->id == $item->unit_id) selected @endif>
+                                                     {{ $unit->name }}</option>
+                                             @endforeach
+                                         </select>
+                                     </td>
+
+                                     <td>
+                                         <input type="number" name="items[{{ $index }}][quantity]"
+                                             value="{{ $item->quantity }}"
+                                             class="w-full quantity-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                     </td>
+
+                                     <td>
+                                         <input type="number" name="items[{{ $index }}][price]"
+                                             value="{{ $item->price }}"
+                                             class="w-full price-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
+                                             min="0" step="0.01" />
+                                     </td>
+
+                                     <td>
+                                         <input type="number" name="items[{{ $index }}][total]"
+                                             value="{{ $item->subtotal }}"
+                                             class="w-full total-input border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1"
+                                             min="0" step="0.01" />
+                                     </td>
+
+                                     <td>
+                                         <input type="date" name="items[{{ $index }}][production_date]"
+                                             value="{{ $item->production_date }}"
+                                             class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                     </td>
+
+                                     <td>
+                                         <input type="date" name="items[{{ $index }}][expiration_date]"
+                                             value="{{ $item->expiration_date }}"
+                                             class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
+                                     </td>
+
+                                     <td class="px-6 py-4">
+                                         <button type="button" class="remove-row-btn text-red-600 hover:text-red-800"
+                                             onclick="removeProductRow(this)">
+                                             <i class="fas fa-trash-alt"></i>
+                                         </button>
+                                     </td>
+                                 </tr>
+                             @endforeach
+                         </tbody>
+
                      </table>
                  </div>
                  <div class="flex justify-start mt-4">
@@ -273,20 +294,20 @@
          let products = @json($products);
          let units = @json($units);
 
-         document.getElementById('add-item').addEventListener('click', function () {
-    let index = document.querySelectorAll('#invoice-items-table tbody tr').length;
+         document.getElementById('add-item').addEventListener('click', function() {
+             let index = document.querySelectorAll('#invoice-items-table tbody tr').length;
 
-    let productOptions = products.map(product =>
-        `<option value="${product.id}" data-price="${product.selling_price}" data-unit-id="${product.unit_id}">
+             let productOptions = products.map(product =>
+                 `<option value="${product.id}" data-price="${product.selling_price}" data-unit-id="${product.unit_id}">
             ${product.id} - ${product.name} - SKU: ${product.sku} - Barcode: ${product.barcode}
         </option>`
-    ).join('');
+             ).join('');
 
-    let unitOptions = units.map(unit =>
-        `<option value="${unit.id}">${unit.name}</option>`
-    ).join('');
+             let unitOptions = units.map(unit =>
+                 `<option value="${unit.id}">${unit.name}</option>`
+             ).join('');
 
-    let newRow = `
+             let newRow = `
         <tr class="product-row border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition duration-200">
             <input type="hidden" name="items[${index}][item_id]" value="0"> <!-- new item -->
 
@@ -341,13 +362,13 @@
         </tr>
     `;
 
-    document.querySelector('#invoice-items-table tbody').insertAdjacentHTML('beforeend', newRow);
+             document.querySelector('#invoice-items-table tbody').insertAdjacentHTML('beforeend', newRow);
 
-    // تفعيل tom-select لل select الجديد
-    new TomSelect('.product-select:last');
+             // تفعيل tom-select لل select الجديد
+             new TomSelect('.product-select:last');
 
-    updateTotalPrice(); // تحديث السعر الإجمالي بعد الإضافة
-});
+             updateTotalPrice(); // تحديث السعر الإجمالي بعد الإضافة
+         });
 
 
          document.querySelector('#invoice-items-table').addEventListener('change', function(e) {

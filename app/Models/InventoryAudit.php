@@ -26,9 +26,8 @@ class InventoryAudit extends Model
     public static function generateAuditCode()
     {
         $date = now()->format('Ymd'); // تاريخ اليوم بصيغة YYYYMMDD
-        $latestAudit = self::latest()->first(); // آخر جرد مضاف
+        $latestAudit = self::orderBy('id', 'desc')->first();
         $nextId = $latestAudit ? $latestAudit->id + 1 : 1; // تحديد الـ ID التالي
-
         return "audit-{$date}-{$nextId}";
     }
     public function audits()

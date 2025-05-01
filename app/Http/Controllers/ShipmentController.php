@@ -15,7 +15,9 @@ class ShipmentController extends Controller
     //     return view('shipments.index', compact('shipments'));
     // }
     public function index()
-    {
+    { 
+        
+        // $products = Product::all();
         // التحقق من وجود قيمة بحث
         $search = request('search');
 
@@ -153,7 +155,7 @@ class ShipmentController extends Controller
 
         // تحديث حالة الشحنة
         $shipment->update([
-            'status' => 'delivered', // تغيير من 'received' إلى 'delivered' لتتوافق مع تعريف ENUM
+            'status' => 'shipped', // تغيير من 'received' إلى 'delivered' لتتوافق مع تعريف ENUM
             'received_quantity' => $validated['received_quantity'],
             'received_date' => $validated['received_date'],
             'notes' => $validated['notes'] ?? null,
@@ -181,6 +183,66 @@ class ShipmentController extends Controller
     }
 
     /**
+     * معالجة استلام الشحنة وتحديث المخزون
+     */
+    public function showSendForm($id)
+    {
+        $shipment = Shipment::findOrFail($id);
+
+        // التحقق من أن الشحنة لم يتم استلامها بعد
+        if ($shipment->status === 'delivered') {
+            return redirect()->route('shipments.index')
+                ->with('error', 'تم استلام هذه الشحنة مسبقاً!');
+        }
+
+        return view('shipments.send', compact('shipment'));
+    }
+    public function send(Request $request, $id)
+    {
+        $shipment = Shipment::findOrFail($id);
+
+        // التحقق من أن الشحنة لم يتم استلامها بعد
+        if ($shipment->status === 'delivered') {
+            return redirect()->route('shipments.index')
+                ->with('error', 'تم شحن هذه الشحنة مسبقاً!');
+        }
+
+        // التحقق من البيانات المدخلة
+        $validated = $request->validate([
+            'received_quantity' => 'required|integer|min:1|max:' . $shipment->quantity,
+            'received_date' => 'required|date',
+            'notes' => 'nullable|string',
+        ]);
+
+        // تحديث حالة الشحنة
+        $shipment->update([
+            'status' => 'delivered', // تغيير من 'received' إلى 'delivered' لتتوافق مع تعريف ENUM
+            'received_quantity' => $validated['received_quantity'],
+            'received_date' => $validated['received_date'],
+            'notes' => $validated['notes'] ?? null,
+        ]);
+
+        // تحديث مخزون المنتج (إضافة الكمية المستلمة)
+        $product = $shipment->product;
+        $product->increment('stock_quantity', $validated['received_quantity']);
+
+        // إنشاء حركة مخزنية
+        // $inventoryTransaction = new \App\Models\InventoryTransaction([
+        //     'product_id' => $product->id,
+        //     'quantity' => $validated['received_quantity'],
+        //     'type' => 'shipment_receive',
+        //     'reference_id' => $shipment->id,
+        //     'reference_type' => 'App\Models\Shipment',
+        //     'transaction_type_id' => 1, // نوع الحركة: استلام شحنة
+        //     'warehouse_id' => 1, // المخزن الافتراضي
+        //     'notes' => 'استلام شحنة رقم: ' . $shipment->shipment_number,
+        // ]);
+        // $inventoryTransaction->save();
+
+        return redirect()->route('shipments.index')
+            ->with('success', 'تم شحن الشحنة !');
+    }
+    /**
      * عرض صفحة الشحنات المنتظرة للاستلام
      */
     public function receiveIndex()
@@ -200,12 +262,12 @@ class ShipmentController extends Controller
     {
         // جلب الشحنات التي يمكن إرسالها
         $shipments = Shipment::with('product')
-            ->where('status', 'confirmed')
+            ->where('status', 'shipped')
             ->get();
 
         return view('shipments.send_index', compact('shipments'));
     }
-
+  
     /**
      * عرض صفحة تتبع الشحنات
      */

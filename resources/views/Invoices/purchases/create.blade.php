@@ -1,4 +1,5 @@
 <x-layout>
+    
     <section class="mb-1 p-6  shadow-md rounded-lg">
         <form action="{{ route('invoices.store', ['type' => 'purchase']) }}" method="POST">
             @csrf

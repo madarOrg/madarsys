@@ -26,7 +26,7 @@
                                 <th class="px-6 py-3" > الباركود</th>
                                 <th class="px-6 py-3">الفئة</th>
                                 {{-- <th class="px-6 py-3">المورد</th>                                --}}
-                                <th class="px-6 py-3">كمية بداية المده</th>
+                                <th class="px-6 py-3">كمية بداية المدة</th>
                                 <th class="px-6 py-3">الحالة</th>
                                 <th class="px-6 py-3">الحد الأدنى للطلب</th>
                                 <th class="px-6 py-3">الحد الأعلى للطلب</th>        

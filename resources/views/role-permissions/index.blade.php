@@ -22,7 +22,7 @@
 
 
             <!-- حقل البحث عن الصلاحية -->
-            <div class="relative mt-1 flex items-center">
+            {{-- <div class="relative mt-1 flex items-center">
                 <select name="permission"
                     class="px-4 py-2 bg-gray-100 rounded-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200">
                     <option value="">اختر الصلاحية</option>
@@ -33,21 +33,21 @@
                         </option>
                     @endforeach
                 </select>
-            </div>
+            </div> --}}
 
 
             <!-- حقل البحث عن الحالة -->
-            <div class="relative mt-1 flex items-center">
+            {{-- <div class="relative mt-1 flex items-center">
                 <select name="status"
                     class="px-4 py-2 bg-gray-100 rounded-lg border dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200">
                     <option value="">اختر الحالة</option>
                     <option value="1" {{ request()->input('status') == '1' ? 'selected' : '' }}>فعال</option>
                     <option value="0" {{ request()->input('status') == '0' ? 'selected' : '' }}>غير فعال</option>
                 </select>
-            </div>
+            </div> --}}
 
 
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">بحث</button>
+            <button type="submit" class="bg-blue-500 border dark:text-white text-gray-600 px-4 py-2 rounded">بحث</button>
         </form>
     </div>
 
@@ -66,7 +66,7 @@
                 <th class="px-6 py-3">إمكانية الحذف</th>
                 <th class="px-6 py-3">الحالة</th>
                 <th class="px-6 py-3">آخر تحديث للحالة</th>
-                <th class="px-6 py-3">الإجراء</th>
+                {{-- <th class="px-6 py-3">الإجراء</th> --}}
             </tr>
         </thead>
         <tbody>
@@ -94,10 +94,10 @@
                             </span>
                         </td>
                         <td class="px-6 py-4">
-                            {{ $permission->pivot->status_updated_at ? \Carbon\Carbon::parse($permission->pivot->status_updated_at)->format('Y-m-d H:i') : '-' }}
+                            {{ $permission->pivot->updated_at ? \Carbon\Carbon::parse($permission->pivot->updated_at)->format('Y-m-d H:i') : '-' }}
                         </td>
 
-                        <td class="px-6 py-4 flex space-x-2">
+                        {{-- <td class="px-6 py-4 flex space-x-2">
                             <a href="{{ route('role-permissions.edit', $role->id) }}"
                                 class="text-blue-600 hover:underline dark:text-blue-500">
                                 <i class="fa-solid fa-pen"></i>
@@ -111,7 +111,7 @@
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </form>
-                        </td>
+                        </td> --}}
                     </tr>
                 @endforeach
             @endforeach

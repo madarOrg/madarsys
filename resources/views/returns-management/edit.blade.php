@@ -22,7 +22,7 @@
                 <!-- اختيار العميل -->
                 <div>
                     <label for="customer_id" class="block text-sm font-medium text-gray-700 mb-2">العميل <span class="text-red-600">*</span></label>
-                    <select id="customer_id" name="customer_id" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
+                    <select id="customer_id" name="customer_id" class="tom-select w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
                         <option value="">-- اختر العميل --</option>
                         @foreach($customers as $customer)
                             <option value="{{ $customer->id }}" {{ old('customer_id', $returnOrder->customer_id) == $customer->id ? 'selected' : '' }}>
@@ -48,11 +48,12 @@
                 <div>
                     <label for="status" class="block text-sm font-medium text-gray-700 mb-2">حالة المرتجع <span class="text-red-600">*</span></label>
                     <select id="status" name="status" class="w-full border-gray-300 rounded-md shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50" required>
-                        <option value="pending" {{ old('status', $returnOrder->status) == 'pending' ? 'selected' : '' }}>معلق</option>
-                        <option value="completed" {{ old('status', $returnOrder->status) == 'completed' ? 'selected' : '' }}>مكتمل</option>
-                        <option value="cancelled" {{ old('status', $returnOrder->status) == 'cancelled' ? 'selected' : '' }}>ملغي</option>
+                        <option value="">-- اختر حالة المرتجع --</option>
+                        <option value="معلق" {{ old('return_status', $returnOrder->status) == 'معلق' ? 'selected' : '' }}>معلق</option>
+                        <option value="مكتمل" {{ old('return_status', $returnOrder->status) == 'مكتمل' ? 'selected' : '' }}>مكتمل</option>
+                        <option value="ملغي" {{ old('return_status', $returnOrder->status) == 'ملغي' ? 'selected' : '' }}>ملغي</option>
                     </select>
-                    @error('status')
+                    @error('return_status')
                         <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
                     @enderror
                 </div>
@@ -82,7 +83,9 @@
                                         <option value="">-- اختر المنتج --</option>
                                         @foreach($products as $product)
                                             <option value="{{ $product->id }}" {{ old('items.'.$index.'.product_id', $item->product_id) == $product->id ? 'selected' : '' }}>
-                                                {{ $product->name }} (المتاح: {{ $product->quantity }})
+                                                {{ $product->name }} 
+                                                {{ $product->name }}-{{ $product->barcode }}-{{ $product->sku }}
+                                                {{-- (المتاح: {{ $product->quantity }}) --}}
                                             </option>
                                         @endforeach
                                     </select>
@@ -100,7 +103,7 @@
                             </div>
                             
                             <button type="button" class="remove-item mt-2 text-red-600 hover:text-red-800" {{ $index === 0 && count($returnOrder->items) === 1 ? 'style=display:none' : '' }}>
-                                <i class="fas fa-trash"></i> إزالة
+                                <i class="fas fa-trash"></i> 
                             </button>
                         </div>
                     @endforeach
@@ -112,9 +115,9 @@
             </div>
             
             <div class="mt-8 flex justify-end">
-                <button type="submit" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md">
+                <x-button type="submit" class="">
                     <i class="fas fa-save ml-1"></i> حفظ التغييرات
-                </button>
+                </x-button>
             </div>
         </form>
     </div>
@@ -146,7 +149,8 @@
                                 <option value="">-- اختر المنتج --</option>
                                 @foreach($products as $product)
                                     <option value="{{ $product->id }}">
-                                        {{ $product->name }} (المتاح: {{ $product->quantity }})
+                                        {{ $product->name }}-{{ $product->barcode }}-{{ $product->sku }}
+                                       
                                     </option>
                                 @endforeach
                             </select>
@@ -164,7 +168,7 @@
                     </div>
                     
                     <button type="button" class="remove-item mt-2 text-red-600 hover:text-red-800">
-                        <i class="fas fa-trash"></i> إزالة
+                        <i class="fas fa-trash"></i> 
                     </button>
                 `;
                 

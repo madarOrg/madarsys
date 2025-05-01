@@ -12,32 +12,62 @@ use Illuminate\Http\Request;
 
 class ReturnOrderController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $returnOrders = ReturnOrder::with('customer', 'items.product') // جلب بيانات العميل والعناصر مع المنتجات
+
+    //         ->when($request->search, function ($query) use ($request) {
+    //             $search = $request->search;
+
+    //             // البحث داخل جدول `return_orders`
+    //             $query->where('return_number', 'like', '%' . $search . '%')
+    //                 ->orWhere('return_reason', 'like', '%' . $search . '%')
+    //                 ->orWhere('return_date', 'like', '%' . $search . '%')
+
+    //                 // البحث في اسم العميل (Partner model)
+    //                 ->orWhereHas('customer', function ($q) use ($search) {
+    //                 $q->where('name', 'like', '%' . $search . '%');
+    //             })
+
+    //                 // البحث في المنتجات المرتبطة عبر الجدول الوسيط
+    //                 ->orWhereHas('items.product', function ($q) use ($search) {
+    //                 $q->where('name', 'like', '%' . $search . '%');
+    //             });
+    //         })
+    //         ->paginate(10);  // تحديد عدد العناصر لكل صفحة
+
+    //     return view('returns-management.index', compact('returnOrders'));
+    // }
     public function index(Request $request)
-    {
-        $returnOrders = ReturnOrder::with('customer', 'items.product') // جلب بيانات العميل والعناصر مع المنتجات
+{
+    $returnOrders = ReturnOrder::with('customer', 'items.product')
+        ->when($request->search, function ($query) use ($request) {
+            $search = $request->search;
 
-            ->when($request->search, function ($query) use ($request) {
-                $search = $request->search;
-
-                // البحث داخل جدول `return_orders`
-                $query->where('return_number', 'like', '%' . $search . '%')
+            $query->where(function ($q) use ($search) {
+                $q->where('return_number', 'like', '%' . $search . '%')
                     ->orWhere('return_reason', 'like', '%' . $search . '%')
                     ->orWhere('return_date', 'like', '%' . $search . '%')
-
-                    // البحث في اسم العميل (Partner model)
-                    ->orWhereHas('customer', function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
-                })
-
-                    // البحث في المنتجات المرتبطة عبر الجدول الوسيط
-                    ->orWhereHas('items.product', function ($q) use ($search) {
-                    $q->where('name', 'like', '%' . $search . '%');
-                });
-            })
-            ->paginate(10);  // تحديد عدد العناصر لكل صفحة
-
+                    ->orWhereHas('customer', function ($q2) use ($search) {
+                        $q2->where('name', 'like', '%' . $search . '%');
+                    })
+                    ->orWhereHas('items.product', function ($q2) use ($search) {
+                        $q2->where('name', 'like', '%' . $search . '%');
+                    });
+            });
+        })
+        ->when($request->status, function ($query) use ($request) {
+            $allowedStatuses = ['معلق', 'مكتمل', 'ملغي']; // الحالات المتوفرة
+            if (in_array($request->status, $allowedStatuses)) {
+                $query->where('status', $request->status);
+            }
+        })
+        ->orderBy('created_at', 'desc')
+        ->paginate(10);
+        // dd($returnOrders->first()->status);
         return view('returns-management.index', compact('returnOrders'));
-    }
+}
+
 
     public function show(string $id, Request $request)
     {
@@ -106,7 +136,7 @@ class ReturnOrderController extends Controller
                 'return_number' => 'RET-' . time(), // إنشاء رقم فريد للمرتجع
                 'return_reason' => $validatedData['return_reason'],
                 'return_date' => $validatedData['return_date'],
-                'status' => 'pending', // الحالة الافتراضية للمرتجع
+                'status' => 'معلق', // الحالة الافتراضية للمرتجع
             ]);
             
             // إضافة المنتجات المرتجعة إلى جدول return_order_items

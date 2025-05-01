@@ -73,7 +73,7 @@
             <div class="flex items-center justify-between">
                 <h3 class="text-lg font-medium">تفاصيل الطلب</h3>
                 <button type="button" id="add-product"
-                    class="bg-green-600 hover:bg-green-700 text-white text-sm px-3 py-1 rounded-md">
+                    class="bg-green-600 hover:bg-green-700 text-gray-600 text-sm px-3 py-1 rounded-md">
                     + إضافة منتج
                 </button>
             </div>
@@ -177,24 +177,25 @@
           <div class="order-detail flex gap-4">
             <div class="w-1/4">
               <label class="text-sm font-medium text-gray-600">المنتج</label>
-              <select name="order_details[${i}][product_id]" class="product-select w-full">
+              <select name="order_details[${i}][product_id]" class="product-select  w-form-input-style w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1">
                 <option value="">اختر منتجًا</option>
               </select>
             </div>
             <div class="w-1/4">
-              <label class="block text-gray-700">الكمية</label>
-              <input type="number" name="order_details[${i}][quantity]" class="form-input-style" min="1" required>
-            </div>
-            <div class="w-1/4">
-              <label class="block text-gray-700">السعر</label>
-              <input type="number" name="order_details[${i}][price]" class="form-input-style" step="0.01" min="0.01" required>
-            </div>
-            <div class="w-1/4">
               <label class="text-sm font-medium text-gray-600">الوحدة</label>
-              <select name="order_details[${i}][unit_id]" class="units-select w-full">
+              <select name="order_details[${i}][unit_id]" class="units-select  w-form-input-style w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1">
                 <option value="">اختر وحدة</option>
               </select>
             </div>
+            <div class="w-1/4">
+              <label class="block text-gray-700">الكمية</label>
+              <input type="number" name="order_details[${i}][quantity]" class="form-input-style  w-form-input-style w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1" min="1" required>
+            </div>
+            <div class="w-1/4">
+              <label class="block text-gray-700">السعر</label>
+              <input type="number" name="order_details[${i}][price]" class="form-input-style  w-form-input-style w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1" step="0.01" min="0.01" required>
+            </div>
+            
           </div>
         `;
         container.insertAdjacentHTML('beforeend', newRow);

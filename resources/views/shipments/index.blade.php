@@ -33,7 +33,7 @@
                 @foreach ($shipments as $shipment)
                     <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                         <td class="p-4">{{ $shipment->shipment_number }}</td>
-                        <td class="px-6 py-4">{{ $shipment->product->name }}</td>
+                        <td class="px-6 py-4">{{ $shipment->product->name }}-{{ $shipment->product->barcode }}-{{ $shipment->product->sku }}</td>
                         <td class="px-6 py-4">{{ $shipment->status }}</td>
                         <td class="px-6 py-4">{{ $shipment->quantity }}</td>
 

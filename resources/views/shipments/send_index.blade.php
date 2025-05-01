@@ -48,8 +48,11 @@
                                 <td class="py-2 px-4 border-b text-center">{{ $shipment->shipment_date }}</td>
                                 <td class="py-2 px-4 border-b text-center">{{ $shipment->status }}</td>
                                 <td class="py-2 px-4 border-b text-center">
-                                    <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded">
-                                        إرسال
+                                    {{-- <a href="#" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded"> --}}
+                                       
+                                        <a href="{{ route('shipments.send.form', $shipment->id) }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-1 px-3 rounded">
+
+                                        شحن
                                     </a>
                                 </td>
                             </tr>

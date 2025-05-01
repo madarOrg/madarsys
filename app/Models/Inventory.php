@@ -22,6 +22,7 @@ class Inventory extends Model
         'unit_price',
         'total_value',
         'created_user', 'updated_user',
+        'blocked_quantity'
     ];
 
     /**

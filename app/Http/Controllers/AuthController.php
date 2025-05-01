@@ -24,26 +24,39 @@ class AuthController extends Controller
 
     /**
      * معالجة تسجيل الدخول
-     */
-    public function login(Request $request)
-    {
-        try {
-            $request->validate([
-                'email' => 'required|email',
-                'password' => 'required',
-            ]);
+     */public function login(Request $request)
+{
+    try {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-            if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
-                return redirect()->intended('/dashboard')->with('success', 'تم تسجيل الدخول بنجاح');
-            }
+        // تحقق أولاً من وجود المستخدم في قاعدة البيانات
+        $user = User::where('email', $request->email)->first();
 
+        // إذا كان المستخدم غير موجود أو حسابه معلق (status = 0)
+        if (!$user || $user->status == 0) {
             return back()->withErrors([
-                'email' => 'Invalid credentials provided.',
+                'email' => 'حسابك معلق أو غير مفعل، لا يمكنك تسجيل الدخول في الوقت الحالي.',
             ]);
-        } catch (Exception $e) {
-            return back()->with('error', 'حدث خطأ أثناء محاولة تسجيل الدخول: ' . $e->getMessage());
         }
+
+        // محاولة تسجيل الدخول باستخدام بيانات الاعتماد المقدمة
+        if (Auth::attempt($request->only('email', 'password'), $request->filled('remember'))) {
+            return redirect()->intended('/dashboard')->with('success', 'تم تسجيل الدخول بنجاح');
+        }
+
+        // في حالة فشل التحقق من بيانات الاعتماد
+        return back()->withErrors([
+            'email' => 'Invalid credentials provided.',
+        ]);
+    } catch (Exception $e) {
+        // التعامل مع الاستثناءات
+        return back()->with('error', 'حدث خطأ أثناء محاولة تسجيل الدخول: ' . $e->getMessage());
     }
+}
+
 
     /**
      * تسجيل الخروج

@@ -179,7 +179,7 @@
                                             class=" text-blue-500 hover:underline dark:text-white-500">
                                             <i class="fas fa-arrow-up ml-2"></i> <!-- توزيع عبر النقل -->
                                         </a>
-                                        <a href="{{ route('inventory-products.createOut', [
+                                        {{-- <a href="{{ route('inventory-products.createOut', [
                                             'warehouse_id' => $product->warehouse_id,
                                             'inventory_transaction_item_id' => $product->inventory_transaction_item_id,
                                             'product_id' => $product->product_id,
@@ -188,10 +188,10 @@
                                         ]) }}"
                                             class=" text-red-500 hover:underline dark:text-white-500">
                                             <i class="fas fa-arrow-down"></i> <!-- توزيع عبر النقل -->
-                                        </a>
+                                        </a> --}}
                                         <a href="{{ route('inventory-products.edit', $product->id) }}"
                                             class="text-blue-600 hover:underline dark:text-blue-500">
-                                            <i class="fa-solid fa-pen"></i>
+                                            <i class="fa-solid fa-pen  ml-2"></i>
                                         </a>
 
                                         <form id="delete-form-{{ $product->id }}"

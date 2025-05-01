@@ -1,6 +1,7 @@
 <x-layout>
 
-    <div class="container">
+    {{-- <div class="container"> --}}
+        <div class="max-w-7xl mx-auto px-4">
 
         <!-- فلترة البحث -->
         <form action="{{ route('inventory.audit.index') }}" method="GET" class="mb-4">
@@ -95,11 +96,9 @@
         </div>
         <!-- عرض قائمة الجرد -->
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
-                <thead
-                    class="px-6 py-3 text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
-
-                    <tr class="">
+            <table class="audit-items-table w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
                         <th class="px-6 py-3">كود الجرد</th>
                         <th class="px-6 py-3">نوع الجرد</th>
                         <th class="px-6 py-3">تاريخ البدء</th>
@@ -135,13 +134,13 @@
                                 @endforeach
                             </td>
                             <td class="px-6 py-4">
-                                <a href="{{ route('inventory.audit.edit', $audit->id) }}"
+                                {{-- <a href="{{ route('inventory.audit.edit', $audit->id) }}"
                                     class="text-blue-600 hover:underline dark:text-blue-500 mx-2">
                                     <i class="fa-solid fa-pen"></i>
-                                </a>
+                                </a> --}}
 
                                 <form action="{{ route('inventory.audit.destroy', $audit->id) }}" method="POST"
-                                    style="display:inline;" class="mx-2">
+                                    style="display:inline;" class="delete-form mx-2">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-red-600 hover:text-red-800">
@@ -155,18 +154,31 @@
                                     'end_date' => \Carbon\Carbon::parse($audit->end_date)->format('Y-m-d'),
                                 ]) }}"
                                     class="font-medium text-blue-600 dark:text-blue-500 hover:underline mx-2">
-                                    <i class="fas fa-eye"></i>
+                                    <i class="fas fa-eye "></i>
                                 </a>
 
-                                <a href="#" class="btn btn-info mt-3 mx-2 text-green-600"
-                                    onclick="createAuditForAllWarehouses({{ $audit->id }}, {{ json_encode($audit->warehouses->pluck('id')) }})">
+                                {{-- بدل id="auditButton" و onclick --}}
+                                <a href="#" class="start-audit-button btn btn-info mt-3 mx-2 text-green-600"
+                                    data-audit-id="{{ $audit->id }}"
+                                    data-warehouse-ids='@json($audit->warehouses->pluck('id'))'>
                                     <i class="fas fa-plus mr-2"></i> تنفيذ الجرد
                                 </a>
-                                                     
-                                <a href="{{ route('inventory.audit.editTrans', $audit->id,) }}"
-                                    class="btn btn-info mt-3 mx-2 text-green-600">
-                                    <i class="fas fa-plus mr-2"></i>
+
+
+
+                                <a href="{{ route('inventory.audit.editTrans', ['id' => $audit->id]) }}"
+                                    class="btn btn-primary">
+                                    <i class="fa-solid fa-pen mr-2"></i>
                                 </a>
+                                @if ($audit)
+                                    <a href="{{ route('inventory.audit.report', ['id' => $audit->id]) }}"
+                                        class="font-medium text-purple-600 dark:text-purple-400 hover:underline mx-2"
+                                        target="_blank">
+                                        <i class="fas fa-file-alt mr-2"></i> 
+                                    </a>
+                                @endif
+
+
                             </td>
 
                         </tr>
@@ -178,46 +190,52 @@
 </x-layout>
 
 <script>
-    function createAuditForAllWarehouses(auditId, warehouseIds) {
-        if (!Array.isArray(warehouseIds)) {
-            warehouseIds = warehouseIds.split(',').map(Number);
-        }
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('.start-audit-button').forEach(btn => {
+            btn.addEventListener('click', async function(e) {
+                e.preventDefault();
 
-        if (!confirm("هل أنت متأكد أنك تريد تنفيذ الجرد لجميع المستودعات؟")) return;
+                const auditId = btn.dataset.auditId;
+                const warehouseIds = JSON.parse(btn.dataset.warehouseIds);
 
-        let firstTransactionUrl = null;
+                if (!confirm("هل أنت متأكد أنك تريد تنفيذ الجرد لجميع المستودعات؟")) {
+                    return;
+                }
 
-        Promise.all(
-            warehouseIds.map(warehouseId => {
-                return fetch(`/inventory/audit/audit-transaction/${auditId}/${warehouseId}`, {
-                    method: 'GET',
-                    headers: {
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
+                // نفّذ العمليات واحد واحد
+                for (const wid of warehouseIds) {
+                    try {
+                        const response = await fetch(
+                            `/inventory/audit/audit-transaction/${auditId}/${wid}`, {
+                                method: 'GET',
+                                headers: {
+                                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                    'Accept': 'application/json',
+                                    'Content-Type': 'application/json',
+                                }
+                            }
+                        );
+
+                        if (!response.ok) {
+                            throw new Error(`فشل للمستودع رقم ${wid}`);
+                        }
+
+                        const data = await response.json();
+
+                        // لو رجع لنا redirect_url ننتقل فوراً
+                        if (data.redirect_url) {
+                            window.location.href = data.redirect_url;
+                            return; // نوقف الحلقة بعد التحويل
+                        }
+                    } catch (err) {
+                        alert(err.message);
+                        return; // توقف لو صار خطأ
                     }
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`فشل تنفيذ الجرد للمستودع رقم ${warehouseId}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    if (data.transaction && data.transaction.id && !firstTransactionUrl) {
-                        firstTransactionUrl = `/inventory/audit/editTrans/${data.transaction.id}`;
-                    }
-                })
-                .catch(error => {
-                    alert(error.message);
-                });
-            })
-        ).then(() => {
-            if (firstTransactionUrl) {
-                window.location.href = firstTransactionUrl;
-            } else {
-                alert("تمت العملية ولكن لم يتم إنشاء أي عملية جرد بنجاح.");
-            }
+                }
+
+                // لو خلصنا الحلقة بدون redirect_url
+                alert("لم يتم إنشاء أي عملية جرد بنجاح.");
+            });
         });
-    }
+    });
 </script>

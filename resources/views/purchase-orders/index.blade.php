@@ -64,9 +64,9 @@
                                             </a>
                                             
                                             @if(!in_array($purchaseOrder->status, ['completed', 'canceled']))
-                                                <a href="{{ route('purchase-orders.edit', $purchaseOrder->id) }}" class="text-yellow-500  px-2 py-1 rounded hover:text-yellow-600">
+                                                {{-- <a href="{{ route('purchase-orders.edit', $purchaseOrder->id) }}" class="text-yellow-500  px-2 py-1 rounded hover:text-yellow-600">
                                                     <i class="fas fa-edit"></i>
-                                                </a>
+                                                </a> --}}
                                                 
                                                 @if($purchaseOrder->status == 'pending')
                                                     <form action="{{ route('purchase-orders.approve', $purchaseOrder->id) }}" method="POST" class="inline">

@@ -20,6 +20,9 @@ use App\Events\InventoryTransactionCreated;
 use App\Models\Inventory;
 use Illuminate\Support\Facades\DB;
 use App\Services\InventoryTransaction\InventoryCalculationService;
+use App\Rules\AfterSystemStartDate;
+use App\Rules\ValidExpirationDate;
+
 
 class InvoiceFromOrdersController extends Controller
 {
@@ -67,10 +70,10 @@ class InvoiceFromOrdersController extends Controller
         }
 
         $partners = Partner::select('id', 'name')->get();
-        $products = Product::select('id', 'name', 'selling_price', 'unit_id','barcode','sku')->get();
+        $products = Product::select('id', 'name', 'selling_price', 'unit_id', 'barcode', 'sku')->get();
         $paymentTypes = PaymentType::select('id', 'name')->get();
         $branches = Branch::select('id', 'name')->get();
-        $warehouses = Warehouse::ForUserWarehouse()->get(); 
+        $warehouses = Warehouse::ForUserWarehouse()->get();
         $units = Unit::all();
         $currencies = Currency::all();
 
@@ -104,11 +107,26 @@ class InvoiceFromOrdersController extends Controller
             'items.*.unit_id' => 'required|exists:units,id',
             'discount_type' => 'required|integer|in:1,2',
             'discount_value' => 'required|numeric|min:0',
+
+            // التحقق من تاريخ الإنتاج
+            'items.*.production_date' => ['nullable', 'date', new AfterSystemStartDate()],
+
+            // التحقق من تاريخ الانتهاء
+            'items.*.expiration_date' => ['nullable', 'date', new AfterSystemStartDate(), new ValidExpirationDate()],
+
         ]);
 
         DB::beginTransaction();
 
         try {
+            // تحقق من تواريخ الإنتاج والانتهاء لكل صنف
+            foreach ($request->items as $item) {
+                if ($item['production_date'] && $item['expiration_date']) {
+                    if (strtotime($item['expiration_date']) < strtotime($item['production_date'])) {
+                        return redirect()->back()->with('error', 'تاريخ الانتهاء يجب أن يكون بعد تاريخ الإنتاج.');
+                    }
+                }
+            }
             $purchaseOrder = PurchaseOrder::with('order')->findOrFail($id);
 
             if ($purchaseOrder->status !== 'approved') {
@@ -223,7 +241,7 @@ class InvoiceFromOrdersController extends Controller
         $products = Product::select('id', 'name', 'selling_price', 'unit_id')->get();
         $paymentTypes = PaymentType::select('id', 'name')->get();
         $branches = Branch::select('id', 'name')->get();
-        $warehouses = Warehouse::ForUserWarehouse()->get(); 
+        $warehouses = Warehouse::ForUserWarehouse()->get();
         // dd($warehouses);
         $units = Unit::all();
         $currencies = Currency::all();
@@ -242,203 +260,218 @@ class InvoiceFromOrdersController extends Controller
 
     /**
      * حفظ فاتورة جديدة من أمر صرف
-     */ public function storeFromSalesOrder(Request $request, $id)
-    {
-        
-        $request->validate([
-            'partner_id' => 'required|exists:partners,id',
-            'invoice_date' => 'required|date',
-            'payment_type_id' => 'required|exists:payment_types,id',
-            // 'branch_id' => 'required|exists:branches,id',
-            'warehouse_id' => 'required|exists:warehouses,id',
-            'items' => 'required|array',
-            'items.*.product_id' => 'required|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
-            'items.*.unit_id' => 'required|exists:units,id',
-            'discount_type' => 'required|integer|in:1,2',
-            'discount_value' => 'required|numeric|min:0',
-        ]);
+     */ 
+/**
+ * تنشئ حركة مخزنية وتحدث المخزون (زيادة blocked_quantity عند البيع).
+ */
+private function storeInventoryTransaction($request, $invoiceCode, $items, $type, $transactionNote)
+{
+    $inventoryTransaction = InventoryTransaction::create([
+        'transaction_type_id'   => ($type === 'sale') ? 7 : 1,
+        'effect'                => ($type === 'sale') ? -1 : 1,
+        'transaction_date'      => now(),
+        'reference'             => $invoiceCode,
+        'partner_id'            => $request->partner_id,
+        'warehouse_id'          => $request->warehouse_id,
+        'branch_id'             => $request->branch_id,
+        'department_id'         => null,
+        'inventory_request_id'  => null,
+        'secondary_warehouse_id'=> null,
+        'notes'                 => $transactionNote,
+        'status'                => 0,
+    ]);
 
-        DB::beginTransaction();
+    $effect = ($type === 'sale') ? -1 : 1;
 
-        try {
-            $salesOrder = SalesOrder::with('order')->findOrFail($id);
+    if (is_iterable($items) && count($items) > 0) {
+        foreach ($items as $item) {
+            // استخراج البيانات من $item
+            $productId      = $item->product_id ?? $item['product_id'] ?? null;
+            $unitId         = $item->unit_id    ?? $item['unit_id']    ?? null;
+            $quantity       = $item->quantity   ?? $item['quantity']   ?? null;
+            $price          = $item->price      ?? $item['price']      ?? null;
+            $itemId         = $item->id         ?? $item['id']         ?? null;
+            $productionDate = $item->production_date ?? $item['production_date'] ?? null;
+            $expirationDate = $item->expiration_date ?? $item['expiration_date'] ?? null;
 
-            if ($salesOrder->status !== 'approved') {
-                return redirect()->route('invoices.sales-orders')
-                    ->with('error', 'يمكن إنشاء فواتير فقط من أوامر الصرف المعتمدة');
+            if (! $productId || ! $unitId || ! $quantity || ! $price) {
+                continue;
             }
 
-            $typeNumber = 1; // بيع
-            $prefix = 'Sa-Inv-';
-            $transactionType = 'sale';
-            $lastInvoice = Invoice::where('type', $typeNumber)->latest('id')->first();
-            $nextNumber = $lastInvoice ? intval(substr($lastInvoice->invoice_code, strlen($prefix))) + 1 : 1;
-            $invoiceCode = $prefix . $nextNumber;
-
-            $discountType = (int) $request->discount_type;
-            $discountValue = (float) $request->discount_value;
-            $totalAmount = 0;
-
-            foreach ($request->items as $item) {
-                $totalAmount += $item['quantity'] * $item['price'];
-            }
-
-            $discountAmount = 0;
-            $discountPercentage = 0;
-            if ($discountType === 1) {
-                $discountAmount = $discountValue;
-                $discountPercentage = ($totalAmount > 0) ? ($discountValue / $totalAmount) * 100 : 0;
-            } else {
-                $discountPercentage = $discountValue;
-                $discountAmount = ($discountValue / 100) * $totalAmount;
-            }
-
-            $invoice = Invoice::create([
-                'invoice_code' => $invoiceCode,
-                'partner_id' => $request->partner_id,
-                'invoice_date' => $request->invoice_date,
-                'payment_type_id' => $request->payment_type_id,
-                // 'branch_id' => $request->branch_id,
-                'total_amount' => $totalAmount - $discountAmount,
-                'check_number' => $request->check_number,
-                'discount_type' => $discountType,
-                'discount_amount' => $discountAmount,
-                'discount_percentage' => $discountPercentage,
-                'type' => $typeNumber,
-                'warehouse_id' => $request->warehouse_id,
-                'currency_id' => $request->currency_id,
-                'exchange_rate' => $request->exchange_rate,
-                'department_id' => $request->department_id,
-                'order_id' => $salesOrder->order_id,
-                'sales_order_id' => $salesOrder->id,
-            ]);
-
-            foreach ($request->items as $item) {
-                
-                
-                InvoiceItem::create([
-                    'invoice_id' => $invoice->id,
-                    'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity'],
-                    'price' => $item['price'],
-                    'subtotal' => $item['quantity'] * $item['price'],
-                    'unit_id' => $item['unit_id'],
-                    'production_date' => $item['production_date'],
-                    'expiration_date' => $item['expiration_date'],
-                ]);
-            }
-
-            $invoice->refresh(); // تحميل العناصر المضافة
-
-
-            // هنا تم تعريف $items بشكل صحيح
-            $items = $invoice->items;
-            // dd($items);
-            $transactionNote = 'فاتورة بيع مرتبطة بأمر صرف رقم: ' . $salesOrder->order_number;
-            $inventoryTransaction = $this->storeInventoryTransaction($request, $invoiceCode, $items, $transactionType, $transactionNote);
-
-            $invoice->update([
-                'inventory_transaction_id' => $inventoryTransaction->id,
-            ]);
-
-            $salesOrder->update([
-                'status' => 'completed',
-            ]);
-
-            DB::commit();
-
-            session()->flash('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح!');
-            return redirect()->route('invoices.sales.index');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return redirect()->back()->with('error', 'خطأ في إنشاء الفاتورة: ' . $e->getMessage());
-        }
-    }
-
-    /**
-     * إنشاء حركة مخزنية
-     */
-    private function storeInventoryTransaction($request, $invoiceCode, $items, $type, $transactionNote)
-    {
-        $inventoryTransaction = InventoryTransaction::create([
-            'transaction_type_id' => ($type === 'sale') ? 7 : 1,
-            'effect' => ($type === 'sale') ? -1 : 1,
-            'transaction_date' => now(),
-            'reference' => $invoiceCode,
-            'partner_id' => $request->partner_id,
-            'warehouse_id' => $request->warehouse_id,
-            'branch_id' => $request->branch_id,
-            'department_id' => null,
-            'inventory_request_id' => null,
-            'secondary_warehouse_id' => null,
-            'notes' => $transactionNote,
-            'status' => 0
-        ]);
-        $effect = ($type === 'sale') ? -1 : 1,
-
-        if ($items) {
-            $isCollection = is_object($items) && method_exists($items, 'isEmpty');
-            $isArray = is_array($items);
-          
-            if (($isCollection && !$items->isEmpty()) || ($isArray && !empty($items))) {
-                foreach ($items as $item) {
-                    $productId = is_object($item) ? $item->product_id : ($item['product_id'] ?? null);
-                    $unitId = is_object($item) ? $item->unit_id : ($item['unit_id'] ?? null);
-                    $quantity = is_object($item) ? $item->quantity : ($item['quantity'] ?? null);
-                    $price = is_object($item) ? $item->price : ($item['price'] ?? null);
-                    $itemId = is_object($item) ? $item->id : ($item['id'] ?? null);
-                    $productionDate = is_object($item) ? $item->production_date : ($item['production_date'] ?? null);
-                    $expirationDate = is_object($item) ? $item->expiration_date : ($item['expiration_date'] ?? null);
-
-                    if (!$productId || !$unitId || !$quantity || !$price) {
-                        continue;
+            // تحقق من التوفر قبل البيع
+            if ($type === 'sale') {
+                $result = $this->isQuantityAvailable($item, $request->warehouse_id);
+                if ($result !== true) {
+                    if (DB::transactionLevel() > 0) {
+                        DB::rollBack();
                     }
-
-                    if ($type === 'sale') {
-                        $result = $this->isQuantityAvailable($item, $request->warehouse_id);
-                        if ($result !== true) {
-                            throw new \Exception($result);
-                        }
-                    }
-                    // جلب المنتج للحصول على وحدة المنتج الأساسية
-                    $product = Product::findOrFail($productId);
-                    // dd($product);
-
-                    $baseUnitId = $product->unit_id;
-                    if ($unitId) {
-                        $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantity, $unitId, $baseUnitId);
-                    }
-                    // dd($baseUnitId,$unitId,$quantity,$convertedOutQuantity);
-
-                    InventoryTransactionItem::create([
-                        'inventory_transaction_id' => $inventoryTransaction->id,
-                        'unit_id' => $unitId,
-                        'unit_product_id' => $baseUnitId,
-                        'target_warehouse_id' => $request->warehouse_id,
-                        'converted_quantity' => $effect*$convertedOutQuantity,
-                        'product_id' => $productId,
-                        'unit_prices' => $effect*$price,
-                        'quantity' => $effect*$quantity,
-                        'total' => $effect*$quantity * $price,
-                        'converted_price' => $effect*$price,
-                        'branch_id' => $request->branch_id,
-                        'reference_item_id' => $itemId,
-                        'production_date' =>$productionDate,
-                        'expiration_date'=>$expirationDate
-                    ]);
+                    throw new \Exception("الكمية المطلوبة للمنتج رقم {$productId} غير متوفرة.");
                 }
             }
+
+            // تحويل الكمية للوحدة الأساسية
+            $product = Product::findOrFail($productId);
+            $baseUnitId = $product->unit_id;
+            $convertedOutQuantity = $this->inventoryCalculationService
+                ->calculateConvertedQuantity($quantity, $unitId, $baseUnitId);
+
+            // إنشاء بند الحركة
+            InventoryTransactionItem::create([
+                'inventory_transaction_id' => $inventoryTransaction->id,
+                'unit_id'                  => $unitId,
+                'unit_product_id'          => $baseUnitId,
+                'target_warehouse_id'      => $request->warehouse_id,
+                'converted_quantity'       => $effect * $convertedOutQuantity,
+                'product_id'               => $productId,
+                'unit_prices'              => $effect * $price,
+                'quantity'                 => $effect * $quantity,
+                'total'                    => $effect * $quantity * $price,
+                'converted_price'          => $effect * $price,
+                'branch_id'                => $request->branch_id,
+                'reference_item_id'        => $itemId,
+                'production_date'          => $productionDate,
+                'expiration_date'          => $expirationDate,
+            ]);
+
+            // تحديث المخزون: زيادة blocked_quantity عند البيع
+            $inventory = Inventory::where('product_id', $productId)
+                                  ->where('warehouse_id', $request->warehouse_id)
+                                  ->first();
+
+            if ($inventory) {
+                if ($type === 'sale') {
+                    $inventory->update([
+                        'blocked_quantity' => $inventory->blocked_quantity + $convertedOutQuantity,
+                    ]);
+                } 
+            }
         }
-
-        $inventoryTransaction->refresh();
-
-        return $inventoryTransaction;
     }
 
-    /**
-     * التحقق من توفر الكمية المطلوبة في المخزون
+    return $inventoryTransaction;
+}
+
+/**
+ * تنشئ فاتورة من أمر صرف جاهز، وتربطها بحركة مخزنية.
+ */
+public function storeFromSalesOrder(Request $request, $id)
+{
+    $request->validate([
+        'partner_id'        => 'required|exists:partners,id',
+        'invoice_date'      => 'required|date',
+        'payment_type_id'   => 'required|exists:payment_types,id',
+        'warehouse_id'      => 'required|exists:warehouses,id',
+        'items'             => 'required|array',
+        'items.*.product_id'=> 'required|exists:products,id',
+        'items.*.quantity'  => 'required|integer|min:1',
+        'items.*.price'     => 'required|numeric|min:0',
+        'items.*.unit_id'   => 'required|exists:units,id',
+        'discount_type'     => 'required|integer|in:1,2',
+        'discount_value'    => 'required|numeric|min:0',
+    ]);
+
+    DB::beginTransaction();
+
+    try {
+        $salesOrder = SalesOrder::with('order')->findOrFail($id);
+        if ($salesOrder->status !== 'approved') {
+            return redirect()->route('invoices.sales-orders')
+                             ->with('error', 'يمكن إنشاء فواتير فقط من أوامر الصرف المعتمدة');
+        }
+
+        // إعداد ترميز الفاتورة
+        $typeNumber      = 1; // بيع
+        $prefix          = 'Sa-Inv-';
+        $transactionType = 'sale';
+        $lastInvoice     = Invoice::where('type', $typeNumber)
+                                  ->latest('id')
+                                  ->first();
+        $nextNumber      = $lastInvoice
+            ? intval(substr($lastInvoice->invoice_code, strlen($prefix))) + 1
+            : 1;
+        $invoiceCode = $prefix . $nextNumber;
+
+        // حساب المجموع والخصم
+        $totalAmount = array_reduce($request->items, function($sum, $i) {
+            return $sum + ($i['quantity'] * $i['price']);
+        }, 0);
+
+        $discountType  = (int)$request->discount_type;
+        $discountValue = (float)$request->discount_value;
+
+        if ($discountType === 1) {
+            $discountAmount     = $discountValue;
+            $discountPercentage = $totalAmount > 0
+                ? ($discountValue / $totalAmount) * 100
+                : 0;
+        } else {
+            $discountPercentage = $discountValue;
+            $discountAmount     = ($discountValue / 100) * $totalAmount;
+        }
+
+        // إنشاء الفاتورة
+        $invoice = Invoice::create([
+            'invoice_code'       => $invoiceCode,
+            'partner_id'         => $request->partner_id,
+            'invoice_date'       => $request->invoice_date,
+            'payment_type_id'    => $request->payment_type_id,
+            'total_amount'       => $totalAmount - $discountAmount,
+            'check_number'       => $request->check_number,
+            'discount_type'      => $discountType,
+            'discount_amount'    => $discountAmount,
+            'discount_percentage'=> $discountPercentage,
+            'type'               => $typeNumber,
+            'warehouse_id'       => $request->warehouse_id,
+            'currency_id'        => $request->currency_id,
+            'exchange_rate'      => $request->exchange_rate,
+            'department_id'      => $request->department_id,
+            'order_id'           => $salesOrder->order_id,
+            'sales_order_id'     => $salesOrder->id,
+        ]);
+
+        // إنشاء بنود الفاتورة
+        foreach ($request->items as $item) {
+            InvoiceItem::create([
+                'invoice_id'      => $invoice->id,
+                'product_id'      => $item['product_id'],
+                'quantity'        => $item['quantity'],
+                'price'           => $item['price'],
+                'subtotal'        => $item['quantity'] * $item['price'],
+                'unit_id'         => $item['unit_id'],
+                'production_date' => $item['production_date'],
+                'expiration_date' => $item['expiration_date'],
+            ]);
+        }
+
+        // ربط الحركة المخزنية
+        $transactionNote       = 'فاتورة بيع مرتبطة بأمر صرف رقم: ' . $salesOrder->order_number;
+        $inventoryTransaction  = $this->storeInventoryTransaction(
+            $request,
+            $invoiceCode,
+            $invoice->items,
+            $transactionType,
+            $transactionNote
+        );
+
+        // مسح الحقل الوحيد المتبقي
+        $invoice->update([
+            'inventory_transaction_id' => $inventoryTransaction->id,
+        ]);
+
+        // إتمام أمر البيع
+        $salesOrder->update(['status' => 'completed']);
+
+        DB::commit();
+        session()->flash('success', 'تم إنشاء الفاتورة والحركة المخزنية بنجاح!');
+        return redirect()->route('invoices.sales.index');
+
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return redirect()->back()->with('error', 'خطأ في إنشاء الفاتورة: ' . $e->getMessage());
+    }
+}
+
+    /* التحقق من توفر الكمية المطلوبة في المخزون
      */
     private function isQuantityAvailable($item, $warehouseId)
     {
@@ -448,12 +481,18 @@ class InvoiceFromOrdersController extends Controller
         if (!$productId || !$requestedQty) {
             return true;
         }
+        
+        $availableBlkQty = Inventory::where('product_id', $productId)
+        ->where('warehouse_id', $warehouseId)
+        ->sum('blocked_quantity');
+
+        $availableBlkQty = $availableBlkQty ?? 0; // إذا كانت null أو غير معرفة، يتم إسناد 0
 
         $availableQty = Inventory::where('product_id', $productId)
             ->where('warehouse_id', $warehouseId)
             ->sum('quantity');
 
-        if ($requestedQty > $availableQty) {
+        if ($requestedQty - $availableBlkQty > $availableQty) {
             return "الكمية المطلوبة للمنتج رقم {$productId} غير متوفرة (المتوفر: {$availableQty}).";
         }
 

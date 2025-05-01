@@ -249,8 +249,17 @@ Route::get('/welcome', function () {
         Route::get('/{storage_area}/edit', [WarehouseStorageAreaController::class, 'edit'])->name('edit'); // تعديل منطقة تخزين
         Route::put('/{storage_area}', [WarehouseStorageAreaController::class, 'update'])->name('update'); // تحديث منطقة تخزين
         Route::delete('/{storage_area}', [WarehouseStorageAreaController::class, 'destroy'])->name('destroy'); // حذف منطقة تخزين
-    });
 
+    });
+        // جلب المناطق التخزينية لمستودع معيَّن
+        Route::get('/api/warehouses/{warehouse}/storage-areas', function(\App\Models\Warehouse $warehouse){
+            return $warehouse->storageAreas()->select('id','area_name')->get();
+        });
+
+        // جلب المواقع لمنطقة تخزين معيَّنة
+        Route::get('/api/storage-areas/{area}/locations', function(\App\Models\WarehouseStorageArea $area){
+            return $area->locations()->select('id','rack_code')->get();
+        });                         
 
 
     Route::prefix('warehouses/{warehouse}/locations')->group(function () {
@@ -507,12 +516,17 @@ Route::get('/welcome', function () {
         Route::get('/audit-transaction/{auditId}/{warehouseId}', [InventoryAuditController::class, 'createInventoryAuditTransaction']);
         Route::delete('/replace', [InventoryAuditController::class, 'replaceAuditTransaction'])->name('inventory.audit.replace');
 
+        Route::post('/updateItem', [InventoryAuditController::class, 'updateItem'])->name('updateItem');
+        
 
         // Route::post('/updateTrans/{id}', [InventoryAuditController::class, 'updateTrans'])->name('updateTrans');
         Route::delete('/destroy/{id}', [InventoryAuditController::class, 'destroy'])->name('destroy');
         Route::middleware([\App\Http\Middleware\GlobalVariablesMiddleware::class])->group(function () {
             Route::get('/warehouse-report', [InventoryAuditController::class, 'warehouseReport'])->name('warehouseReport');
-            Route::get('/report', [InventoryAuditController::class, 'report'])->name('report');
+            Route::get('/report', [InventoryAuditController::class, 'showAuditReport'])->name('inventory.audit.report');
+
+            Route::get('/report/{id}', [InventoryAuditController::class, 'showAuditReport'])->name('report');
+
         });
     });
 
@@ -545,7 +559,9 @@ Route::get('/welcome', function () {
         Route::get('sales-orders', [InvoiceFromOrdersController::class, 'salesOrders'])->name('sales-orders');
         Route::get('create-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'createFromPurchaseOrder'])->name('create-from-purchase-order');
         Route::post('store-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'storeFromPurchaseOrder'])->name('store-from-purchase-order');
-        
+        Route::post('store-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'storeFromPurchaseOrder'])->name('store-from-purchase-order');
+        Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
+
         // مسارات إنشاء فاتورة من أمر صرف باستخدام المتحكم الجديد
         
         // مسارات إنشاء فاتورة من طلب
@@ -629,6 +645,10 @@ Route::get('/welcome', function () {
         Route::get('/{id}/receive', [ShipmentController::class, 'showReceiveForm'])->name('shipments.receive.form');
         Route::post('/{id}/receive', [ShipmentController::class, 'receive'])->name('shipments.receive');
         
+          // طرق استلام الشحنات
+          Route::get('/{id}/send', [ShipmentController::class, 'showSendForm'])->name('shipments.send.form');
+          Route::post('/{id}/send', [ShipmentController::class, 'send'])->name('shipments.send');
+          
         // طرق CRUD الأساسية
         Route::get('/', [ShipmentController::class, 'index'])->name('shipments.index');
         Route::get('/create', [ShipmentController::class, 'create'])->name('shipments.create');

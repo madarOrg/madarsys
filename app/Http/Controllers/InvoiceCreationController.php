@@ -21,6 +21,9 @@ use App\Models\InventoryTransactionItem;
 use App\Events\InventoryTransactionCreated;
 use Illuminate\Support\Facades\DB;
 use App\Services\InventoryTransaction\InventoryCalculationService;
+use App\Rules\AfterSystemStartDate;
+
+use App\Rules\ValidExpirationDate;
 
 class InvoiceCreationController extends Controller
 {
@@ -36,7 +39,7 @@ class InvoiceCreationController extends Controller
     public function createFromSalesOrder($id)
     {
 
-         $salesOrder = SalesOrder::with('order.order_details.product')->find($id);
+        $salesOrder = SalesOrder::with('order.order_details.product')->find($id);
         if (!$salesOrder) {
             dd("Sales Order not found");
         }
@@ -47,7 +50,7 @@ class InvoiceCreationController extends Controller
         //         ->with('error', 'يمكن إنشاء فواتير فقط من أوامر الصرف المعتمدة');
         // }
         $partners = Partner::select('id', 'name')->get();
-        $products = Product::select('id', 'name', 'selling_price', 'unit_id','sku','barcode')->get();
+        $products = Product::select('id', 'name', 'selling_price', 'unit_id', 'sku', 'barcode')->get();
         $paymentTypes = PaymentType::select('id', 'name')->get();
 
         $branches = Branch::select('id', 'name')->get();
@@ -58,7 +61,7 @@ class InvoiceCreationController extends Controller
 
         $currencies = Currency::all();
         // dd('in',$order->id);
-       $order= $salesOrder->order;
+        $order = $salesOrder->order;
         return view('invoices.sales.create_from_order', compact(
             'order',
             'partners',
@@ -74,10 +77,12 @@ class InvoiceCreationController extends Controller
     /**
      * حفظ فاتورة جديدة من أمر صرف
      */ public function storeFromSalesOrder(Request $request, $id)
-     {
+    {
         $request->validate([
             'partner_id' => 'required|exists:partners,id',
-            'invoice_date' => 'required|date',
+            // 'invoice_date' => 'required|date',
+            'invoice_date' => ['required', 'date', new AfterSystemStartDate],
+
             'payment_type_id' => 'required|exists:payment_types,id',
             // 'branch_id' => 'required|exists:branches,id',
             'warehouse_id' => 'required|exists:warehouses,id',
@@ -91,7 +96,7 @@ class InvoiceCreationController extends Controller
         ]);
 
         DB::beginTransaction();
-// dd($id);
+        // dd($id);
         try {
             $salesOrder = SalesOrder::with('order')->findOrFail($id);
 
@@ -151,7 +156,7 @@ class InvoiceCreationController extends Controller
                 InvoiceItem::create([
                     'invoice_id' => $invoice->id,
                     'product_id' => $item['product_id'],
-                    'quantity' => $item['quantity']* $effect,
+                    'quantity' => $item['quantity'] * $effect,
                     'price' => $item['price'],
                     'subtotal' => $item['quantity'] * $item['price'] * $effect,
                     'unit_id' => $item['unit_id'],
@@ -202,7 +207,7 @@ class InvoiceCreationController extends Controller
         }
 
         $partners = Partner::select('id', 'name')->get();
-        $products = Product::select('id', 'name', 'selling_price', 'unit_id','sku','barcode')->get();
+        $products = Product::select('id', 'name', 'selling_price', 'unit_id', 'sku', 'barcode')->get();
         $paymentTypes = PaymentType::select('id', 'name')->get();
         $branches = Branch::select('id', 'name')->get();
         $warehouses = Warehouse::all();
@@ -228,7 +233,9 @@ class InvoiceCreationController extends Controller
     {
         $request->validate([
             'partner_id' => 'required|exists:partners,id',
-            'invoice_date' => 'required|date',
+            // 'invoice_date' => 'required|date',
+            'invoice_date' => ['required', 'date', new AfterSystemStartDate],
+
             'payment_type_id' => 'required|exists:payment_types,id',
             'branch_id' => 'required|exists:branches,id',
             'warehouse_id' => 'required|exists:warehouses,id',
@@ -239,6 +246,12 @@ class InvoiceCreationController extends Controller
             'items.*.unit_id' => 'required|exists:units,id',
             'discount_type' => 'required|integer|in:1,2',
             'discount_value' => 'required|numeric|min:0',
+            // التحقق من تاريخ الإنتاج
+            'items.*.production_date' => [ 'nullable','date', new AfterSystemStartDate()],
+
+            // التحقق من تاريخ الانتهاء
+            'items.*.expiration_date' => ['nullable','date', new AfterSystemStartDate(), new ValidExpirationDate()],
+
         ]);
 
         DB::beginTransaction();
@@ -324,20 +337,20 @@ class InvoiceCreationController extends Controller
                 'فاتورة بيع مرتبطة بطلب رقم: ' . $id;
 
             // إنشاء حركة مخزنية بطريقة مباشرة ومضمونة
-            $inventoryTransaction = InventoryTransaction::create([
-                'transaction_type_id' => ($transactionType === 'sale') ? 7 : 1,
-                'effect' => ($transactionType === 'sale') ? -1 : 1,
-                'transaction_date' => now(),
-                'reference' => $invoiceCode,
-                'partner_id' => $request->partner_id,
-                'warehouse_id' => $request->warehouse_id,
-                'branch_id' => $request->branch_id,
-                'department_id' => null,
-                'inventory_request_id' => null,
-                'secondary_warehouse_id' => null,
-                'notes' => $transactionNote,
-                'status' => 0
-            ]);
+            // $inventoryTransaction = InventoryTransaction::create([
+            //     'transaction_type_id' => ($transactionType === 'sale') ? 7 : 1,
+            //     'effect' => ($transactionType === 'sale') ? -1 : 1,
+            //     'transaction_date' => now(),
+            //     'reference' => $invoiceCode,
+            //     'partner_id' => $request->partner_id,
+            //     'warehouse_id' => $request->warehouse_id,
+            //     'branch_id' => $request->branch_id,
+            //     'department_id' => null,
+            //     'inventory_request_id' => null,
+            //     'secondary_warehouse_id' => null,
+            //     'notes' => $transactionNote,
+            //     'status' => 0
+            // ]);
 
             // تأكد من تحميل عناصر الفاتورة بشكل كامل
             $invoice = Invoice::with('items')->find($invoice->id);
@@ -408,23 +421,23 @@ class InvoiceCreationController extends Controller
                         continue;
                     }
 
-
-                    // if ($type === 'sale') {
-                    //     $result = $this->isQuantityAvailable($item, $request->warehouse_id);
-                    //     if ($result !== true) {
-                    //         return redirect()->back()->withErrors(['error' => $result])->withInput();
-                    //     }
-                    // }
                     if ($type === 'sale') {
-                        $result = $this->isQuantityAvailable($item, $request->warehouse_id);
+
+                        $result = $this->isQuantityAvailable($request);
                         if ($result !== true) {
-                            throw new \Exception($result);
+                            if (DB::transactionLevel() > 0) {
+                                DB::rollBack();
+                            }
+                            //  dd($result);
+                            return redirect()->back()->withErrors([
+                                'inventory' => "الكمية المطلوبة للمنتج رقم {$productId} غير متوفرة (المتوفر:)."
+                            ])->withInput();
                         }
                     }
-                    $effect = $type === 'sale'?-1:1;
-                    
+                    $effect = $type === 'sale' ? -1 : 1;
+
                     $baseUnitId = $item->unit_id;
-    
+
                     if ($unitId) {
                         $convertedOutQuantity = $this->inventoryCalculationService->calculateConvertedQuantity($quantity, $unitId, $baseUnitId);
                     }
@@ -433,38 +446,72 @@ class InvoiceCreationController extends Controller
                         'unit_id' => $unitId,
                         'unit_product_id' => $baseUnitId,
                         'target_warehouse_id' => $request->warehouse_id,
-                        'converted_quantity' => $convertedOutQuantity*$effect,
+                        'converted_quantity' => $convertedOutQuantity * $effect,
                         'product_id' => $productId,
-                        'unit_prices' => $price*$effect,
-                        'quantity' => $quantity*$effect,
+                        'unit_prices' => $price * $effect,
+                        'quantity' => $quantity * $effect,
                         'total' => $quantity * $price,
                         'converted_price' => $price,
                         'branch_id' => $request->branch_id,
                         'reference_item_id' => $itemId,
-                        'production_date' =>$productionDate,
-                        'expiration_date'=>$expirationDate
+                        'production_date' => $productionDate,
+                        'expiration_date' => $expirationDate
                     ]);
                 }
             }
         }
+            if ($type === 'sale') {
 
+            $inventory = Inventory::where('product_id', $item->product_id)
+                ->where('warehouse_id', $request->warehouse_id)
+                ->first();
+
+            if ($inventory) {
+                $inventory->update(['blocked_quantity' => $inventory->blocked_quantity - $convertedOutQuantity]);
+            }
+        }
         $inventoryTransaction->refresh();
 
         return $inventoryTransaction;
     }
-    private function isQuantityAvailable($item, $warehouseId)
+
+    private function isQuantityAvailable($request)
     {
-        $productId = is_object($item) ? $item->product_id : ($item['product_id'] ?? null);
-        $requestedQty = is_object($item) ? $item->quantity : ($item['quantity'] ?? null);
+        $requestedTotalAmount = $request->total_amount;
 
-        $availableQty = Inventory::where('product_id', $productId)
-            ->where('warehouse_id', $warehouseId)
-            ->sum('quantity');
-
-        if ($requestedQty > $availableQty) {
-            return "الكمية المطلوبة للمنتج رقم {$productId} غير متوفرة (المتوفر: {$availableQty}).";
+        if ($requestedTotalAmount <= 0) {
+            return redirect()->back()->withErrors([
+                'inventory' => "قيمة الخصم ({$request->discount_amount}) لا يمكن أن تكون أكبر أو يساوي إجمالي الفاتورة قبل الخصم ({$request->amount_before_discount})."
+            ])->withInput();
         }
+        // dd($requestedTotalAmount);
 
+
+        foreach ($request->items as $item) {
+            $productId = $item['product_id'];
+            $warehouseId = $request->warehouse_id;
+            $requestedQty = $item['quantity'];
+            
+            $availableBlkQty = Inventory::where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->sum('blocked_quantity');
+            
+            $availableBlkQty = $availableBlkQty ?? 0; // إذا كانت null أو غير معرفة، يتم إسناد 0
+
+            $availableQty = Inventory::where('product_id', $productId)
+                ->where('warehouse_id', $warehouseId)
+                ->sum('quantity');
+            // dd("Product ID: {$productId}", $requestedQty, $availableQty);
+
+            if ($requestedQty-$availableBlkQty > $availableQty) {
+                // dd($requestedQty , $availableQty);
+
+                return redirect()->back()->withErrors([
+                    'inventory' => "الكمية المطلوبة للمنتج رقم {$productId} غير متوفرة (المتوفر: {$availableQty})."
+                ])->withInput();
+            }
+          
+        }
         return true;
     }
 }

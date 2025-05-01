@@ -47,7 +47,7 @@
                             :value="old('sku', $product->sku)" />
                     </div>
                     <div class="">
-                        <x-file-input id="stock_quantity" name="stock_quantity" label="الكمية المتوفرة" type="number"
+                        <x-file-input id="stock_quantity" name="stock_quantity" label="بداية المدة" type="number"
                             value="{{ old('stock_quantity', $product->stock_quantity) }}" required />
                     </div>
 

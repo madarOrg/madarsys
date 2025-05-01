@@ -22,14 +22,16 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         try {
-            $request->validate([
-                'inventory_transaction_min_date' => 'required|date|before_or_equal:today',
-            ]);
-
-            Setting::where('key', 'inventory_transaction_min_date')
-                ->update(['value' => $request->inventory_transaction_min_date]);
-
-            return redirect()->back()->with('success', 'تم تحديث السياسات بنجاح');
+            $data = $request->except('_token', '_method'); // نستثني التوكن وطريقة الإرسال
+    
+            foreach ($data as $key => $value) {
+                Setting::updateOrCreate(
+                    ['key' => $key],
+                    ['value' => $value]
+                );
+            }
+    
+            return redirect()->back()->with('success', 'تم تحديث الإعدادات بنجاح');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'حدث خطأ أثناء تحديث الإعدادات: ' . $e->getMessage());
         }

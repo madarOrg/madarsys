@@ -100,6 +100,7 @@
                         <td  class="border p-2"> {{ $product->area_name }}</td>
                         @endif 
                         <td  class="border p-2">{{ number_format($product->total_quantity, 2) }}</td>
+                        
 
                     </tr>
                 @endforeach

@@ -58,7 +58,7 @@
         </div>
         
         <div class="bg-white p-4 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">عدد العملاء</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">عدد الموردين</h3>
             <p class="text-3xl font-bold text-yellow-600">{{ $customerReturns->count() }}</p>
             <p class="text-sm text-gray-500 mt-2">عدد العملاء الذين لديهم مرتجعات</p>
         </div>

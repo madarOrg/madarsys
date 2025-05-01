@@ -40,7 +40,7 @@
                                 <x-file-input id="sku" name="sku" label="كود التخزين SKU" type="text" :value="old('sku', 'SKU-' . Str::random(8))" readonly />
                             </div>
                             
-                            <x-file-input id="stock_quantity" name="stock_quantity" label="الكمية المتوفرة"
+                            <x-file-input id="stock_quantity" name="stock_quantity" label=" بداية المدة"
                                 type="number" required />
                             <x-file-input id="purchase_price" name="purchase_price" label="سعر الشراء" type="number"
                                 required />

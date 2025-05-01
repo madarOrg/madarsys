@@ -25,11 +25,10 @@
         <div class="flex items-center space-x-2 space-x-reverse">
             <span class="text-gray-700">تصفية حسب الحالة:</span>
             <a href="{{ route('returns-suppliers.index') }}" class="px-3 py-1 {{ !request('status') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-blue-500 hover:text-white">الكل</a>
-            <a href="{{ route('returns-suppliers.index', ['status' => 'pending']) }}" class="px-3 py-1 {{ request('status') == 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-yellow-400 hover:text-white">معلق</a>
-            <a href="{{ route('returns-suppliers.index', ['status' => 'sent']) }}" class="px-3 py-1 {{ request('status') == 'sent' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-blue-500 hover:text-white">تم الإرسال</a>
-            <a href="{{ route('returns-suppliers.index', ['status' => 'completed']) }}" class="px-3 py-1 {{ request('status') == 'completed' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-green-500 hover:text-white">مكتمل</a>
-            <a href="{{ route('returns-suppliers.index', ['status' => 'cancelled']) }}" class="px-3 py-1 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-red-500 hover:text-white">ملغي</a>
-        </div>
+    <a href="{{ route('returns-suppliers.index', ['status' => 'قيد المراجعة']) }}" class="px-3 py-1 {{ request('status') == 'قيد المراجعة' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-yellow-400 hover:text-white">قيد المراجعة</a>
+    <a href="{{ route('returns-suppliers.index', ['status' => 'قيد التوصيل']) }}" class="px-3 py-1 {{ request('status') == 'قيد التوصيل' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-blue-500 hover:text-white">قيد التوصيل</a>
+    <a href="{{ route('returns-suppliers.index', ['status' => 'تم الاستلام']) }}" class="px-3 py-1 {{ request('status') == 'تم الاستلام' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-green-500 hover:text-white">تم الاستلام</a>
+</div>
     </div>
 
     <!-- جدول عرض مرتجعات الموردين -->
@@ -38,7 +37,7 @@
             <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                     <th class="p-4">#</th>
-                    <th class="px-6 py-3">رقم المرتجع</th>
+                    {{-- <th class="px-6 py-3">رقم المرتجع</th> --}}
                     <th class="px-6 py-3">اسم المورد</th>
                     <th class="px-6 py-3">سبب الإرجاع</th>
                     <th class="px-6 py-3">تاريخ الإنشاء</th>
@@ -50,7 +49,7 @@
             @forelse($returnOrders as $order)
                 <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                     <td class="p-4">{{ $order->id }}</td>
-                    <td class="px-6 py-4">{{ $order->return_number }}</td>
+                    {{-- <td class="px-6 py-4">{{ $order->return_number }}</td> --}}
                     <td class="px-6 py-4">{{ $order->supplier->name ?? 'غير محدد' }}</td>
                     <td class="px-6 py-4">{{ Str::limit($order->return_reason, 30) }}</td>
                     <td class="px-6 py-4">{{ $order->created_at->format('Y-m-d') }}</td>
@@ -116,6 +115,9 @@
                                 @method('PUT')
                             </form>
                         @endif
+                        <a href="{{ route('returns-suppliers.edit', $order->id) }}" class="text-yellow-500 hover:text-yellow-600 p-2 rounded-md">
+                            <i class="fas fa-edit"></i>
+                        </a>
                         
                         <a href="{{ route('returns-suppliers.print', $order->id) }}" class="text-purple-500 hover:text-purple-600  p-2 rounded-md inline-block" target="_blank">
                             <i class="fas fa-print"></i>

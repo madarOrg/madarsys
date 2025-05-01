@@ -25,9 +25,13 @@
         <div class="flex items-center space-x-2 space-x-reverse">
             <span class="text-gray-700">تصفية حسب الحالة:</span>
             <a href="{{ route('returns-management.index') }}" class="px-3 py-1 {{ !request('status') ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-blue-500 hover:text-white">الكل</a>
-            <a href="{{ route('returns-management.index', ['status' => 'pending']) }}" class="px-3 py-1 {{ request('status') == 'pending' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-yellow-400 hover:text-white">معلق</a>
-            <a href="{{ route('returns-management.index', ['status' => 'completed']) }}" class="px-3 py-1 {{ request('status') == 'completed' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-green-500 hover:text-white">مكتمل</a>
-            <a href="{{ route('returns-management.index', ['status' => 'cancelled']) }}" class="px-3 py-1 {{ request('status') == 'cancelled' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-red-500 hover:text-white">ملغي</a>
+
+            <a href="{{ route('returns-management.index', ['status' => 'معلق']) }}" class="px-3 py-1 {{ request('status') == 'معلق' ? 'bg-yellow-500 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-yellow-400 hover:text-white">معلق</a>
+            
+            <a href="{{ route('returns-management.index', ['status' => 'مكتمل']) }}" class="px-3 py-1 {{ request('status') == 'مكتمل' ? 'bg-green-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-green-500 hover:text-white">مكتمل</a>
+            
+            <a href="{{ route('returns-management.index', ['status' => 'ملغي']) }}" class="px-3 py-1 {{ request('status') == 'ملغي' ? 'bg-red-600 text-white' : 'bg-gray-200 text-gray-700' }} rounded-md hover:bg-red-500 hover:text-white">ملغي</a>
+                
         </div>
     </div>
 
@@ -53,25 +57,28 @@
                     <td class="px-6 py-4">{{ $order->customer->name ?? 'غير محدد' }}</td>
                     <td class="px-6 py-4">{{ Str::limit($order->return_reason, 30) }}</td>
                     <td class="px-6 py-4">{{ \Carbon\Carbon::parse($order->return_date)->format('Y-m-d') }}</td>
-                    {{-- <td class="px-6 py-4">
-                        @if($order->status == 'pending')
+                    <td class="px-6 py-4">
+                        @if($order->status == 'معلق')
                             <span class="bg-yellow-100 text-yellow-800 text-xs font-medium px-2.5 py-0.5 rounded">معلق</span>
-                        @elseif($order->status == 'completed')
+                        @elseif($order->status == 'مكتمل')
                             <span class="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded">مكتمل</span>
-                        @elseif($order->status == 'cancelled')
+                        @elseif($order->status == 'ملغي')
                             <span class="bg-red-100 text-red-800 text-xs font-medium px-2.5 py-0.5 rounded">ملغي</span>
                         @else
                             <span class="bg-gray-100 text-gray-800 text-xs font-medium px-2.5 py-0.5 rounded">{{ $order->status }}</span>
                         @endif
-                    </td> --}}
-                    <td>{{ $order->status }}</td>
+                    </td>
+                    {{-- <td>{{ $order->status }}</td> --}}
                     <td class="px-6 py-4 flex space-x-2 space-x-reverse">
-                        <button href="{{ route('returns-management.show', $order->id) }}" class="text-blue-500 hover:text-blue-600  p-2 rounded-md">
+                        <a href="{{ route('returns-management.show', $order->id) }}" class="text-blue-500 hover:text-blue-600 p-2 rounded-md">
                             <i class="fas fa-eye"></i>
-                        </button>
-                        <button href="{{ route('returns-management.edit', $order->id) }}" class="text-yellow-500 hover:text-yellow-600  p-2 rounded-md">
+                        </a>
+                        <a href="{{ route('returns-management.edit', $order->id) }}" class="text-yellow-500 hover:text-yellow-600 p-2 rounded-md">
                             <i class="fas fa-edit"></i>
-                        </button>
+                        </a>
+                        <a href="{{ route('returns-management.print', $order->id) }}" class="text-purple-500 hover:text-purple-600  p-2 rounded-md inline-block" target="_blank">
+                            <i class="fas fa-print"></i>
+                        </a>
                         <form action="{{ route('returns-management.destroy', $order->id) }}" method="POST" class="inline" onsubmit="return confirm('هل أنت متأكد من حذف هذا المرتجع؟');">
                             @csrf
                             @method('DELETE')

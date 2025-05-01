@@ -65,10 +65,10 @@
                                             </a>
                                             
                                             @if(!in_array($salesOrder->status, ['completed', 'canceled']))
-                                                <a href="{{ route('sales-orders.edit', $salesOrder->id) }}" class=" text-yellow-500 px-2 py-1 rounded hover:text-yellow-600">
+                                                {{-- <a href="{{ route('sales-orders.edit', $salesOrder->id) }}" class=" text-yellow-500 px-2 py-1 rounded hover:text-yellow-600">
                                                     <i class="fas fa-edit"></i>
                                                 </a>
-                                                
+                                                 --}}
                                                 @if($salesOrder->status == 'pending')
                                                     <form action="{{ route('sales-orders.approve', $salesOrder->id) }}" method="POST" class="inline">
                                                         @csrf

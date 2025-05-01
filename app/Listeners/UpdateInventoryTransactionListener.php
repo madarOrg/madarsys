@@ -73,7 +73,7 @@ class UpdateInventoryTransactionListener
                 if (isset($oldItems[$productId])) {
                     $item = $oldItems[$productId];
                     // $this->updateInventoryStock($item->target_warehouse_id, $item->product_id, -$item->quantity, -$item->unit_prices);
-
+dd($item);
                     $item->update([
                         'quantity' => $quantity,
                         'unit_id' => $unitId,

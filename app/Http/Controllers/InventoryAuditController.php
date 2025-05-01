@@ -13,6 +13,7 @@ use App\Models\Company;
 use App\Models\Unit;
 use App\Models\InventoryTransactionSubtype;
 use App\Models\InventoryTransaction;
+use App\Models\InventoryTransactionItem;
 use Illuminate\Support\Collection;
 
 use Illuminate\Support\Facades\DB;
@@ -20,6 +21,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use App\Services\InventoryTransaction\InventoryTransactionService;
+use App\Rules\AfterSystemStartDate;
 
 class InventoryAuditController extends Controller
 {
@@ -135,6 +137,7 @@ class InventoryAuditController extends Controller
                 'p.sku',
                 'wl.rack_code',
                 'ws.area_name',
+
                 DB::raw('SUM(ip.converted_quantity * ip.distribution_type) as total_quantity')
             )->groupBy(
                 'w.id',
@@ -222,16 +225,20 @@ class InventoryAuditController extends Controller
 
     public function store(Request $request)
     {
+        // DD('S');
+
         $validated = $request->validate([
             'inventory_type' => 'required|integer',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'start_date' => ['required', 'date', new AfterSystemStartDate],
+            'end_date' => ['required', 'date', new AfterSystemStartDate, 'after_or_equal:start_date'],
             'notes' => 'nullable|string',
             'users' => 'required|array',
             'warehouses' => 'required|array',
         ]);
+        // DD(new AfterSystemStartDate);
 
         $auditCode = InventoryAudit::generateAuditCode();
+        // DD($auditCode);
 
         $inventoryAudit = InventoryAudit::create([
             'inventory_code' => $auditCode, // تعديل الاسم ليطابق الجدول
@@ -242,7 +249,6 @@ class InventoryAuditController extends Controller
             'status' => 1, // تعيين الحالة إلى "معلق" بشكل افتراضي
 
         ]);
-
         foreach ($validated['users'] as $userId) {
             // تأكد من أن القيمة هي قيمة مفردة (بناءً على الصلاحيات المختارة للمستخدم)
             $operationType = $request->input("user_permissions.{$userId}");
@@ -262,18 +268,47 @@ class InventoryAuditController extends Controller
             }
         }
 
-
+        // ربط المستودعات بالجرد
         foreach ($validated['warehouses'] as $warehouseId) {
             InventoryAuditWarehouse::create([
                 'inventory_audit_id' => $inventoryAudit->id,
                 'warehouse_id' => $warehouseId,
-
             ]);
         }
 
         return redirect()->route('inventory.audit.index')->with('success', 'تم إنشاء عملية الجرد بنجاح.');
     }
 
+    public function updateItem(Request $request)
+{
+    // التحقق من صحة البيانات المرسلة
+    $validated = $request->validate([
+        'product_id' => 'required|exists:inventory_transaction_items,id',
+        'quantity' => 'required|numeric',
+        'quantity_expected' => 'required|numeric',
+        'unit_price' => 'required|numeric',
+        'total' => 'required|numeric',
+    ]);
+
+    // جلب الصنف المطلوب تحديثه
+    $item = InventoryTransactionItem::find($request->product_id);
+
+    if (!$item) {
+        return response()->json(['error' => 'الصنف غير موجود'], 404);
+    }
+
+    // تحديث بيانات الصنف
+    // dd( $request->quantity);
+    $item->quantity = $request->quantity;
+    $item->quantity_expected = $request->quantity_expected;
+    $item->unit_price = $request->unit_price;
+    $item->total = $request->total;
+    $item->save();
+
+    return response()->json(['message' => 'تم تحديث الصنف بنجاح!']);
+}
+
+    
     public function edit($id)
     {
         $audit = InventoryAudit::findOrFail($id);
@@ -342,55 +377,66 @@ class InventoryAuditController extends Controller
     public function editTrans($id)
     {
         try {
-            // $departments = Department::all();
             $warehouses = Warehouse::ForUserWarehouse()->get();
-
             $units = Unit::all(); // جلب جميع الوحدات
-            
-            $products = Product::all();
-            // $warehouseLocations = WarehouseLocation::all();
+    
+            // جلب العملية المخزنية المطلوبة
             $transOfAudit = DB::table('inventory_transactions')
                 ->where('inventory_request_id', $id)
                 ->where('transaction_type_id', 8)
-                ->select(
-                    'id');
-
-            $selectedTransaction = InventoryTransaction::with(['items.product', 'items.unit'])->find($transOfAudit);
-            $items = $selectedTransaction->items()->paginate(6);
-
+                ->first(); // تصحيح هنا: استخدام first بدلاً من select
+    
+            if (!$transOfAudit) {
+                return redirect()->back()->withErrors(['error' => 'لم يتم العثور على العملية المطلوبة']);
+            }
+    
+            // الآن استخدم find مع id الصحيح وجلب العلاقات
+            $selectedTransaction = InventoryTransaction::with(['products', 'items.product', 'items.unit'])->find($transOfAudit->id);
+    
+            if (!$selectedTransaction) {
+                return redirect()->back()->withErrors(['error' => 'لم يتم العثور على بيانات العملية']);
+            }
+    
+            $products = $selectedTransaction->products; // المنتجات المرتبطة بالعملية
+            $items = $selectedTransaction->items()->paginate(6); // العناصر المرتبطة بالعملية
+    // dd('selectedTransaction',$selectedTransaction->id);
             return view('inventory.audit.editTrans', compact('selectedTransaction', 'products', 'warehouses', 'units', 'items'));
         } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية: ' . $e->getMessage()]);
+            return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحميل بيانات العملية المخزنية-editTrans: ' . $e->getMessage()]);
         }
     }
     
+
     /**
      * عرض صفحة تعديل المنتج المخزني.
      *
      * @param  int  $id
      * @return \Illuminate\View\View
      */
-    
 
-    public function updateTrans(Request $request, $id)
-    {
-        try {
-            // $transaction = InventoryTransaction::findOrFail($id);
-            // dd($request);
-            $transaction = $this->inventoryTransactionService->updateTransaction($id, $request->all());
-            // إرجاع استجابة بناءً على نوع الطلب (JSON أو View)
-            if ($request->expectsJson()) {
-                return response()->json([
-                    'message' => 'تمت إضافة العملية المخزنية بنجاح',
-                    'transaction' => $transaction
-                ], 201);
-            }
-            return redirect()->route('inventory.audit.editTrans', $id)->with('success', 'تم تحديث العملية المخزنية بنجاح');
-        } catch (\Exception $e) {
-            return redirect()->back()->withErrors(['error' => 'حدث خطأ أثناء تحديث العملية المخزنية: ' . $e->getMessage()]);
-        }
-    }
-
+     public function updateTrans(Request $request, $id)
+     {
+         \Log::info($request->all()); // your debugging
+     
+         $data = $request->validate([
+           'items'              => 'nullable|array|min:1',
+           'items.*.id'         => 'nullable|integer|exists:inventory_transaction_items,id',
+           'items.*.quantity'   => 'nullable|numeric',
+           'items.*.expected'   => 'nullable|numeric',
+           'items.*.unit_price'      => 'nullable|numeric',
+         ]);
+     
+         foreach ($data['items'] as $row) {
+           $item = InventoryTransactionItem::findOrFail($row['id']);
+           $item->quantity               = $row['quantity'];
+           $item->expected_audit_quantity= $row['expected'];
+           $item->unit_prices                  = $row['unit_price'];
+           $item->save();
+         }
+     
+         return response()->json(['message'=>'تم تحديث الجرد بنجاح']);
+     }
+     
     public function replaceAuditTransaction(Request $request)
     {
         $transactionId = $request->transaction_id;
@@ -470,12 +516,15 @@ class InventoryAuditController extends Controller
 
     public function createInventoryAuditTransaction(Request $request, $auditId, int $warehouseId, $groupByBatch = true)
     {
-        DB::beginTransaction();
+        // DD($auditId);
 
+        $audit = InventoryAudit::findOrFail($auditId);
+        // DD($audit);
         try {
             // 1. تجهيز بيانات الأصناف من جدول inventory_products
             $query = DB::table('inventory_products')
                 ->where('warehouse_id', $warehouseId)
+                // ->where('created_at', '<=', $audit->end_date) // شرط الفترة
                 ->select(
                     'product_id',
                     'unit_product_id as unit_id',
@@ -493,26 +542,24 @@ class InventoryAuditController extends Controller
             } else {
                 $query->groupBy('product_id', 'unit_product_id', 'price', 'production_date', 'expiration_date');
             }
-
-            $items = $query->get();
+            // dd($query);
             $items = $query->get()
-                ->map(function ($i) {
+                ->map(function ($i) use ($warehouseId) {
                     return [
-                        'product_id'                => $i->product_id,
-                        'unit_id'                   => $i->unit_id,
-                        'unit_product_id'                   => $i->unit_id,
-                        'quantity'                   => $i->quantity,
-                        'converted_quantity'        => $i->quantity,
-                        'price'                     => $i->price,
-                        'batch_number'              => $i->batch_number   ?? null,
-                        'production_date'           => $i->production_date ?? null,
-                        'expiration_date'           => $i->expiration_date ?? null,
-                        'target_warehouse_id'        => $warehouseId,
+                        'product_id'           => $i->product_id,
+                        'unit_id'              => $i->unit_id,
+                        'unit_product_id'      => $i->unit_id,
+                        'quantity'             => $i->quantity,
+                        'converted_quantity'   => $i->quantity,
+                        'price'                => $i->price,
+                        'batch_number'         => $i->batch_number ?? null,
+                        'production_date'      => $i->production_date ?? null,
+                        'expiration_date'      => $i->expiration_date ?? null,
+                        'target_warehouse_id'  => $warehouseId
                     ];
                 })
                 ->toArray();
             // dd($request->all());
-            $audit = InventoryAudit::findOrFail($auditId);
             // dd($audit);
 
 
@@ -543,7 +590,7 @@ class InventoryAuditController extends Controller
                         ]
                     ]);
                 }
-            
+
                 return redirect()->back()->with([
                     'error' => 'يوجد بالفعل حركة مرتبطة بنفس رمز الجرد',
                     'replace_route' => route('inventory.audit.replace'),
@@ -551,24 +598,35 @@ class InventoryAuditController extends Controller
                     'audit_id' => $auditId,
                 ]);
             }
-            
+
             // 4. حفظ الحركة عبر نفس الدالة المستخدمة في الفواتير
             $inventoryTransaction = $this->storeInventoryTransaction(
                 $transactionData,
                 $items,
             );
-
+            // dd('end');
             DB::commit();
 
-            // استجابة حسب نوع الطلب
+            // if ($request->expectsJson()) {
+            //     return response()->json([
+            //         'message'      => 'تمت إضافة حركة الجرد بنجاح',
+            //         'transaction'  => $inventoryTransaction,
+            //         'redirect_url' => route('inventory.audit.editTrans', $inventoryTransaction->id),
+            //         'status' => 'success'
+            //     ], 200);
             if ($request->expectsJson()) {
                 return response()->json([
-                    'message' => 'تمت إضافة حركة الجرد بنجاح',
-                    'transaction' => $inventoryTransaction
-                ]);
+                    'message' => 'تمت إضافة العملية المخزنية بنجاح',
+                    'transaction' => $inventoryTransaction,
+                    'redirect_url' => route('inventory.audit.editTrans', $inventoryTransaction->id),
+
+                ], 200); // تغيير الكود إلى 200 لأنه تم تحديث العملية بنجاح
+            
+                
             }
 
-            return redirect()->back()->with('success', 'تمت إضافة حركة الجرد بنجاح');
+            // الباقي كما هو للرد العادي (redirect back أو view)
+
         } catch (\Exception $e) {
             DB::rollBack();
 
@@ -581,4 +639,37 @@ class InventoryAuditController extends Controller
                 ->withErrors(['error' => 'حدث خطأ أثناء عملية الجرد: ' . $e->getMessage()]);
         }
     }
+
+    // /////////////////////////////////////////
+    
+
+    /**
+     * عرض تقرير الجرد بناءً على الرقم المدخل.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\View\View
+     */
+    
+     public function showAuditReport($id)
+     {
+         $auditId = $id;
+         if (!$auditId) {
+             return redirect()->back()->withErrors(['error' => 'لم يتم تحديد رقم الجرد']);
+         }
+     
+         // جلب جميع الحركات المخزنية المرتبطة برقم الجرد
+         $transactions = InventoryTransaction::with(['products', 'items.product', 'items.unit', 'warehouse'])
+             ->where('inventory_request_id', $auditId)
+             ->where('transaction_type_id', 8)
+             ->get();
+     
+         if ($transactions->isEmpty()) {
+             return redirect()->back()->withErrors(['error' => 'لم يتم العثور على أي حركات مخزنية مرتبطة بالجرد']);
+         }
+     
+         return view('inventory.audit.audit_report', compact('transactions'));
+     }
+     
 }
+
+
