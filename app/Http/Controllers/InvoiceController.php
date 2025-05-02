@@ -93,6 +93,7 @@ class InvoiceController extends Controller
 
     public function create($type)
     {
+
         $Warehouses = Warehouse::ForUserWarehouse()->get();
 
         $viewFolder = $type === 'sale' ? 'sales' : 'purchases';
@@ -101,15 +102,38 @@ class InvoiceController extends Controller
         $paymentTypes = PaymentType::select('id', 'name')->get();
         $Branches = Branch::select('id', 'name')->get();
         // $Warehouses = Warehouse::all();
-
+        
         $units = Unit::all();
         $currencies = Currency::all();
         $selectedPaymentTypeId = $invoice->payment_type_id ?? 1; // 1 كقيمة افتراضية في حال لم توجد قيمة محفوظة
-
         return view("invoices.$viewFolder.create", compact('selectedPaymentTypeId', 'partners', 'products', 'paymentTypes', 'type', 'Branches', 'Warehouses', 'units', 'currencies'));
     }
 
-
+    public function show($type, $id)
+    {
+        $viewFolder = $type === 'sale' ? 'sales' : 'purchases';
+    
+        // استرجاع الفاتورة مع الأصناف المتعلقة بها
+        $invoice = Invoice::with('items.product')->findOrFail($id);
+    
+        // استرجاع قائمة الشركاء
+        $partners = Partner::select('id', 'name')->get();
+        // استرجاع قائمة المنتجات
+        $products = Product::select('id', 'name', 'selling_price', 'unit_id', 'barcode', 'sku')->get();
+        // استرجاع أنواع الدفع
+        $paymentTypes = PaymentType::select('id', 'name')->get();
+        // استرجاع الفروع
+        $branches = Branch::select('id', 'name')->get();
+        // استرجاع المستودعات للمستخدم الحالي
+        $warehouses = Warehouse::ForUserWarehouse()->get();
+        // استرجاع الوحدات
+        $units = Unit::all();
+        // استرجاع العملات
+        $currencies = Currency::all();
+    
+        return view("invoices.$viewFolder.show", compact('invoice', 'partners', 'products', 'paymentTypes', 'type', 'branches', 'warehouses', 'units', 'currencies'));
+    }
+    
 
     public function store(Request $request, $type)
     {

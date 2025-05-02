@@ -543,15 +543,8 @@ Route::get('/welcome', function () {
     Route::post('/mark-notification-as-read/{id}', [NotificationController::class, 'markAsRead']);
     // Route::post('/broadcasting/auth', [BroadcastController::class, 'authenticate']);
 
-    // مسارات الفواتير
-    // Route::prefix('invoices')->name('invoices.')->group(function () {
-    //     Route::get('/', [InvoiceController::class, 'index'])->name('index'); // List invoices
-    //     Route::get('/{type}/create', [InvoiceController::class, 'create'])->name('create'); // Create invoice form
-    //     Route::post('/{type}', [InvoiceController::class, 'store'])->name('store'); // Store new invoice
-    //     Route::get('/{type}/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit'); // Edit invoice form
-    //     Route::put('/{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
-    //     Route::delete('/{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
-          //invoices routes
+    
+    //invoices routes
     Route::prefix('invoices')->name('invoices.')->group(function () {
        
         // مسارات إنشاء فاتورة من أمر شراء وأمر صرف
@@ -560,7 +553,6 @@ Route::get('/welcome', function () {
         Route::get('create-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'createFromPurchaseOrder'])->name('create-from-purchase-order');
         Route::post('store-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'storeFromPurchaseOrder'])->name('store-from-purchase-order');
         Route::post('store-from-purchase-order/{id}', [InvoiceFromOrdersController::class, 'storeFromPurchaseOrder'])->name('store-from-purchase-order');
-        Route::get('/{invoice}', [InvoiceController::class, 'show'])->name('show');
 
         // مسارات إنشاء فاتورة من أمر صرف باستخدام المتحكم الجديد
         
@@ -583,6 +575,7 @@ Route::get('/welcome', function () {
         Route::get('{type}/{invoice}/edit', [InvoiceController::class, 'edit'])->name('edit'); // Edit invoice
         Route::put('{type}/{invoice}', [InvoiceController::class, 'update'])->name('update'); // Update invoice
         Route::delete('{type}/{invoice}', [InvoiceController::class, 'destroy'])->name('destroy'); // Delete invoice
+        Route::get('/{type}/{invoice}', [InvoiceController::class, 'show'])->name('show');
     
     
     });
