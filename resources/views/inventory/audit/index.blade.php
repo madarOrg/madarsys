@@ -1,7 +1,7 @@
 <x-layout>
 
     {{-- <div class="container"> --}}
-        <div class="max-w-7xl mx-auto px-4">
+    <div class="max-w-7xl mx-auto px-4">
 
         <!-- فلترة البحث -->
         <form action="{{ route('inventory.audit.index') }}" method="GET" class="mb-4">
@@ -34,33 +34,25 @@
                                 'attributes' => 'value="' . request()->input('end_date') . '"',
                             ])
                         </div>
-                        {{-- <div class="">
-                                <label for="inventory_type">نوع الجرد</label>
-                                <select name="inventory_type" id="inventory_type" class="form-control">
-                                    <option value="">الكل</option>
-                                    <option value="1" {{ request()->input('inventory_type') == 1 ? 'selected' : '' }}>جرد دوري</option>
-                                    <option value="2" {{ request()->input('inventory_type') == 2 ? 'selected' : '' }}>جرد مفاجئ</option>
-                                </select>
-                            </div>
-                                <div class="">
-                                    <label for="status">الحالة</label>
-                                    <select name="status" id="status" class="form-control">
-                                        <option value="">الكل</option>
-                                        <option value="1" {{ request()->input('status') == 1 ? 'selected' : '' }}>معلق</option>
-                                        <option value="0" {{ request()->input('status') == 0 ? 'selected' : '' }}>مكتمل</option>
+                       
+                        <div class="flex-1 min-w-[200px]">
+                            @if ($subTypes->isNotEmpty())
+                                <div class="mb-2">
+                                    <label for="subType"
+                                        class="block text-sm font-medium text-gray-600 dark:text-gray-400">الأنواع
+                                        الفرعية</label>
+                                    <select name="subType" id="subType"
+                                        class="form-select w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 
+                                 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors 
+                                     duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1">
+                                        @foreach ($subTypes as $subType)
+                                            <option value="{{ $subType->id }}">{{ $subType->name }}</option>
+                                        @endforeach
                                     </select>
-                                </div> --}}
-                        <div class="flex-1 min-w-[200px]">
-                            @include('components.select-dropdown', [
-                                'id' => 'inventory_type',
-                                'name' => 'inventory_type',
-                                'label' => 'نوع الجرد',
-                                'options' => $subTypeOptions,
-                                'selected' => request()->input('inventory_type'),
-                            ])
+                                </div>
+                            @endif
                         </div>
-
-                        <div class="flex-1 min-w-[200px]">
+                        <div class="flex-1 min-w-[200px] ">
                             @include('components.select-dropdown', [
                                 'id' => 'status',
                                 'name' => 'status',
@@ -174,7 +166,7 @@
                                     <a href="{{ route('inventory.audit.report', ['id' => $audit->id]) }}"
                                         class="font-medium text-purple-600 dark:text-purple-400 hover:underline mx-2"
                                         target="_blank">
-                                        <i class="fas fa-file-alt mr-2"></i> 
+                                        <i class="fas fa-file-alt mr-2"></i>
                                     </a>
                                 @endif
 

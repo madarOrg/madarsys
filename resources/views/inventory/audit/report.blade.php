@@ -1,5 +1,6 @@
 <x-layout>
     <div class="container">
+      
         <form method="GET" action="{{ route('inventory.audit.report') }}" class="mb-3">
             <x-reportHeader>
                 <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقارير قوائم الجرد</h1>

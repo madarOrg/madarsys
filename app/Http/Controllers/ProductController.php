@@ -14,7 +14,22 @@ use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
-
+    public function updateBarcode(Request $request, Product $product)
+    {
+        $data = $request->validate([
+            'barcode' => 'required|string|unique:products,barcode,' . $product->id,
+        ]);
+    
+        $product->barcode = $data['barcode'];
+        $product->save();
+    
+        return response()->json([
+            'status'  => 'success',
+            'message' => 'تم تحديث الباركود بنجاح',
+            'product' => $product,
+        ]);
+    }
+    
 
     // عرض جميع المنتجات
     // public function index(Request $request)

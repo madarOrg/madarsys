@@ -1,6 +1,6 @@
 <x-layout dir="rtl">
     <section class="relative mt-1 flex items-center justify-between">
-        <x-title :title="'قائمة المرتجعات الواردة'"></x-title>
+        <x-title :title="'قائمة المرتجعات الواردة من العملاء'"></x-title>
 
         <div class="flex items-center space-x-2 space-x-reverse">
             <!-- زر إنشاء مرتجع جديد -->

@@ -342,7 +342,7 @@ class ReturnOrderController extends Controller
             ->orderByDesc('count')
             ->limit(5)
             ->get();
-        
+    
         // إحصائيات حسب العملاء
         $customerReturns = ReturnOrder::with('customer')
             ->select('customer_id', DB::raw('COUNT(*) as count'))
@@ -452,7 +452,7 @@ class ReturnOrderController extends Controller
         InventoryTransaction::create([
             'product_id' => $item->product_id,
             'quantity' => $item->quantity,
-            'warehouse_id' => $defaultWarehouse ? $defaultWarehouse->id : 1, // المستودع الافتراضي
+            'warehouse_id' => $defaultWarehouse ? $defaultWarehouse->id : 1, 
             'type' => 'return', // نوع الحركة: مرتجع
             'reference_id' => $item->id,
             'reference_type' => 'App\Models\ReturnOrderItem',
@@ -461,6 +461,8 @@ class ReturnOrderController extends Controller
             'created_user' => auth()->id() ?? 1,
             'updated_user' => auth()->id() ?? 1,
             'transaction_date'     => now(), 
+            'reference' => $item->returnOrder->return_number,
+            'partner_id' => $item->returnOrder->customer_id,
         ]);
         
         // تحديث كمية المنتج في المخزون

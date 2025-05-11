@@ -13,7 +13,8 @@ class ReturnSuppliersOrder extends Model
         'return_reason',
         'return_date',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'return_number'
     ];
 
     public function supplier()

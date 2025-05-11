@@ -90,7 +90,17 @@ class User extends Authenticatable
     {
         return $this->hasMany(Warehouse::class, 'supervisor_id');
     }
-  
+    public function warehousesUsers()
+    {
+        return $this->hasManyThrough(
+            Warehouse::class,
+            RoleWarehouse::class,
+            'role_id',
+            'id',
+            'id',
+            'warehouse_id'
+        );
+    }
 
     public function allowedCompanies()
 {

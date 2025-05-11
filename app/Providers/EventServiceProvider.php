@@ -12,6 +12,9 @@ use App\Listeners\CreateInventoryTransactionListener;
 use App\Listeners\UpdateInventoryTransactionListener;
 use App\Listeners\ClearUserPermissionsCache;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use App\Models\InventoryTransaction;
+use App\Observers\InventoryTransactionObserver;
+
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -42,12 +45,9 @@ class EventServiceProvider extends ServiceProvider
             SendNotificationCreatedNotification::class,
         ],
     ];
-
-    /**
-     * Register any events for your application.
-     */
     public function boot(): void
     {
-        //
+        InventoryTransaction::observe(InventoryTransactionObserver::class);
     }
+  
 }

@@ -58,7 +58,7 @@
         </div>
         
         <div class="bg-white p-4 rounded-lg shadow-md">
-            <h3 class="text-lg font-semibold text-gray-800 mb-2">عدد الموردين</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-2">عدد الشركاء</h3>
             <p class="text-3xl font-bold text-yellow-600">{{ $customerReturns->count() }}</p>
             <p class="text-sm text-gray-500 mt-2">عدد العملاء الذين لديهم مرتجعات</p>
         </div>
@@ -197,13 +197,13 @@
 
         <!-- العملاء الأكثر إرجاعاً -->
         <div class="bg-white p-4 rounded-lg shadow-md">
-            <h3 class="text-xl font-semibold text-gray-800 mb-4">العملاء الأكثر إرجاعاً</h3>
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">الشركاء الأكثر إرجاعاً</h3>
             
             <div class="overflow-x-auto">
                 <table class="w-full text-sm text-right text-gray-500">
                     <thead class="text-xs text-gray-700 uppercase bg-gray-200">
                         <tr>
-                            <th class="px-4 py-2">العميل</th>
+                            <th class="px-4 py-2">الشريك</th>
                             <th class="px-4 py-2">عدد المرتجعات</th>
                             <th class="px-4 py-2">النسبة المئوية</th>
                         </tr>

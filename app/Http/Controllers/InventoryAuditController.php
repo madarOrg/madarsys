@@ -176,6 +176,7 @@ class InventoryAuditController extends Controller
         $endDate     = $request->input('end_date');
         $inventoryType = $request->input('inventory_type');
         $status      = $request->input('status');  // 1 أو 0 (معلق أو مكتمل)
+        $subTypes = InventoryTransactionSubtype::where('transaction_type_id', 8)->get();
 
         // بناء الاستعلام مع الفلاتر
         $query = InventoryAudit::query();
@@ -209,7 +210,7 @@ class InventoryAuditController extends Controller
 
         $subTypeOptions = $subTypes->pluck('name', 'id'); // [id => name]
 
-        return view('inventory.audit.index', compact('audits', 'subTypeOptions'));
+        return view('inventory.audit.index', compact('audits', 'subTypeOptions','subTypes'));
     }
 
 
@@ -658,7 +659,7 @@ class InventoryAuditController extends Controller
          }
      
          // جلب جميع الحركات المخزنية المرتبطة برقم الجرد
-         $transactions = InventoryTransaction::with(['products', 'items.product', 'items.unit', 'warehouse'])
+         $transactions = InventoryTransaction::with(['products', 'items.product', 'items.unit', 'warehouse','items.product.Category'])
              ->where('inventory_request_id', $auditId)
              ->where('transaction_type_id', 8)
              ->get();

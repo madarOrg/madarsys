@@ -4,9 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Product;
 use App\Models\InventoryTransactionItem;
 use Illuminate\Http\Request;
-use App\Http\Controllers\InventoryAuditController;
+use App\Http\Controllers\ProductController;
 
 // Route::get('/inventory-audit/{auditId}/{warehouseId}', [InventoryAuditController::class, 'createInventoryAuditTransaction']);
+Route::put('/products/{product}/barcode', [ProductController::class, 'updateBarcode']);
 
 Route::get('/search/products', function (Request $request) {
     // الحصول على الاستعلام من الطلب

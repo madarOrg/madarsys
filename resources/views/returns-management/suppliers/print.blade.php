@@ -1,50 +1,19 @@
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<x-base>
+<div class="hide-on-print text-right mt-2 mb-4">
+    <button onclick="window.print()"
+        class="w-52 h-12 shadow-sm rounded-lg text-gray-200 border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700  dark:text-gray-400 text-base font-semibold leading-7">طباعة
+        التقرير
+    </button>
+</div>
+<x-reportHeader>
+    <h1 class="text-center text-xl font-semibold text-gray-900 dark:text-gray-300"> تقرير
+        الجرد </h1>
+</x-reportHeader>
+
+
     <title>طباعة مرتجع المورد #{{ $returnOrder->return_number }}</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Cairo Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-        }
-        
-        @media print {
-            .no-print {
-                display: none !important;
-            }
-            
-            body {
-                margin: 0;
-                padding: 0;
-            }
-            
-            .print-container {
-                width: 100%;
-                max-width: 100%;
-            }
-            
-            @page {
-                size: A4;
-                margin: 10mm;
-            }
-        }
-    </style>
-</head>
-<body class="bg-gray-100">
-    <!-- زر الطباعة -->
+     <!-- زر الطباعة -->
     <div class="no-print fixed top-4 left-4 z-50">
         <button onclick="window.print()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md shadow-md">
             <i class="fas fa-print ml-1"></i> طباعة
@@ -177,5 +146,5 @@
             <p>العنوان: المملكة العربية السعودية - الرياض</p>
         </div>
     </div>
-</body>
-</html>
+
+</x-base>

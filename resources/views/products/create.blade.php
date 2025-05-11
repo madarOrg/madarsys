@@ -37,7 +37,7 @@
 
                             <input type="hidden" name="sku" value="{{ $generatedSku ?? '' }}">
                             <div class="">
-                                <x-file-input id="sku" name="sku" label="كود التخزين SKU" type="text" :value="old('sku', 'SKU-' . Str::random(8))" readonly />
+                                <x-file-input id="sku" name="sku" label="كود التخزين SKU" type="text" readonly />
                             </div>
                             
                             <x-file-input id="stock_quantity" name="stock_quantity" label=" بداية المدة"

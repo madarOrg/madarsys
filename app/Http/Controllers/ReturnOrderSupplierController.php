@@ -50,6 +50,7 @@ class ReturnOrderSupplierController extends Controller
                 $query->where(function ($q) use ($search) {
                     $q->where('return_reason', 'like', '%' . $search . '%')
                         ->orWhere('created_at', 'like', '%' . $search . '%')
+                        ->orWhere('return_number', 'like', '%' . $search . '%') 
                         ->orWhereHas('supplier', function ($q2) use ($search) {
                             $q2->where('name', 'like', '%' . $search . '%');
                         })
@@ -66,7 +67,7 @@ class ReturnOrderSupplierController extends Controller
     
         return view('returns-management.suppliers.index', compact('returnOrders'));
     }
-    
+
     public function create()
     {
         // جلب قائمة الموردين

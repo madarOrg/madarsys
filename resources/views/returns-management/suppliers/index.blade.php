@@ -37,7 +37,7 @@
             <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
                 <tr>
                     <th class="p-4">#</th>
-                    {{-- <th class="px-6 py-3">رقم المرتجع</th> --}}
+                    <th class="px-6 py-3">رقم المرتجع</th>
                     <th class="px-6 py-3">اسم المورد</th>
                     <th class="px-6 py-3">سبب الإرجاع</th>
                     <th class="px-6 py-3">تاريخ الإنشاء</th>
@@ -49,7 +49,7 @@
             @forelse($returnOrders as $order)
                 <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
                     <td class="p-4">{{ $order->id }}</td>
-                    {{-- <td class="px-6 py-4">{{ $order->return_number }}</td> --}}
+                    <td class="px-6 py-4">{{ $order->return_number??'-' }}</td>
                     <td class="px-6 py-4">{{ $order->supplier->name ?? 'غير محدد' }}</td>
                     <td class="px-6 py-4">{{ Str::limit($order->return_reason, 30) }}</td>
                     <td class="px-6 py-4">{{ $order->created_at->format('Y-m-d') }}</td>

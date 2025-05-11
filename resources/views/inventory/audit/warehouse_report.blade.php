@@ -72,9 +72,9 @@
         <h3 class="dark:text-gray-100 text-xl font-semibold"> ({{ $products->first()->warehouse_name }} )</h3>
     </div>
         <div class="">
-            <table class="w-full border-collapse border border-gray-300 text-sm">
-                <thead>
-                    <tr class="bg-gray-100">
+            <table class="w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                    <tr>
                   
                     <th  class="border p-2">المنتج</th>
                     @if ($groupByBatch)
@@ -88,7 +88,8 @@
             </thead>
             <tbody class=" p-2 w-auto min-w-[50px] whitespace-nowrap">
                 @foreach ($products as $product)
-                <tr>
+                <tr class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+
                     <td class="border p-2"><a href="{{ route('products.show', $product->product_id) }}" class="font-medium text-blue-600 dark:text-blue-500 hover:underline">
                         {{ $product->product_name }}  {{ $product->sku }}
                     </a>

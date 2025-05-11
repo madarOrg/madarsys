@@ -80,9 +80,6 @@
 
         </div>
 
-        <!-- إضافة pagination -->
-        <div class="mt-5">
-            {{ $orders->links() }}
-        </div>
+      
     </section>
 </x-layout> 

@@ -1,51 +1,70 @@
 import './bootstrap'; // تحميل الإعدادات الأساسية
 
+// Get the user ID from the meta tag
+document.addEventListener('DOMContentLoaded', function() {
+    const userId = document.querySelector('meta[name="user-id"]')?.content;
+    
+    if (userId && window.Echo) {
+        // Listen for notifications on the user's private channel
+        window.Echo.private(`App.Models.User.${userId}`)
+            .notification((notification) => {
+                // This is a warehouse transaction notification
+                if (notification.transaction_id) {
+                    // Use SweetAlert2 for notifications
+                    Swal.fire({
+                        title: notification.title,
+                        text: notification.message,
+                        icon: notification.type || 'info',
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true
+                    });
+                }
+            });
+    }
+
+    // تأكد من أن TomSelect تم تحميله بشكل صحيح
+    if (typeof TomSelect === 'undefined') {
+        console.error("TomSelect is not loaded.");
+        return;
+    }
+
+    // تهيئة TomSelect لجميع العناصر التي تحمل الكلاس tom-select
+    document.querySelectorAll('.tom-select').forEach(select => {
+        if (!select.tomselect) {
+            // إنشاء TomSelect مع الوراثة التلقائية
+            const tomSelect = new TomSelect(select, {
+                create: select.hasAttribute('data-create') ? select.getAttribute('data-create') === 'true' : false,
+                placeholder: select.getAttribute('placeholder') || 'اختر',
+                sortField: select.getAttribute('data-sort-field') || 'text',
+                maxItems: select.hasAttribute('multiple') ? null : 1,
+            });
+
+            // إضافة لون بناءً على الخاصية data-color
+            const color = select.getAttribute('data-color');
+            if (color) {
+                tomSelect.wrapper.style.borderColor = color;
+                tomSelect.wrapper.style.backgroundColor = color + '20'; 
+                tomSelect.wrapper.style.color = color;
+            }
+
+            // التعامل مع باقي الخصائص
+            if (select.hasAttribute('disabled')) tomSelect.disable();
+            if (select.hasAttribute('required')) tomSelect.wrapper.setAttribute('required', 'required');
+        }
+    });
+});
+
 // الاستماع للأحداث في Livewire
 Livewire.on('alert', (data) => {
     Swal.fire({
         icon: data.type,
         title: data.message,
         showConfirmButton: false,
-        // يمكن إضافة timer إذا كنت ترغب بإغلاق الإشعار تلقائيًا بعد مدة
-        // timer: 3000
     });
 });
-
-document.addEventListener('DOMContentLoaded', function () {
-  // تأكد من أن TomSelect تم تحميله بشكل صحيح
-  if (typeof TomSelect === 'undefined') {
-      console.error("TomSelect is not loaded.");
-      return;
-  }
-
-  // تهيئة TomSelect لجميع العناصر التي تحمل الكلاس tom-select
-  document.querySelectorAll('.tom-select').forEach(select => {
-      if (!select.tomselect) {
-          // إنشاء TomSelect مع الوراثة التلقائية
-          const tomSelect = new TomSelect(select, {
-              create: select.hasAttribute('data-create') ? select.getAttribute('data-create') === 'true' : false,
-              placeholder: select.getAttribute('placeholder') || 'اختر',
-              sortField: select.getAttribute('data-sort-field') || 'text',
-              maxItems: select.hasAttribute('multiple') ? null : 1,
-          });
-
-          // إضافة لون بناءً على الخاصية data-color
-          const color = select.getAttribute('data-color');
-          if (color) {
-              tomSelect.wrapper.style.borderColor = color;
-              tomSelect.wrapper.style.backgroundColor = color + '20'; 
-              tomSelect.wrapper.style.color = color;
-          }
-
-          // التعامل مع باقي الخصائص
-          if (select.hasAttribute('disabled')) tomSelect.disable();
-          if (select.hasAttribute('required')) tomSelect.wrapper.setAttribute('required', 'required');
-      }
-  });
-});
-
-
-
 
 document.addEventListener("DOMContentLoaded", function() {
     //  تفعيل زر تغيير الثيم (الوضع الداكن/المضيء)
@@ -129,4 +148,3 @@ document.addEventListener("DOMContentLoaded", function() {
       }
     });
   });
-
