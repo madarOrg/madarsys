@@ -58,8 +58,8 @@ class Product extends Model
     // دالة لإنشاء SKU فريد
     public static function generateSKU($product)
     {
-        $categoryCode = strtoupper(substr($product->category->code ?? 'GEN', 0, 3)); // أول 3 أحرف من اسم الفئة
-        $brandCode = strtoupper(substr($product->brand ?? 'NO-BRAND', 0, 3)); // أول 3 أحرف من العلامة التجارية
+        $categoryCode = strtoupper($product->category->code ?? 'GEN'); 
+        $brandCode = strtoupper($product->brand->code ?? 'NO-BRAND'); 
         $uniqueId = str_pad(self::max('id') + 1, 6, '0', STR_PAD_LEFT); // رقم فريد من 6 أرقام
 
         return "{$categoryCode}-{$brandCode}-{$uniqueId}";
