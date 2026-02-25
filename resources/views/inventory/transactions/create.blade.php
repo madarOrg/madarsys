@@ -103,7 +103,7 @@
                                 <th class="px-6 py-3">الكمية</th>
                                 <th class="px-6 py-3">سعر الوحدة</th>
                                 <th class="px-6 py-3">الإجمالي</th>
-                                <th class="px-6 py-3">موقغ التخزين</th>
+                                {{-- <th class="px-6 py-3">موقغ التخزين</th> --}}
                                 <th class="px-6 py-3">تاريخ إنتاج المنتج </th>
                                 <th class="px-6 py-3">تاريخ إنتهاء المنتج </th>
 
@@ -155,8 +155,9 @@
                                             class="w-full border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" />
                                     </td>
 
-                                    <td class="">
+                                    <td class="hidden">
                                         <select name="warehouse_locations[]"
+                                        
                                             class=" warehouse-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                                             <option value="">اختر موقع التخزين</option>
                                             @foreach ($warehouseLocations as $location)
@@ -219,10 +220,10 @@
                     </td>
                     <td class="">
                         <input type="number" name="totals[]" class="w-full total-input bg-gray-100 border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 px-3 py-1" min="0" step="0.01" />
-                    </td>
-                   <td class="">
+                    </td> 
+                  <td class="hidden">
                 <select name="warehouse_locations[]" 
-                    class="warehouse-select tom-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
+                    class="warehouse-select  border rounded dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 focus:outline-blue-500">
                     <option value="">اختر موقع التخزين</option>
                     @foreach ($warehouseLocations as $location)
                         <option value="{{ $location->id }}">{{ $location->name }}</option>

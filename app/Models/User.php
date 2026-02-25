@@ -65,7 +65,16 @@ class User extends Authenticatable
      /**
      * العلاقة بين المستخدمين والأدوار (Many-to-Many)
      */
-  
+    public function role()
+    {
+        return $this->belongsTo(Role::class);
+    }
+    
+    public function hasPermission($permissionKey)
+    {
+        return $this->role->permissions()->where('permission_key', $permissionKey)->exists();
+    }
+    
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'role_user')

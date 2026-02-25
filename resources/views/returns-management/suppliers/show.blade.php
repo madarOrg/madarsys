@@ -3,11 +3,11 @@
         <x-title :title="'تفاصيل مرتجع المورد: ' . $returnOrder->return_number"></x-title>
 
         <div class="flex items-center space-x-2 space-x-reverse">
-            <x-button href="{{ route('returns-suppliers.index') }}" class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-md">
+            <x-button href="{{ route('returns-suppliers.index') }}" class="">
                 <i class="fas fa-arrow-right ml-1"></i> العودة إلى مرتجعات الموردين
             </x-button>
             
-            <x-button href="{{ route('returns-suppliers.print', $returnOrder->id) }}" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md" target="_blank">
+            <x-button href="{{ route('returns-suppliers.print', $returnOrder->id) }}" class="" target="_blank">
                 <i class="fas fa-print ml-1"></i> طباعة المرتجع
             </x-button>
             
@@ -30,7 +30,7 @@
     <!-- معلومات المرتجع -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <!-- بيانات المرتجع -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class=" p-6 rounded-lg shadow-md">
             <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">بيانات المرتجع</h3>
             
             <div class="grid grid-cols-2 gap-4">
@@ -76,7 +76,7 @@
         </div>
         
         <!-- بيانات المورد -->
-        <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class=" p-6 rounded-lg shadow-md">
             <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">بيانات المورد</h3>
             
             <div class="grid grid-cols-2 gap-4">
@@ -104,12 +104,13 @@
     </div>
 
     <!-- عناصر المرتجع -->
-    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+    <div class=" p-6 rounded-lg shadow-md mt-6">
         <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">عناصر المرتجع</h3>
         
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-right text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+            <table class="w-full text-sm text-gray-500 dark:text-gray-400">
+                <thead
+                    class="text-xs text-gray-700 uppercase bg-gray-300 dark:bg-gray-600 dark:text-gray-400">
                     <tr>
                         <th class="px-4 py-2">#</th>
                         <th class="px-4 py-2">المنتج</th>
@@ -120,7 +121,8 @@
                 </thead>
                 <tbody>
                     @forelse($returnOrder->items as $index => $item)
-                        <tr class="border-b hover:bg-gray-100">
+                        <tr   class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+
                             <td class="px-4 py-3">{{ $index + 1 }}</td>
                             <td class="px-4 py-3">{{ $item->product->name ?? 'غير محدد' }}</td>
                             <td class="px-4 py-3">{{ $item->quantity }}</td>
@@ -144,12 +146,13 @@
     </div>
 
     <!-- سجل الحركات -->
-    <div class="bg-white p-6 rounded-lg shadow-md mt-6">
+    <div class=" p-6 rounded-lg shadow-md mt-6">
         <h3 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">سجل حركة المخزون</h3>
         
         <div class="overflow-x-auto">
-            <table class="w-full text-sm text-right text-gray-500">
-                <thead class="text-xs text-gray-700 uppercase bg-gray-200">
+            <table class="w-full text-sm text-gray-500 dark:text-gray-400">
+                <thead
+                    class="text-xs text-gray-700 uppercase bg-gray-300 dark:bg-gray-600 dark:text-gray-400">
                     <tr>
                         <th class="px-4 py-2">المنتج</th>
                         <th class="px-4 py-2">الكمية</th>
@@ -170,7 +173,8 @@
                     @endphp
                     
                     @forelse($transactions as $transaction)
-                        <tr class="border-b hover:bg-gray-100">
+                        <tr  class="bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+
                             <td class="px-4 py-3">{{ $transaction->product->name ?? 'غير محدد' }}</td>
                             <td class="px-4 py-3">{{ abs($transaction->quantity) }}</td>
                             <td class="px-4 py-3">

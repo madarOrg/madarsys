@@ -12,6 +12,7 @@ class ReturnOrder extends Model
         'return_number',
         'customer_id',
         'return_reason',
+        'status',
         'return_date',
     ];
 

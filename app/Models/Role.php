@@ -39,12 +39,14 @@ class Role extends Model
                     ->withPivot('branch_id') 
                     ->withTimestamps();
     }
-    public function permissions()
-    {
-        return $this->belongsToMany(Permission::class, 'role_permissions')
-                    ->withPivot('id','status', 'status_updated_at') // إضافة الحقول الخاصة بالـ pivot
-                    ->withTimestamps();
-    }
     
+    public function permissions()
+{
+    return $this->belongsToMany(Permission::class, 'role_permissions')
+        ->withPivot('id','status', 'status_updated_at', 'can_update', 'can_delete')
+        ->withTimestamps();
+    }
+ 
+
 
 }

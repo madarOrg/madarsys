@@ -1,7 +1,7 @@
 <x-layout>
     <section>
         <div>
-            <x-title :title="'سحب منتج إمن المستودع '"></x-title>
+            <x-title :title="'سحب منتج من المستودع '"></x-title>
             <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
                 يرجى إدخال مكان المنتج بدقة.
             </p>

@@ -116,10 +116,10 @@
                     <!-- أزرار النقل -->
                     <div class="flex flex-col justify-center gap-2">
                         <button type="button" id="btn_add"
-                            class="w-32 h-12 shadow-sm rounded-lg  hover:text-green-500 transition-all duration-700 text-gray-100 text-base font-semibold leading-7"><i
+                            class="w-32 h-12 shadow-sm rounded-lg  text-gray-700 dark:text-gray-800 transition-all duration-700  text-base font-semibold leading-7"><i
                                 class="fa-solid fa-angles-left"></i></button>
                         <button type="button" id="btn_remove"
-                            class="w-32 h-12 shadow-sm rounded-lg  hover:text-gray-200 transition-all duration-700 text-gray-100 text-base font-semibold leading-7"><i
+                            class="w-32 h-12 shadow-sm rounded-lg  text-gray-700 dark:text-gray-800transition-all duration-700  text-base font-semibold leading-7"><i
                                 class="fa-solid fa-angles-right"></i></button>
                     </div>
 
@@ -161,10 +161,10 @@
                     <!-- أزرار النقل -->
                     <div class="flex flex-col justify-center gap-2">
                         <button type="button" id="btn_add_wh"
-                            class="w-32 h-12 shadow-sm rounded-lg  hover:text-indigo-60 transition-all duration-700 text-gray-100 text-base font-semibold leading-7"><i
+                            class="w-32 h-12 shadow-sm rounded-lg text-gray-700 dark:text-gray-800 transition-all duration-700  text-base font-semibold leading-7"><i
                                 class="fa-solid fa-angles-left"></i></button>
                         <button type="button" id="btn_remove_wh"
-                            class="w-32 h-12 shadow-sm rounded-lg  hover:text transition-all duration-700 text-gray-100 text-base font-semibold leading-7"><i
+                            class="w-32 h-12 shadow-sm rounded-lg  text-gray-700 dark:text-gray-800 transition-all duration-700 text-base font-semibold leading-7"><i
                                 class="fa-solid fa-angles-right"></i></button>
                     </div>
                     <!-- قائمة المستودعات المختارة -->

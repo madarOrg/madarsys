@@ -14,33 +14,59 @@ use Illuminate\Support\Facades\View;
 
 class ReturnOrderSupplierController extends Controller
 {
+    // public function index(Request $request)
+    // {
+    //     $returnOrders = ReturnSuppliersOrder::with('supplier', 'items.product')
+    //         ->when($request->search, function ($query) use ($request) {
+    //             $search = $request->search;
+                
+    //             // البحث داخل جدول `return_suppliers_orders`
+    //             $query
+    //                 ->Where('return_reason', 'like', '%' . $search . '%')
+    //                 ->orWhere('created_at', 'like', '%' . $search . '%')
+                    
+    //                 // البحث في اسم المورد
+    //                 ->orWhereHas('supplier', function ($q) use ($search) {
+    //                     $q->where('name', 'like', '%' . $search . '%');
+    //                 })
+                    
+    //                 // البحث في المنتجات المرتبطة
+    //                 ->orWhereHas('items.product', function ($q) use ($search) {
+    //                     $q->where('name', 'like', '%' . $search . '%');
+    //                 });
+                    
+    //         })
+    //         ->orderBy('created_at', 'desc')
+    //         ->paginate(10);
+            
+    //     return view('returns-management.suppliers.index', compact('returnOrders'));
+    // }
     public function index(Request $request)
     {
         $returnOrders = ReturnSuppliersOrder::with('supplier', 'items.product')
             ->when($request->search, function ($query) use ($request) {
                 $search = $request->search;
                 
-                // البحث داخل جدول `return_suppliers_orders`
-                $query->where('return_number', 'like', '%' . $search . '%')
-                    ->orWhere('return_reason', 'like', '%' . $search . '%')
-                    ->orWhere('created_at', 'like', '%' . $search . '%')
-                    
-                    // البحث في اسم المورد
-                    ->orWhereHas('supplier', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
-                    })
-                    
-                    // البحث في المنتجات المرتبطة
-                    ->orWhereHas('items.product', function ($q) use ($search) {
-                        $q->where('name', 'like', '%' . $search . '%');
-                    });
+                $query->where(function ($q) use ($search) {
+                    $q->where('return_reason', 'like', '%' . $search . '%')
+                        ->orWhere('created_at', 'like', '%' . $search . '%')
+                        ->orWhereHas('supplier', function ($q2) use ($search) {
+                            $q2->where('name', 'like', '%' . $search . '%');
+                        })
+                        ->orWhereHas('items.product', function ($q2) use ($search) {
+                            $q2->where('name', 'like', '%' . $search . '%');
+                        });
+                });
+            })
+            ->when($request->status, function ($query) use ($request) {
+                $query->where('status', $request->status);
             })
             ->orderBy('created_at', 'desc')
             ->paginate(10);
-            
+    
         return view('returns-management.suppliers.index', compact('returnOrders'));
     }
-
+    
     public function create()
     {
         // جلب قائمة الموردين
@@ -60,6 +86,7 @@ class ReturnOrderSupplierController extends Controller
         $validatedData = $request->validate([
             'supplier_id' => 'required|exists:partners,id',
             'return_reason' => 'required|string',
+            'return_date' => 'required|date',
             'items' => 'required|array',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -215,8 +242,9 @@ class ReturnOrderSupplierController extends Controller
             // تأكيد المعاملة
             DB::commit();
             
-            return redirect()->route('returns.suppliers.show', $returnOrder->id)->with('success', 'تم تحديث مرتجع المورد بنجاح');
-        } catch (\Exception $e) {
+            return redirect()->route('returns-suppliers.edit', $returnOrder->id)
+            ->with('success', 'تم تحديث مرتجع المورد بنجاح');
+    } catch (\Exception $e) {
             // التراجع عن المعاملة في حالة حدوث خطأ
             DB::rollBack();
             
@@ -451,6 +479,7 @@ class ReturnOrderSupplierController extends Controller
             'reference_type' => 'App\Models\ReturnSuppliersOrderItem',
             'transaction_type_id' => 2, // خصم من المخزون
             'notes' => 'خصم مخزون من مرتجع المورد: ' . ($item->returnSuppliersOrder->supplier->name ?? 'غير محدد'),
+            'transaction_date' => now(),
             'created_user' => auth()->id() ?? 1,
             'updated_user' => auth()->id() ?? 1,
         ]);

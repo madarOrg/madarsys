@@ -90,6 +90,8 @@
                     
 
                     <td class="px-6 py-4 flex space-x-2">
+                        <div class="flex items-center space-x-3 rtl:space-x-reverse">
+
                         <a href="{{ route('warehouses.edit', $warehouse->id) }}"
                             class="text-blue-600 hover:underline dark:text-blue-500">
                             <i class="fa-solid fa-pen"></i>
@@ -102,6 +104,7 @@
                                 <i class="fas fa-trash-alt"></i>
                             </button>
                         </form>
+                    </div>
                     </td>
                 </tr>
 

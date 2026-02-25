@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 use App\Models\Permission;
 use App\Models\RolePermission;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+
 
 class RolePermissionController extends Controller
 {
@@ -14,125 +18,167 @@ class RolePermissionController extends Controller
         try {
             // جلب الأدوار مع الصلاحيات المرتبطة
             $query = Role::with('permissions');
-    
+
             // تطبيق فلتر البحث عن الدور إذا تم إدخاله
             if ($request->filled('role')) {
                 $query->where('id', $request->input('role'));
             }
-    
+
             // تطبيق فلتر البحث عن الصلاحية إذا تم إدخالها
             if ($request->filled('permission')) {
                 $query->whereHas('permissions', function ($q) use ($request) {
                     $q->where('id', $request->input('permission'));
                 });
             }
-    
+
             // تطبيق فلتر البحث حسب الحالة (فعال/غير فعال)
             if ($request->filled('status')) {
                 $query->whereHas('permissions', function ($q) use ($request) {
                     $q->where('pivot.status', $request->input('status'));
                 });
             }
-    
+
             // تنفيذ الاستعلام بناءً على الفلاتر المحددة
             $roles = Role::all(); // جلب كل الأدوار من أجل القوائم المنسدلة
             $permissions = Permission::all(); // جلب جميع الصلاحيات من أجل القوائم المنسدلة
-            $rolePermissions = $query->get(); 
-    
+            $rolePermissions = $query->get();
+
             return view('role-permissions.index', compact('roles', 'permissions', 'rolePermissions'));
         } catch (\Exception $e) {
             return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب الأدوار والصلاحيات: ' . $e->getMessage()], 500);
-
         }
     }
-    
 
-    public function create()
+
+    public function create(Request $request)
     {
-        try {
-            $roles = Role::all();
-            $permissions = Permission::all();
-            return view('role-permissions.create', compact('roles', 'permissions'));
-        } catch (\Exception $e) {
-            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء عرض نموذج إضافة صلاحية الدور: ' . $e->getMessage()], 500);
-        }
-    }
-    public function edit($id)
-    {
-        try {
-            $role = Role::with('permissions')->findOrFail($id);
-            $permissions = Permission::all();
-            return view('role-permissions.edit', compact('role', 'permissions'));
-        } catch (\Exception $e) {
-            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب بيانات الدور للتعديل: ' . $e->getMessage()], 500);
-        }
-    }
-    
+        $roles = Role::all();
+        $roleId = $request->query('role_id');
 
-    public function update(Request $request)
-    {
-        try {
-            $role = Role::findOrFail($request->role_id);
-            $role->permissions()->sync($request->permissions); // تحديث الصلاحيات
+        $permissions = Permission::with('moduleAction')->get();
 
-            return response()->json(['message' => 'تم تحديث الصلاحيات بنجاح']);
-        } catch (\Exception $e) {
-            return response()->json(['error' => 'حدث خطأ أثناء تحديث الصلاحيات: ' . $e->getMessage()], 500);
+        // تحميل الصلاحيات الحالية المرتبطة بالدور إن وجد
+        $rolePermissions = [];
+        if ($roleId) {
+            $rolePermissions = RolePermission::where('role_id', $roleId)
+                ->get()
+                ->keyBy('permission_id')
+                ->map(function ($item) {
+                    return [
+                        'can_create' => $item->can_create,
+                        'can_update' => $item->can_update,
+                        'can_delete' => $item->can_delete,
+                        'status' => $item->status,
+                    ];
+                });
         }
+
+        return view('role-permissions.create', compact('roles', 'permissions', 'roleId', 'rolePermissions'));
     }
 
-    public function destroy($id)
-    {
-        try {
-            $role = Role::findOrFail($id);
-            $role->delete();
-
-            return redirect()->route('role-permissions.index')->with('success', 'تم حذف الدور بنجاح.');
-        } catch (\Exception $e) {
-            return redirect()->route('role-permissions.index')->withErrors(['error' => 'حدث خطأ أثناء حذف الدور: ' . $e->getMessage()]);
-        }
-    }
-
-    /**
-     * تخزين سجل جديد لصلاحية الدور.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        try {
-            // التحقق من صحة البيانات القادمة من الطلب
-            $validated = $request->validate([
-                'role_id'       => 'required|exists:roles,id',       // تأكد من وجود الدور في جدول roles
-                'permission_id' => 'required|exists:permissions,id', // تأكد من وجود الصلاحية في جدول permissions
-                'status'        => 'sometimes|boolean',                // يمكن إرسالها أو لا، وإذا لم تُرسل ستستخدم القيمة الافتراضية
+        $request->validate([
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        $roleId = $request->input('role_id');
+        $permissionsData = $request->input('permissions', []);
+
+        // حذف الصلاحيات القديمة
+        RolePermission::where('role_id', $roleId)->delete();
+
+        // إدخال الصلاحيات الجديدة
+        foreach ($permissionsData as $permissionId => $data) {
+            if (!isset($data['selected'])) continue;
+
+            RolePermission::create([
+                'role_id' => $roleId,
+                'permission_id' => $permissionId,
+                'can_create' => isset($data['can_create']),
+                'can_update' => isset($data['can_update']),
+                'can_delete' => isset($data['can_delete']),
+                'status' => $data['status'] ?? 1,
             ]);
+        }
 
-            // إنشاء سجل جديد باستخدام البيانات المُحقق منها
-            $rolePermission = new RolePermission();
-            $rolePermission->role_id = $validated['role_id'];
-            $rolePermission->permission_id = $validated['permission_id'];
-            $rolePermission->status = $validated['status'] ?? 1; // إذا لم يُرسل قيمة يتم تعيين 1 كافتراضية
-            $rolePermission->status_updated_at = now(); // يتم تعيين تاريخ ووقت التحديث الحالي
+        return redirect()->route('role-permissions.create', ['role_id' => $roleId])
+            ->with('success', 'تم تحديث صلاحيات الدور بنجاح');
+    }
 
-            // حفظ السجل في قاعدة البيانات
-            $rolePermission->save();
+    public function edit(Request $request)
+    {
+        $roles = Role::all();
+        $selectedRole = null;
+        $permissions = [];
 
-            // إعادة التوجيه مع رسالة نجاح (يمكن تعديلها حسب الحاجة)
-            return redirect()->back()->with('success', 'تم حفظ صلاحية الدور بنجاح!');
-        } catch (\Exception $e) {
-            return back()->withErrors(['error' => 'حدث خطأ أثناء حفظ صلاحية الدور: ' . $e->getMessage()]);
+        if ($request->has('role_id')) {
+            $selectedRole = Role::with(['permissions' => function ($q) {
+                $q->withPivot(['can_update', 'can_delete', 'status']);
+            }])->findOrFail($request->role_id);
+
+            $permissions = $selectedRole->permissions;
+        }
+
+        return view('role-permissions.edit', compact('roles', 'selectedRole', 'permissions'));
+    }
+    public function update(Request $request, $roleId)
+    {
+        $role = Role::findOrFail($roleId);
+
+        foreach ($request->permissions as $permissionId => $data) {
+            $role->permissions()->updateExistingPivot($permissionId, [
+                'can_update' => isset($data['can_update']),
+                'can_delete' => isset($data['can_delete']),
+                'status' => $data['status'] ?? 0,
+                'status_updated_at' => now(),
+            ]);
+        }
+
+        return redirect()->route('role-permissions.edit', ['role_id' => $roleId])
+            ->with('success', 'تم تحديث الصلاحيات بنجاح.');
+    }
+
+
+    // طرد المستخدمين من sessions المرتبطين بالدور المحدث
+    private function logoutUsersByRole($roleId)
+    {
+        $userIds = DB::table('role_user')
+            ->where('role_id', $roleId)
+            ->pluck('user_id');
+
+        $currentUserId = Auth::id();
+
+        $userIds = $userIds->filter(function ($id) use ($currentUserId) {
+            return $id != $currentUserId;
+        });
+
+        if ($userIds->isNotEmpty()) {
+            DB::table('sessions')->whereIn('user_id', $userIds)->delete();
         }
     }
 
-    public function show($id)
+    public function destroy($pivotId)
     {
         try {
-            $role = Role::with('permissions')->findOrFail($id);
-            return view('role-permissions.show', compact('role'));
+            // استخراج السطر من جدول role_permissions
+            $pivotRecord = DB::table('role_permissions')->where('id', $pivotId)->first();
+
+            if (!$pivotRecord) {
+                return redirect()->route('role-permissions.index')->withErrors(['error' => 'لم يتم العثور على هذا السطر في جدول role_permissions.']);
+            }
+
+            $roleId = $pivotRecord->role_id;
+
+            // حذف السجل
+            DB::table('role_permissions')->where('id', $pivotId)->delete();
+
+            // إخراج المستخدمين التابعين لهذا الدور
+            $this->logoutUsersByRole($roleId);
+
+            return redirect()->route('role-permissions.index')->with('success', 'تم حذف الصلاحية من الدور بنجاح.');
         } catch (\Exception $e) {
-            return response()->view('errors.500', ['error' => 'حدث خطأ أثناء جلب بيانات الدور: ' . $e->getMessage()], 500);
+            return redirect()->route('role-permissions.index')->withErrors(['error' => 'حدث خطأ أثناء حذف الصلاحية من الدور: ' . $e->getMessage()]);
         }
     }
 }

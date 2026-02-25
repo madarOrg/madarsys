@@ -7,7 +7,7 @@ use App\Models\SalesOrder;
 use App\Models\Partner;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-
+use App\Models\Inventory;
 class SalesOrderController extends Controller
 {
     /**
@@ -52,12 +52,28 @@ class SalesOrderController extends Controller
             'notes' => 'nullable|string',
         ]);
         
-        // التحقق من الطلب
-        $order = Order::findOrFail($request->order_id);
+        // // التحقق من الطلب
+        // $order = Order::findOrFail($request->order_id);
+        // if ($order->type !== 'sell' || $order->status !== 'confirmed') {
+        //     return redirect()->back()->with('error', 'الطلب غير صالح لإنشاء أمر صرف');
+        // }
+        $order = Order::with('order_details.product')->findOrFail($request->order_id);
+
         if ($order->type !== 'sell' || $order->status !== 'confirmed') {
             return redirect()->back()->with('error', 'الطلب غير صالح لإنشاء أمر صرف');
         }
         
+        // التحقق من توفر الكمية لكل منتج في تفاصيل الطلب
+        foreach ($order->order_details as $item) {
+            $result = $this->isQuantityAvailable($item, $order->warehouse_id);
+        
+            if ($result !== true) {
+                return redirect()->back()->with('error', 'الكمية غير متوفرة للمنتج: ' . $item->product->name);
+            }
+        }
+        
+        
+
         // إنشاء رقم فريد لأمر الصرف
         $lastSalesOrder = SalesOrder::latest('id')->first();
         $lastId = $lastSalesOrder ? $lastSalesOrder->id + 1 : 1;
@@ -75,6 +91,7 @@ class SalesOrderController extends Controller
             'created_user' => Auth::id(),
         ]);
         
+
         // تحديث الطلب الأصلي بإضافة رقم أمر الصرف
         // نضيف رقم أمر الصرف في حقل مناسب إذا كان موجوداً
         // في هذه الحالة نحفظ رقم أمر الصرف في نفس حقل رقم أمر الشراء
@@ -194,6 +211,7 @@ class SalesOrderController extends Controller
      */
     public function approve($id)
     {
+        
         $salesOrder = SalesOrder::findOrFail($id);
         
         // التحقق من أن أمر الصرف ليس مكتملاً أو ملغياً
@@ -208,5 +226,28 @@ class SalesOrderController extends Controller
         
         return redirect()->route('sales-orders.show', $salesOrder->id)
             ->with('success', 'تم اعتماد أمر الصرف بنجاح');
+    }
+    
+    /**
+     * التحقق من توفر الكمية المطلوبة في المخزون
+     */
+    private function isQuantityAvailable($item, $warehouseId)
+    {
+        $productId = is_object($item) ? $item->product_id : ($item['product_id'] ?? null);
+        $requestedQty = is_object($item) ? $item->quantity : ($item['quantity'] ?? null);
+
+        if (!$productId || !$requestedQty) {
+            return true;
+        }
+
+        $availableQty = Inventory::where('product_id', $productId)
+            ->where('warehouse_id', $warehouseId)
+            ->sum('quantity');
+
+        if ($requestedQty > $availableQty) {
+            return "الكمية المطلوبة للمنتج رقم {$productId} غير متوفرة (المتوفر: {$availableQty}).";
+        }
+
+        return true;
     }
 }

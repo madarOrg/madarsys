@@ -48,7 +48,7 @@
    DB_PORT=3306
    DB_DATABASE=madarsys
    DB_USERNAME=root
-   DB_PASSWORD=
+   DB_PASSWORD=root
    ```
 4. توليد مفتاح التطبيق:
    ```bash

@@ -12,8 +12,12 @@ class InventoryTransactionService
 {
     public function createTransaction(array $data)
     {
-        event(new InventoryTransactionCreated($data));
-    }
+        try {
+            event(new InventoryTransactionCreated($data));
+        } catch (\Exception $e) {
+            throw new \Exception("خطأ أثناء تحديث العملية المخزنية: " . $e->getMessage());
+        }
+}
     public function updateTransaction($id, array $data)
     {
         try {

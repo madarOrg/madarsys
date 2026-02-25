@@ -106,11 +106,14 @@ class CompanyController extends Controller
     {
         try {
             $validated = $request->validate([
-                'name' => 'sometimes|string|max:255',
-                'logo' => 'nullable|image',
-                'phone_number' => 'nullable|string',
-                'email' => 'sometimes|email',
-                'settings' => 'nullable|json',
+                'name' => 'required|string|max:255',
+            'logo' => 'nullable|image',
+            'phone_number' => 'nullable|string',
+            'email' => 'nullable|email',
+            'address' => 'nullable|string',
+            'additional_info' => 'nullable|string',
+            'settings' => 'nullable|json',
+                
             ]);
 
             // Handle file upload if logo exists
@@ -167,10 +170,12 @@ class CompanyController extends Controller
         try {
             // Validation for the update
             $validated = $request->validate([
-                'name' => 'sometimes|string|max:255',
+                'name' => 'required|string|max:255',
                 'logo' => 'nullable|image',
                 'phone_number' => 'nullable|string',
-                'email' => 'sometimes|email',
+                'email' => 'nullable|email',
+                'address' => 'nullable|string',
+                'additional_info' => 'nullable|string',
                 'settings' => 'nullable|json',
             ]);
 
@@ -185,10 +190,10 @@ class CompanyController extends Controller
             // Update company data
             $company->update($validated);
             // Redirect back with success message
-            return redirect()->route('companies.edit', $company->id)->with('success', 'تم تحديث بيانات الشركة بنجاح');
+            return redirect()->route('companies.index', $company->id)->with('success', 'تم تحديث بيانات الشركة بنجاح');
         } catch (Exception $e) {
             // Handle exceptions
-            return redirect()->route('companies.edit', $company->id)->with('error', 'حدث خطأ أثناء تحديث بيانات الشركة: ' . $e->getMessage());
+            return redirect()->route('companies.index', $company->id)->with('error', 'حدث خطأ أثناء تحديث بيانات الشركة: ' . $e->getMessage());
         }
     }
 

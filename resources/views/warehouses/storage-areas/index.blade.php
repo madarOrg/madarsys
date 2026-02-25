@@ -19,15 +19,15 @@
                     <input id="checkbox-all-search" type="checkbox"
                         class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600">
                 </th> --}}
-                <th class="px-6 py-3 min-w-[200px]">اسم المنطقة التخزينية</th>
-                <th class="px-6 py-3 min-w-[150px]">نوع المنطقة التخزينية</th>
-                <th class="px-6 py-3 min-w-[200px]">السعة القصوى للتخزين</th>
-                <th class="px-6 py-3 min-w-[200px]">عدد المنتجات المخزنة</th>
-                <th class="px-6 py-3 min-w-[200px]">منطقة التخزين الجغرافية</th>
-                <th class="px-6 py-3 min-w-[200px]">شروط التخزين</th>
-                <th class="px-6 py-3 min-w-[200px]">تاريخ الإضافة</th>
-                <th class="px-6 py-3 min-w-[200px]">تاريخ آخر تحديث</th>
-                <th class="px-6 py-3 min-w-[150px]">الإجراءات</th>
+                <th class="px-6 py-3 ">اسم المنطقة التخزينية</th>
+                <th class="px-6 py-3 ">نوع المنطقة التخزينية</th>
+                <th class="px-6 py-3 ">السعة القصوى للتخزين</th>
+                <th class="px-6 py-3 ">عدد المنتجات المخزنة</th>
+                <th class="px-6 py-3 ">منطقة التخزين الجغرافية</th>
+                <th class="px-6 py-3 ">شروط التخزين</th>
+                <th class="px-6 py-3 ">تاريخ الإضافة</th>
+                <th class="px-6 py-3 ">تاريخ آخر تحديث</th>
+                <th class="px-6 py-3 ">الإجراءات</th>
             </tr>
         </thead>
         <tbody>
@@ -41,14 +41,14 @@
                         <a href="javascript:void(0)"
                             onclick="toggleAreaDetails({{ $area->area_id }})">{{ $area->area_name }}</a>
                     </td>
-                    <td class="px-6 py-4">{{ $area->area_type }}</td>
-                    <td class="px-6 py-4">{{ $area->capacity }}</td>
-                    <td class="px-6 py-4">{{ $area->current_occupancy }}</td>
-                    <td class="px-6 py-4">{{ $area->zone->name }}</td>
-                    <td class="px-6 py-4">{{ $area->storage_conditions }}</td>
-                    <td class="px-6 py-4">{{ $area->created_at->format('Y-m-d H:i:s') }}</td>
-                    <td class="px-6 py-4">{{ $area->updated_at->format('Y-m-d H:i:s') }}</td>
-                    <td class="px-6 py-4 flex space-x-2">
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $area->area_type }}</td>
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $area->capacity }}</td>
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $area->current_occupancy }}</td>
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $area->zone->name }}</td>
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $area->storage_conditions }}</td>
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $area->created_at->format('Y-m-d H:i:s') }}</td>
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $area->updated_at->format('Y-m-d H:i:s') }}</td>
+                    <td class="p-2 w-auto min-w-[50px] whitespace-nowrap flex space-x-2">
                         <a href="{{ route('warehouse.storage-areas.edit', [$warehouse, $area->id]) }}"
                             class="text-blue-600 hover:underline dark:text-blue-500">
                             <i class="fa-solid fa-pen"></i>

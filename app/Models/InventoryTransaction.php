@@ -4,23 +4,20 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Traits\
-{
-HasBranch,
-HasUser
-};
+use App\Traits\HasBranch;
+use App\Traits\HasUser;
 
 class InventoryTransaction extends Model
 {
-    use HasUser,HasBranch,HasFactory;
-    
+    use HasUser, HasBranch, HasFactory;
+
     protected $table = 'inventory_transactions';
 
     protected $fillable = [
         'transaction_type_id',
         'sub_type_id',
         'effect',
-        'transaction_date', 
+        'transaction_date',
         'reference',
         'partner_id',
         'department_id',
@@ -29,11 +26,13 @@ class InventoryTransaction extends Model
         'notes',
         'branch_id',
         'inventory_request_id',
-        'created_user', 
+        'created_user',
         'updated_user',
         'status',
+        'transaction_date',
+        'approved_at',
     ];
-    
+
     protected $casts = [
         'transaction_date' => 'datetime',
     ];
@@ -48,31 +47,37 @@ class InventoryTransaction extends Model
             'product_id'                // المفتاح الأجنبي في InventoryTransactionItem
         );
     }
-// public function product()
-// {
-//     return $this->belongsTo(Product::class);
-// }
+    // public function product()
+    // {
+    //     return $this->belongsTo(Product::class);
+    // }
 
-        
+
     public function branch()
     {
         return $this->belongsTo(Branch::class);
     }
-    
+
+    // في موديل InventoryTransaction
     public function items()
     {
-        return $this->hasMany(InventoryTransactionItem::class);
+        return $this->hasMany(InventoryTransactionItem::class, 'inventory_transaction_id');
     }
-    
+
+    public function audit()
+    {
+        return $this->belongsTo(InventoryAudit::class, 'id', 'inventory_transaction_id');
+    }
+
     public function transactionType()
     {
         return $this->belongsTo(TransactionType::class, 'transaction_type_id');
     }
 
-public function subType()
-{
-    return $this->belongsTo(InventoryTransactionSubtype::class, 'sub_type_id');
-}
+    public function subType()
+    {
+        return $this->belongsTo(InventoryTransactionSubtype::class, 'sub_type_id');
+    }
 
     public function warehouse()
     {
@@ -97,13 +102,12 @@ public function subType()
         return $this->hasMany(InventoryTransactionItem::class, 'inventory_transaction_id');
     }
     public function createdUser()
-{
-    return $this->belongsTo(User::class, 'created_user');
-}
+    {
+        return $this->belongsTo(User::class, 'created_user');
+    }
 
-public function updatedUser()
-{
-    return $this->belongsTo(User::class, 'updated_user');
-}
-
+    public function updatedUser()
+    {
+        return $this->belongsTo(User::class, 'updated_user');
+    }
 }

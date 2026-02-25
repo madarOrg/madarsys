@@ -97,23 +97,48 @@
                                 @endforeach
                             </select>
                         </div>
+                        {{-- <div class="flex gap-4">
+                            <label><input type="checkbox" name="expired" value="1" {{ request('expired') ? 'checked' : '' }}> منتهية الصلاحية</label>
+                            <label><input type="checkbox" name="near_expiry" value="1" {{ request('near_expiry') ? 'checked' : '' }}> قاربت على الانتهاء</label>
+                            <label><input type="checkbox" name="reorder" value="1" {{ request('reorder') ? 'checked' : '' }}> وصلت حد الطلب</label>
+                            <label><input type="checkbox" name="surplus" value="1" {{ request('surplus') ? 'checked' : '' }}> فائض</label>
+                        </div> --}}
+                        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" name="expired" value="1" {{ request('expired') ? 'checked' : '' }}>
+                                منتهية الصلاحية
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" name="near_expiry" value="1" {{ request('near_expiry') ? 'checked' : '' }}>
+                                قاربت على الانتهاء
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" name="reorder" value="1" {{ request('reorder') ? 'checked' : '' }}>
+                                وصلت حد الطلب
+                            </label>
+                            <label class="flex items-center gap-2">
+                                <input type="checkbox" name="surplus" value="1" {{ request('surplus') ? 'checked' : '' }}>
+                                فائض
+                            </label>
+                        </div>
+                        
+                        
                     </div>
 
                     <!-- أزرار التصفية والتفريغ -->
                     <div class="mt-4 flex gap-4">
-                        <button type="submit"
-                            class=" hide-on-print btn btn-primary text-white bg-indigo-600 hover:bg-indigo-700">تصفية</button>
-
-                        <a href="{{ route('reports.product-stock') }}"
-                            class="hide-on-print btn bg-gray-300 hover:bg-gray-400 text-gray-800">تفريغ الفلاتر</a>
-                    </div>
-                    <div class="flex gap-4">
-                        <label><input type="checkbox" name="expired" value="1" {{ request('expired') ? 'checked' : '' }}> منتهية الصلاحية</label>
-                        <label><input type="checkbox" name="near_expiry" value="1" {{ request('near_expiry') ? 'checked' : '' }}> قاربت على الانتهاء</label>
-                        <label><input type="checkbox" name="reorder" value="1" {{ request('reorder') ? 'checked' : '' }}> وصلت حد الطلب</label>
-                        <label><input type="checkbox" name="surplus" value="1" {{ request('surplus') ? 'checked' : '' }}> فائض</label>
-                    </div>
-                    
+                        <div class="col-md-12 mt-1 hide-on-print">
+                            <button type="submit" name="filter" value="1"
+                                class=" btn btn-primary text-indigo-600 hover:text-indigo-700">
+                                تصفية</button>
+                        </div>
+                        <!-- زر تفريغ الفلاتر -->
+                        <div class="hide-on-print  mt-1 hide-on-print">
+                            <button type="button" id="resetFilters"
+                                class="btn btn-secondary bg-gray-300 hover:bg-gray-500 text-gray-700">تفريغ الفلاتر</button>
+                        </div>
+                        
+                  
                 </form>
             </div>
         </div>
@@ -132,6 +157,7 @@
                             <th class="border p-2">الباركود</th>
                             <th class="border p-2">الشركة المصنعة</th>
                             <th class="border p-2">البراند</th>
+                            <th class="border p-2"> الكمية المتاحة</th>
                             <th class="border p-2">المورد</th>
                             <th class="border p-2">الحد الأدنى</th>
                             <th class="border p-2">الحد الأقصى</th>
@@ -153,25 +179,27 @@
                                     @endif
                                 </td>
                                 
-                                <td class="border p-2">{{ $product->name }}</td>
-                                <td class="border p-2">{{ $product->sku }}</td>
-                                <td class="border p-2">{{ $product->barcode }}</td>
-                                <td class="border p-2">{{ optional($product->manufacturer)->name ?? 'غير متاح' }}</td>
-                                <td class="border p-2">{{ optional($product->brand)->name ?? 'غير متاح' }}</td>
-                                <td class="border p-2">{{ optional($product->supplier)->name ?? 'غير متاح' }}</td>
-                                <td class="border p-2">{{ $product->min_quantity ?? 'غير محدد' }}</td>
-                                <td class="border p-2">{{ $product->max_quantity ?? 'غير محدد' }}</td>
-                                <td class="border p-2">
-                                    @if (!empty($product->components))
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->name }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->sku }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->barcode }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product->manufacturingCountry)->name ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product->brand)->name ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product)->total_quantity ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ optional($product->supplier)->name ?? 'غير متاح' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->min_stock_level ?? 'غير محدد' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">{{ $product->max_stock_level ?? 'غير محدد' }}</td>
+                                <td class="border p-2 w-auto min-w-[50px] whitespace-nowrap">
+                                    @if (!empty($product->ingredients))
                                         <ul class="list-disc list-inside">
-                                            @foreach ($product->components as $component)
-                                                <li>{{ $component }}</li>
+                                            @foreach (explode('،', $product->ingredients) as $ingredient)
+                                                <li>{{ trim($ingredient) }}</li>
                                             @endforeach
                                         </ul>
                                     @else
                                         لا توجد مكونات
                                     @endif
                                 </td>
+                                
                             </tr>
                         @endforeach
                     </tbody>

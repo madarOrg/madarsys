@@ -6,13 +6,15 @@
             @method('PUT')
 
             <div class="p-2 rounded-lg shadow w-full overflow-x-auto">
-                <div class="flex items-center justify-between mb-2">
-                    <x-title :title="'تعديل الحركات المخزنية'" class="text-lg font-semibold" />
+                <div class="flex  mb-2">
                     
+                    <x-title :title="'تعديل الحركات المخزنية'" class="text-lg font-semibold" />
+                    <div class="!w-auto">
                     <x-search-input id="custom-id" name="search"
                         placeholder="ابحث برقم المرجع، الشريك، القسم، أو المستودع..." :value="request()->input('search')"
                         class="w-64" />
                 </div>
+            </div>
                 
                 
 

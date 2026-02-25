@@ -8,7 +8,7 @@ class RolePermission extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['role_id', 'permission_id', 'status', 'status_updated_at','created_user', 'updated_user'];
+    protected $fillable = ['role_id', 'permission_id', 'status', 'status_updated_at','created_user', 'updated_user','can_update', 'can_delete','can_create'];
 
     // تحديث `status_updated_at` تلقائيًا عند تغيير `status`
     protected static function boot()

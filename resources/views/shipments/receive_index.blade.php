@@ -2,7 +2,8 @@
     <section class="relative mt-1 flex items-center">
         <x-title :title="'استلام الشحنات'"></x-title>
 
-        <a href="{{ route('shipments.index') }}" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
+        <a href="{{ route('shipments.index') }}" class="w-52 h-12 flex items-center justify-center shadow-sm rounded-lg border-indigo-600 bg-indigo-600 dark:hover:bg-indigo-800 hover:bg-indigo-900 hover:text-gray-200 transition-all duration-700 text-white dark:text-gray-400 text-base font-semibold leading-7">
+
             العودة إلى قائمة الشحنات
         </a>
     </section>

@@ -2,7 +2,7 @@
     <section class="relative mt-5 flex flex-col items-start">
         <x-title :title="'تفاصيل أمر الصرف'"></x-title>
         
-        <div class="w-full mt-5 bg-white p-6 rounded-lg shadow-md">
+        <div class="w-full mt-5  p-6 rounded-lg shadow-md">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-xl font-bold">أمر صرف رقم: {{ $salesOrder->order_number }}</h2>
                 <div class="flex space-x-2 space-x-reverse">
@@ -13,7 +13,7 @@
                     @if($salesOrder->status === 'pending')
                         <form action="{{ route('sales-orders.approve', $salesOrder->id) }}" method="POST" class="inline">
                             @csrf
-                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700">
+                            <button type="submit" class="bg-green-600 text-gray-600 px-4 py-2 rounded-md hover:bg-green-700">
                                 <i class="fas fa-check ml-1"></i> اعتماد
                             </button>
                         </form>
@@ -25,20 +25,20 @@
                         </a>
                     @endif
                     
-                    <a href="{{ route('sales-orders.print', $salesOrder->id) }}" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700" target="_blank">
+                    <a href="{{ route('sales-orders.print', $salesOrder->id) }}" class="bg-green-200 text-gray-600 px-4 py-2 rounded-md hover:bg-green-700" target="_blank">
                         <i class="fas fa-print ml-1"></i> طباعة
                     </a>
                     
-                    <a href="{{ route('sales-orders.edit', $salesOrder->id) }}" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">
+                    {{-- <a href="{{ route('sales-orders.edit', $salesOrder->id) }}" class="bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700">
                         <i class="fas fa-edit ml-1"></i> تعديل
-                    </a>
+                    </a> --}}
                 </div>
             </div>
             
-            <div class="grid grid-cols-2 gap-6 mb-6">
-                <div class="bg-gray-50 p-4 rounded-md">
+            <div class="grid grid-cols-2 gap-6 mb-6 rounded-md border border-gray-300">
+                <div class=" p-4 rounded-md ">
                     <h3 class="text-lg font-semibold mb-3">معلومات أمر الصرف</h3>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4 ">
                         <div>
                             <p class="font-semibold">رقم أمر الصرف: <span class="font-normal">{{ $salesOrder->order_number }}</span></p>
                             <p class="font-semibold">رقم الطلب الأصلي: <span class="font-normal">{{ $salesOrder->order_id }}</span></p>
@@ -64,7 +64,7 @@
                     </div>
                 </div>
                 
-                <div class="bg-gray-50 p-4 rounded-md">
+                <div class="b p-4 rounded-md">
                     <h3 class="text-lg font-semibold mb-3">معلومات العميل</h3>
                     <div>
                         <p class="font-semibold">اسم العميل: <span class="font-normal">{{ $salesOrder->partner->name ?? 'غير محدد' }}</span></p>
@@ -85,28 +85,28 @@
             <div class="mt-6">
                 <h3 class="text-lg font-semibold mb-3">تفاصيل الطلب</h3>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full bg-white border border-gray-300">
-                        <thead>
-                            <tr class="bg-gray-100">
-                                <th class="py-2 px-4 border-b">#</th>
-                                <th class="py-2 px-4 border-b">المنتج</th>
-                                <th class="py-2 px-4 border-b">الوحدة</th>
-                                <th class="py-2 px-4 border-b">الكمية</th>
-                                <th class="py-2 px-4 border-b">السعر</th>
-                                <th class="py-2 px-4 border-b">الإجمالي</th>
+                    <table class="min-w-full w-full text-sm text-right text-gray-500 dark:text-gray-400">
+                        <thead class="text-xs text-gray-700 uppercase bg-gray-400 dark:bg-gray-700 dark:text-gray-400">
+                            <tr>
+                                <th class="py-2 px-4 ">#</th>
+                                <th class="py-2 px-4 ">المنتج</th>
+                                <th class="py-2 px-4 ">الوحدة</th>
+                                <th class="py-2 px-4 ">الكمية</th>
+                                <th class="py-2 px-4 ">السعر</th>
+                                <th class="py-2 px-4 ">الإجمالي</th>
                             </tr>
                         </thead>
                         <tbody>
                             @php $total = 0; @endphp
                             @foreach($salesOrder->order->order_details as $index => $detail)
                                 @php $subtotal = $detail->quantity * $detail->price; $total += $subtotal; @endphp
-                                <tr>
-                                    <td class="py-2 px-4 border-b text-center">{{ $index + 1 }}</td>
-                                    <td class="py-2 px-4 border-b">{{ $detail->product->name ?? 'غير محدد' }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ $detail->unit->name ?? 'غير محدد' }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ $detail->quantity }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ number_format($detail->price, 2) }}</td>
-                                    <td class="py-2 px-4 border-b text-center">{{ number_format($subtotal, 2) }}</td>
+                                <tr  class="item-row bg-gray-200 border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600">
+                                    <td class="py-2 px-4  text-center">{{ $index + 1 }}</td>
+                                    <td class="py-2 px-4 ">{{ $detail->product->name ?? 'غير محدد' }}-{{ $detail->product->barcode ?? 'غير محدد' }}-{{ $detail->product->sku ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4  text-center">{{ $detail->unit->name ?? 'غير محدد' }}</td>
+                                    <td class="py-2 px-4  text-center">{{ $detail->quantity }}</td>
+                                    <td class="py-2 px-4  text-center">{{ number_format($detail->price, 2) }}</td>
+                                    <td class="py-2 px-4  text-center">{{ number_format($subtotal, 2) }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

@@ -26,7 +26,8 @@
                 <th class="px-6 py-3">رقم الرف الفرعي</th>
                 <th class="px-6 py-3">الموقع على الرف</th>
                 <th class="px-6 py-3">الباركود</th>
-                <th class="px-6 py-3">حالة الشغل</th>
+                <th class="px-6 py-3">كود التخزين</th>
+                <th class="px-6 py-3">الحالة</th>
                 <th class="px-6 py-3">تاريخ الإضافة</th>
                 <th class="px-6 py-3">تاريخ آخر تحديث</th>
                 <th class="px-6 py-3">الملاحظات</th>
@@ -46,6 +47,7 @@
                     <td class="px-6 py-4">{{ $location->shelf }}</td>
                     <td class="px-6 py-4">{{ $location->position }}</td>
                     <td class="px-6 py-4">{{ $location->barcode }}</td>
+                    <td class="px-6 py-4">{{ $location->rack_code }}</td>
                     <td class="px-6 py-4">
                         @if ($location->is_occupied)
                             مشغول

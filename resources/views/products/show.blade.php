@@ -62,10 +62,10 @@
 
                             <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الشراء:</strong>
                                 {{ $product->purchase_date ?? 'غير متوفر' }}</p>
-                            <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الإنتاج:</strong>
+                            {{-- <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الإنتاج:</strong>
                                 {{ $product->manufacturing_date ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>تاريخ الانتهاء:</strong>
-                                {{ $product->expiration_date ?? 'غير متوفر' }}</p>
+                                {{ $product->expiration_date ?? 'غير متوفر' }}</p> --}}
                             <p class="text-gray-700 dark:text-gray-300"><strong>آخر تحديث:</strong>
                                 {{ $product->updated_at ?? 'غير متوفر' }}</p>
                             <p class="text-gray-700 dark:text-gray-300"><strong>الملاحظات :</strong>

@@ -98,25 +98,25 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
- // إظهار/إخفاء الإشعارات عند الضغط على زر الإشعارات
- document.getElementById("notificationsLink").addEventListener("click", function(event) {
-    event.preventDefault();  // منع الانتقال إلى الرابط
-    const notificationsDropdown = document.getElementById("notificationsDropdown");
+//  // إظهار/إخفاء الإشعارات عند الضغط على زر الإشعارات
+//  document.getElementById("notificationsLink").addEventListener("click", function(event) {
+//     event.preventDefault();  // منع الانتقال إلى الرابط
+//     const notificationsDropdown = document.getElementById("notificationsDropdown");
     
-    // التبديل بين إظهار وإخفاء القائمة المنسدلة
-    notificationsDropdown.classList.toggle("hidden");
-  });
+//     // التبديل بين إظهار وإخفاء القائمة المنسدلة
+//     notificationsDropdown.classList.toggle("hidden");
+//   });
   
-  // إخفاء القائمة عند الضغط في أي مكان آخر
-  document.addEventListener("click", function(event) {
-    const notificationsDropdown = document.getElementById("notificationsDropdown");
-    const notificationsLink = document.getElementById("notificationsLink");
+//   // إخفاء القائمة عند الضغط في أي مكان آخر
+//   document.addEventListener("click", function(event) {
+//     const notificationsDropdown = document.getElementById("notificationsDropdown");
+//     const notificationsLink = document.getElementById("notificationsLink");
     
-    // إذا تم الضغط خارج الرابط أو القائمة، قم بإخفائها
-    if (!notificationsLink.contains(event.target) && !notificationsDropdown.contains(event.target)) {
-      notificationsDropdown.classList.add("hidden");
-    }
-  });
+//     // إذا تم الضغط خارج الرابط أو القائمة، قم بإخفائها
+//     if (!notificationsLink.contains(event.target) && !notificationsDropdown.contains(event.target)) {
+//       notificationsDropdown.classList.add("hidden");
+//     }
+//   });
   
   // توجيه القائمة المنسدلة عند النقر عليها في الهاتف المحمول
   document.querySelectorAll('li.relative > a').forEach(item => {

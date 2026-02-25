@@ -2,10 +2,11 @@
     <div class="container">
         <x-title :title="'إعدادات النظام'"></x-title>
         <p class="mt-1 text-sm/6 text-gray-600 dark:text-gray-400">
-            تتيح لك إعدادات النظام التحكم الكامل في الوظائف الأساسية، يرجى ضبط الإعدادات وفقًا لاحتياجات العمل لضمان تجربة مثالية للمستخدمين.
+            تتيح لك إعدادات النظام التحكم الكامل في الوظائف الأساسية، يرجى ضبط الإعدادات وفقًا لاحتياجات العمل لضمان
+            تجربة مثالية للمستخدمين.
         </p>
 
-        @if(session('success'))
+        @if (session('success'))
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
@@ -14,26 +15,22 @@
             @method('POST')
             <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-6 min-h-full">
 
-                <x-file-input 
-                    type="date" 
-                    id="system_start_date" 
-                    name="system_start_date" 
-                    :label="'تاريخ بداية تشغيل النظام'" 
-                    :value="old('system_start_date', $settings->where('key', 'system_start_date')->first()->value ?? '')" 
-                    class="flex items-center space-x-2"
-                    required 
-                />
+                <x-file-input type="date" id="system_start_date" name="system_start_date" :label="'تاريخ بداية تشغيل النظام'"
+                    :value="old(
+                        'system_start_date',
+                        $settings->where('key', 'system_start_date')->first()->value ?? '',
+                    )" class="flex items-center space-x-2" required />
+                <x-select-dropdown id="accept_products_expiry" name="accept_products_expiry" :label="'هل يقبل منتجات منتهية الصلاحية؟'"
+                    :selected="old(
+                        'accept_products_expiry',
+                        $settings->where('key', 'accept_products_expiry')->first()->value ?? '',
+                    )" :options="[
+                        '1' => 'نعم',
+                        '0' => 'لا',
+                    ]" required />
 
-                <x-file-input 
-                    type="number" 
-                    id="inventory_transaction_min_date" 
-                    name="inventory_transaction_min_date" 
-                    :label="'أقل تاريخ مسموح للحركات المخزنية (بالأيام)'" 
-                    :value="old('inventory_transaction_min_date', $settings->where('key', 'inventory_transaction_min_date')->first()->value ?? '')" 
-                    class="flex items-center space-x-2"
-                    required 
-                />
 
+                {{-- 
                 <x-file-input 
                     type="date" 
                     id="fiscal_year_end_date" 
@@ -52,18 +49,14 @@
                     :value="old('daily_transaction_limit', $settings->where('key', 'daily_transaction_limit')->first()->value ?? '')" 
                     class="flex items-center space-x-2"
                     required 
-                />
+                /> --}}
 
-                <x-file-input 
-                    type="number" 
-                    id="minimum_items_per_transaction" 
-                    name="minimum_items_per_transaction" 
-                    :label="'الحد الأدنى للمنتجات في الحركة'" 
-                    :value="old('minimum_items_per_transaction', $settings->where('key', 'minimum_items_per_transaction')->first()->value ?? '')" 
-                    class="flex items-center space-x-2"
-                    required 
-                />
-
+                <x-file-input type="number" id="minimum_items_per_transaction" name="minimum_items_per_transaction"
+                    :label="'الحد الأدنى للمنتجات في الحركة'" :value="old(
+                        'minimum_items_per_transaction',
+                        $settings->where('key', 'minimum_items_per_transaction')->first()->value ?? '',
+                    )" class="flex items-center space-x-2" required />
+                {{-- 
                 <x-file-input 
                     type="number" 
                     id="max_quantity_per_product" 
@@ -72,19 +65,12 @@
                     :value="old('max_quantity_per_product', $settings->where('key', 'max_quantity_per_product')->first()->value ?? '')" 
                     class="flex items-center space-x-2"
                     required 
-                />
+                /> --}}
 
-                <x-file-input 
-                    type="text" 
-                    id="currency" 
-                    name="currency" 
-                    :label="'العملة'" 
-                    :value="old('currency', $settings->where('key', 'currency')->first()->value ?? '')" 
-                    class="flex items-center space-x-2"
-                    required 
-                />
+                <x-file-input type="text" id="currency" name="currency" :label="'العملة'" :value="old('currency', $settings->where('key', 'currency')->first()->value ?? '')"
+                    class="flex items-center space-x-2" required />
 
-                <x-file-input 
+                {{-- <x-file-input 
                     type="number" 
                     id="tax_rate" 
                     name="tax_rate" 
@@ -101,9 +87,9 @@
                     :options="['true' => 'نعم', 'false' => 'لا']" 
                     :selected="old('is_test_mode', $settings->where('key', 'is_test_mode')->first()->value ?? '')"
                     class="flex items-center space-x-2"
-                />
+                /> --}}
 
-                <x-file-input 
+                {{-- <x-file-input 
                     type="number" 
                     id="max_file_size" 
                     name="max_file_size" 
@@ -111,16 +97,12 @@
                     :value="old('max_file_size', $settings->where('key', 'max_file_size')->first()->value ?? '')" 
                     class="flex items-center space-x-2"
                     required 
-                />
-                <x-file-input 
-                type="number" 
-                id="expiration_threshold_days" 
-                name="expiration_threshold_days" 
-                :label="'عدد الأيام لتحديد انتهاء الصلاحية'" 
-                :value="old('expiration_threshold_days', $settings->where('key', 'expiration_threshold_days')->first()->value ?? 0)" 
-                class="flex items-center space-x-2"
-                required 
-            />
+                /> --}}
+                <x-file-input type="number" id="expiration_threshold_days" name="expiration_threshold_days"
+                    :label="'عدد الأيام لتحديد انتهاء الصلاحية'" :value="old(
+                        'expiration_threshold_days',
+                        $settings->where('key', 'expiration_threshold_days')->first()->value ?? 0,
+                    )" class="flex items-center space-x-2" required />
                 <div class="sm:col-span-2 flex justify-end">
                     <x-button type="submit">حفظ</x-button>
                 </div>

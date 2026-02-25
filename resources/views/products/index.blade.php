@@ -25,8 +25,8 @@
                                 <th class="px-6 py-3"> كود التخزين SKU</th>
                                 <th class="px-6 py-3" > الباركود</th>
                                 <th class="px-6 py-3">الفئة</th>
-                                <th class="px-6 py-3">المورد</th>                               
-                                <th class="px-6 py-3">كمية بداية المده</th>
+                                {{-- <th class="px-6 py-3">المورد</th>                                --}}
+                                <th class="px-6 py-3">كمية بداية المدة</th>
                                 <th class="px-6 py-3">الحالة</th>
                                 <th class="px-6 py-3">الحد الأدنى للطلب</th>
                                 <th class="px-6 py-3">الحد الأعلى للطلب</th>        
@@ -45,7 +45,7 @@
                                     <td class="px-6 py-4 "> {{ $product->sku }}</td>
                                     <td class="px-6 py-4 "> {{ $product->barcode }}</td>
                                     <td class="px-6 py-4">{{ $product->category->name }}</td>
-                                    <td class="px-6 py-4">{{ optional($product->supplier)->name ?? 'غير متوفر' }}</td>
+                                    {{-- <td class="px-6 py-4">{{ optional($product->supplier)->name ?? 'غير متوفر' }}</td> --}}
                                     {{-- <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">
                                         ${{ number_format($product->purchase_price, 2) }}</td>
                                     <td class="px-6 py-4 font-semibold text-gray-900 dark:text-white">

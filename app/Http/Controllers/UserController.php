@@ -17,17 +17,21 @@ class UserController extends Controller
     {
         try {
             $search = $request->input('search'); // الحصول على نص البحث
-
-            $users = User::when($search, function ($query, $search) {
-                return $query->where('name', 'like', "%{$search}%")
-                    ->orWhere('email', 'like', "%{$search}%");
-            })->paginate(7); // جلب 7 مستخدمين في كل صفحة
-
+    
+            // جلب المستخدمين مع الأدوار المرتبطة بهم
+            $users = User::with('roles')
+                ->when($search, function ($query, $search) {
+                    return $query->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%");
+                })
+                ->paginate(7); // جلب 7 مستخدمين في كل صفحة
+    
             return view('users.index', compact('users'));
         } catch (\Exception $e) {
             return redirect()->route('users.index')->with('error', 'حدث خطأ أثناء عرض المستخدمين: ' . $e->getMessage());
         }
     }
+    
 
 
 

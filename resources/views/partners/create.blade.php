@@ -26,7 +26,9 @@
                                 <label for="type"
                                     class="text-sm font-medium text-gray-600 dark:text-gray-400">الفرع</label>
                                 <select name="type" id="type"
-                                    class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1"
+                                    class="w-full bg-gray-100 rounded border border-b dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200
+                                     hover:bg-gray-300 dark:hover:bg-gray-600 text-gray-700 py-1 px-3 leading-8 transition-colors duration-200 ease-in-out
+                                      dark:focus:bg-gray-700 focus:outline-blue-500 dark:focus:text-gray-200 mt-1"
                                     required>
                                     <option value="">اختر نوع الشريك</option>
                                     @foreach ($partnerTypes as $type)
@@ -82,7 +84,8 @@
 
                         <div class="flex items-center space-x-2">
                             <input id="partner-is_active" name="is_active" type="checkbox" value="1"
-                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-900  dark:border-gray-700 focus:border-indigo-500 focus:outline-none">
+                                class="w-4 h-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-gray-900  dark:border-gray-700
+                                 focus:border-indigo-500 focus:outline-none">
 
                             <label for="partner-is_active" class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                 فعال
